@@ -1,0 +1,77 @@
+.hiring-container{
+display:flex;
+max-width:1200px;
+margin:auto;
+padding:40px;
+}
+
+.hiring-left{
+flex:1;
+}
+
+.hiring-right{
+flex:1;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.subtitle{
+color:#666;
+margin-bottom:20px;
+}
+
+form{
+display:flex;
+flex-direction:column;
+gap:14px;
+}
+
+select,input{
+padding:10px;
+border:1px solid #ddd;
+border-radius:6px;
+}
+
+.row{
+display:flex;
+gap:12px;
+}
+
+.quantity-box{
+display:flex;
+align-items:center;
+border:1px solid #ddd;
+border-radius:6px;
+}
+
+.quantity-box button{
+padding:6px 10px;
+border:none;
+background:#eee;
+cursor:pointer;
+}
+
+.quantity-box span{
+padding:0 14px;
+}
+
+.radio-group{
+display:flex;
+gap:20px;
+}
+
+.submit-btn{
+margin-top:20px;
+padding:12px;
+background:#00b14f;
+color:white;
+border:none;
+border-radius:6px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.submit-btn:hover{
+background:#009e45;
+}

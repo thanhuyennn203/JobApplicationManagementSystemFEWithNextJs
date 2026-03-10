@@ -1,0 +1,72 @@
+.job-card{
+  display:flex;
+  gap:20px;
+  padding:18px;
+  border-radius:12px;
+  border:1px solid #eee;
+  margin-bottom:20px;
+  background:white;
+}
+
+.company-logo{
+  width:70px;
+  height:70px;
+  object-fit:contain;
+  border:1px solid #eee;
+  border-radius:10px;
+}
+
+.job-info{
+  flex:1;
+}
+
+.job-top{
+  display:flex;
+  justify-content:space-between;
+}
+
+.salary{
+  color:#00b14f;
+  font-weight:600;
+}
+
+.company{
+  color:#666;
+  margin:6px 0;
+}
+
+.tags{
+  display:flex;
+  gap:10px;
+  margin:10px 0;
+}
+
+.tag{
+  background:#f3f3f3;
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:13px;
+}
+
+.job-bottom{
+  display:flex;
+  justify-content:space-between;
+  color:#777;
+  font-size:14px;
+}
+
+.right{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.heart{
+  border:1px solid #00b14f;
+  background:white;
+  color:#00b14f;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  cursor:pointer;
+}

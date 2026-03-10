@@ -1,0 +1,18 @@
+.saved-page{
+  display:flex;
+  gap:30px;
+  padding:30px;
+}
+
+.left{
+  flex:3;
+}
+
+.right{
+  flex:1;
+}
+
+.banner{
+  width:100%;
+  border-radius:12px;
+}

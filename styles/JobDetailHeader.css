@@ -1,0 +1,89 @@
+.job-apply-card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.job-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.job-meta-row {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 12px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+}
+
+.meta-item .icon {
+  align-items: center;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 40px;
+  justify-content: center;
+  padding: 10px;
+  width: 40px;
+  background: #00b14f;
+}
+
+.meta-item .label {
+  display: block;
+  color: #666;
+  font-size: 14px;
+}
+
+.meta-item .value {
+  font-weight: 600;
+}
+
+.job-deadline {
+  margin: 16px 0 20px;
+  color: #444;
+}
+
+.job-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.apply-btn {
+  flex: 1;
+  background: #00b14f;
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.apply-btn i {
+  margin-right: 8px;
+}
+
+.save-btn {
+  border: 1px solid #00b14f;
+  background: #fff;
+  color: #00b14f;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-btn i {
+  margin-right: 6px;
+}
