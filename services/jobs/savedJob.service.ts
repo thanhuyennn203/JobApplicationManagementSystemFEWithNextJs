@@ -1,18 +1,7 @@
-export interface SavedJob {
-  jobId: number
-  title: string
-  company: string
-  logo: string
-  salary: string
-  locations: string[]
-  experience: string
-  savedDate: string
-  updatedAt: string
-}
-
+import { Job } from "@/types/jobs";
 const API_URL = "http://localhost:9191/api/candidates"
 
-export const getSavedJobs = async (candidateId: number): Promise<SavedJob[]> => {
+export const getSavedJobs = async (candidateId: number): Promise<Job[]> => {
 
   const token = localStorage.getItem("token")
 

@@ -19,6 +19,7 @@ export interface Job {
   dueDate: Date;
   experienceRequired: string;
   posted_date: Date;
+  savedAt: Date;
 }
 
 export interface JobDetail {

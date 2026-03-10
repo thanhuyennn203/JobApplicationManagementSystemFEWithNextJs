@@ -1,67 +1,116 @@
 "use client";
 
 import "@/styles/SavedJobCard.css";
-import { SavedJob } from "@/services/jobs/savedJob.service";
-
+import { Job } from "@/types/jobs";
+import "@/styles/JobCard.css";
+import { useState, useEffect } from "react";
+import {
+  checkSavedJob,
+  saveJob,
+  removeSavedJob,
+} from "@/services/candidate/savedJob.service";
+import { useAuth } from "@/context/AuthContext";
 interface Props {
-  job: SavedJob;
+  job: Job;
 }
 
 export default function SavedJobCard({ job }: Props) {
+  const locations = job.locations ?? [];
+  const firstLocation = locations[0];
+  const remainingCount = locations.length - 1;
+  const auth = useAuth();
+  const [saved, setSaved] = useState(false);
+  const candidateId = auth?.user?.candidateId;
+  // console.log("candidateId: ", candidateId);
 
-  const logo = job?.logo || "/default-company-logo.png";
-  const title = job?.title || "Untitled Job";
-  const company = job?.company || "Unknown Company";
-  const salary = job?.salary || "Thỏa thuận";
-  const locations = job?.locations ?? [];
-  const experience = job?.experience || "Không yêu cầu";
-  const savedDate = job?.savedDate || "N/A";
-  const updatedAt = job?.updatedAt || "N/A";
-  console.log(job);
+  useEffect(() => {
+    const detectSaved = async () => {
+      if (!candidateId) return;
+
+      try {
+        const result = await checkSavedJob(candidateId, job.id);
+        setSaved(result);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    detectSaved();
+  }, [candidateId, job.id]);
+
+  const handleSave = async (e: React.MouseEvent) => {
+    e.preventDefault(); // stop link navigation
+
+    if (!candidateId) {
+      alert("You must login as candidate");
+      return;
+    }
+
+    try {
+      if (saved) {
+        await removeSavedJob(candidateId, job.id);
+      } else {
+        await saveJob(candidateId, job.id);
+      }
+
+      setSaved(!saved);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
-    <div className="job-card">
+    <div>
+      <div className="job-card">
+        <div className="job-card__header">
+          <img
+            src={job.logo}
+            className="job-card__logo"
+            alt={job.company_name}
+          />
 
-      <img
-        src={logo}
-        className="company-logo"
-        alt="company logo"
-      />
+          <div className="job-card__info">
+            <h3 className="job-card__title">{job.title}</h3>
+            <p className="job-card__company">{job.company_name}</p>
 
-      <div className="job-info">
+            <span className="salary">
+              <i className="fa-solid fa-dollar-sign" style={{ marginRight: "5px" }}></i>
+              {job.salary_min && job.salary_max
+                ? `${job.salary_min} - ${job.salary_max}`
+                : "Negotiable"}
+             </span>
 
-        <div className="job-top">
-          <h3>{title}</h3>
-          <span className="salary">
-            <i className="fa-solid fa-dollar-sign" style={{ marginRight: "5px" }}></i>
-            {salary}
-          </span>
+          </div>
         </div>
 
-        <p className="company">{company}</p>
-
-        <div className="tags">
-          {locations.length > 0 ? (
-            locations.map((loc, index) => (
-              <span key={index} className="tag">
-                {loc}
-              </span>
-            ))
-          ) : (
-            <span className="tag">Không rõ địa điểm</span>
+        <div className="job-card__footer">
+          {firstLocation && (
+            <span className="job-card__badge">
+              {firstLocation.province}
+              {remainingCount > 0 && ` +${remainingCount}`}
+            </span>
           )}
 
-          <span className="tag">{experience}</span>
+          <span className="job-card__badge">
+            {job?.experienceRequired ? job.experienceRequired : "Not Required"}
+          </span>
+
         </div>
 
-        <div className="job-bottom">
-          <span>Đã lưu: {savedDate}</span>
+        <div>
+          <p>Saved at:  {new Date(job.savedAt).toLocaleDateString("vi-VN", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}</p>
+        </div>
+        <div
+          className="job-card__heart"
+          onClick={(e) => e.preventDefault()} // prevent navigation
+        >
+          <button onClick={handleSave}>
+            <i className={saved ? "fa-solid fa-heart" : "fa-regular fa-heart"}></i>
+          </button>
 
-          <div className="right">
-            <span>Cập nhật {updatedAt}</span>
-            <button className="heart">
-              <i className="fa-solid fa-heart"></i>
-            </button>
-          </div>
         </div>
 
       </div>
