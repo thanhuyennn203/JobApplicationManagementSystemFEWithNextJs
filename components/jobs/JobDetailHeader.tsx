@@ -8,27 +8,41 @@ import {
   saveJob,
   removeSavedJob,
 } from "@/services/candidate/savedJob.service";
+import { useAuth } from "@/context/AuthContext";
 
 interface Props {
   data: {
-    jobId: string;
+    jobId: number;
     title: string;
     income: string;
     locations: string[];
     experience: string;
-    due_date: string;
+    due_date: Date;
   };
 }
 
 export default function JobDetailHeader({ data }: Props) {
-  const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const auth = useAuth();
+  const [saved, setSaved] = useState(false);
+  const candidateId = auth?.user?.candidateId;
+  // console.log("candidateId: ", candidateId);
 
-  const candidateId =
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("candidateId") || "null")
-      : null;
+  useEffect(() => {
+    const detectSaved = async () => {
+      if (!candidateId) return;
+
+      try {
+        const result = await checkSavedJob(candidateId, data.jobId);
+        setSaved(result);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    detectSaved();
+  }, [candidateId, data.jobId]);
 
   const daysLeft = Math.max(
     Math.ceil(
@@ -37,21 +51,6 @@ export default function JobDetailHeader({ data }: Props) {
     ),
     0
   );
-
-  useEffect(() => {
-    const checkSaved = async () => {
-      if (!candidateId) return;
-
-      try {
-        const result = await checkSavedJob(candidateId, data.jobId);
-        setSaved(result);
-      } catch (err) {
-        console.error("Check saved job failed", err);
-      }
-    };
-
-    checkSaved();
-  }, [candidateId, data.jobId]);
 
   const handleSaveJob = async () => {
     if (!candidateId) {
@@ -84,29 +83,50 @@ export default function JobDetailHeader({ data }: Props) {
       <h1 className="job-title">{data.title}</h1>
 
       <div className="job-meta-row">
-        <MetaItem icon="fa-dollar-sign" label="Thu nhập" value={data.income} />
+        <MetaItem icon="fa-dollar-sign" label="Income" value={data.income} />
 
         <MetaItem
           icon="fa-location-dot"
-          label="Địa điểm"
-          value={data.locations.join(", ")}
+          label="Location"
+          value={
+            data.locations.length > 2
+              ? `${data.locations.slice(0, 2).join(", ")}...`
+              : data.locations.join(", ")
+          }
         />
 
         <MetaItem
           icon="fa-hourglass-half"
-          label="Kinh nghiệm"
+          label="Experience"
           value={data.experience}
         />
       </div>
+
+      <p><strong>Due date:</strong>{" "}
+        {new Date(data.due_date).toLocaleDateString("vi-VN", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}
+
+        {daysLeft > 0 ? (
+          <span style={{ color: daysLeft <= 3 ? "red" : "green", paddingLeft: "5px", }}>
+            ({daysLeft} days left)
+          </span>
+        ) : (
+          <span style={{ color: "red", paddingLeft: "5px", }}>(Expired)</span>
+        )}
+      </p>
+
       <div className="job-actions">
         <button className="apply-btn">
           <i className="fa-solid fa-paper-plane" />
-          Ứng tuyển ngay
+          Apply Now
         </button>
 
         <button className="save-btn" onClick={handleSaveJob} disabled={loading}>
           <i className={saved ? "fa-solid fa-heart" : "fa-regular fa-heart"} />
-          {saved ? "Đã lưu" : "Lưu tin"}
+          {saved ? "Saved" : "Save"}
         </button>
       </div>
     </div>

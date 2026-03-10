@@ -17,6 +17,7 @@ interface Props {
 }
 
 export default function JobCard({ job }: Props) {
+  // console.log(job);
   const pathname = usePathname();
   const locations = job.locations ?? [];
   const firstLocation = locations[0];

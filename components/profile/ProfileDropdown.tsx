@@ -3,12 +3,14 @@ import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import "@/styles/ProfileDropdown.css";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ProfileDropdown() {
   const [open, setOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const auth = useAuth();
 
   // close dropdown when click outside
   useEffect(() => {
@@ -50,9 +52,9 @@ export default function ProfileDropdown() {
           <div className="profile-header">
             <img src="/avatar.png" className="avatar-large" />
             <div>
-              <p className="name">Huyền Nguyễn Thị Thanh</p>
+              <p className="name">{auth?.user?.email}</p>
               <p className="verify">Tài khoản đã xác thực</p>
-              <p className="email">thanhhuyenbb4683@gmail.com</p>
+              <p className="email">{auth?.user?.email}</p>
             </div>
           </div>
 

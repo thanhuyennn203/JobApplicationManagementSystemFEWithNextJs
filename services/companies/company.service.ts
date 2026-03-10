@@ -1,4 +1,4 @@
-export const getCompanyById = async (id: string) => {
+export const getCompanyById = async (id: number) => {
   const res = await fetch(
     `http://localhost:9191/api/companies/${id}`,
     { cache: "no-store" }

@@ -1,5 +1,4 @@
-import { getJobById } from "@/services/jobs/job.servce";
-import { getJobDetailById } from "@/services/jobs/jobDetail.service";
+import { getJobById, getJobDetailById } from "@/services/jobs/jobs.service";
 import JobRequirement from "@/components/jobs/JobRequirement";
 import JobDetailHeader from "@/components/jobs/JobDetailHeader";
 import "@/styles/JobDetail.css";
@@ -10,24 +9,23 @@ import JobGeneralInformation from "@/components/jobs/JobGeneralInformation";
 
 interface Props {
   params: {
-    id: string;
+    id: number;
   };
 }
 
 export default async function JobDetailPage({ params }: Props) {
   const { id: jobId } = await params;
-  // console.log("job id: ",jobId);
-  // fetch data in parallel (faster)
+
   const [job, jobDetail] = await Promise.all([
     getJobById(jobId),
     getJobDetailById(jobId),
   ]);
 
+  // console.log("job: ",job);
+  // console.log("job detail: ", jobDetail);
   const company = await getCompanyById(job?.company_id);
   const generalInfo = await getGeneralInformationByJobId(jobId);
-  // console.log("company id: ",company_id);
-  // console.log(company);
-  // console.log(jobDetail);
+
   if (!jobDetail) {
     return (
       <div className="job-detail__wrapper">
@@ -46,53 +44,60 @@ export default async function JobDetailPage({ params }: Props) {
             data={{
               jobId,
               title: job.title,
-              income: jobDetail.income || "Thoả thuận",
+              income:
+                job.salary_min && job.salary_max
+                  ? `${job.salary_min} - ${job.salary_max}`
+                  : "Negotiable",
+
               locations: job.locations?.map((l: any) => l.province) ?? [],
               experience: job.experienceRequired
-                ? jobDetail.requirement.split("\n")[0]
-                : "Không yêu cầu",
-              due_date: jobDetail.due_date,
+                ? job.experienceRequired.split("\n")[0]
+                : "Not required",
+              due_date: job.dueDate,
             }} />
 
           {/* BODY */}
           <section className="job-detail-box__left">
-            <JobRequirement title="Mô tả công việc" content={jobDetail.description} />
-            <JobRequirement title="Yêu cầu ứng viên" content={jobDetail.requirement} />
-            <JobRequirement title="Quyền lợi" content={jobDetail.interest} />
-            <JobRequirement title="Phụ cấp" content={jobDetail.allowance} />
-            <JobRequirement title="Thu nhập" content={jobDetail.income} />
-            <JobRequirement title="Thời gian làm việc" content={jobDetail.working_time} />
-            <JobRequirement title="Địa điểm" content={jobDetail.working_location} />
-            <JobRequirement title="Cách ứng tuyển" content={jobDetail.apply_by} />
+            <JobRequirement title="Job Description" content={jobDetail.description || "Not specified"} />
+            <JobRequirement title="Candidate Requirements" content={jobDetail.requirement || "Not specified"} />
+            <JobRequirement title="Benefits" content={jobDetail.interest || "Not specified"} />
+            <JobRequirement title="Allowance" content={jobDetail.allowance || "Not specified"} />
+            <JobRequirement title="Income" content={jobDetail.income || "Negotiable"} />
+            <JobRequirement title="Working Time" content={jobDetail.working_time || "Not specified"} />
+
+            <ul >
+            <h3>Working Locations</h3>
+
+              {job?.locations?.map((loc) => (
+                <li key={loc.id}>
+                  - {loc.detailAddress}, {loc.ward}, {loc.province}
+                </li>
+              ))}
+            </ul>
+
+            <JobRequirement title="How to Apply" content={jobDetail.apply_by || "Not specified"} />
+
             <div className="job-section">
-              <h3>Hạn nộp hồ sơ: <span>{new Date(jobDetail.due_date).toLocaleDateString("vi-VN")}</span></h3>
+              <h3>
+                Application Deadline:{" "}
+                <span>
+                  {jobDetail.due_date
+                    ? new Date(jobDetail.due_date).toLocaleDateString("en-US")
+                    : "Not specified"}
+                </span>
+              </h3>
             </div>
 
             <div className="group-btn">
               <button className="apply-btn">
-                Ứng tuyển ngay
+                Apply Now
               </button>
 
               {/* <button className="save-btn">
-                Lưu tin
-              </button> */}
+      Save Job
+    </button> */}
             </div>
-            {/* <div className="job-info-grid">
-              <Info label="Thu nhập" value={jobDetail.income} />
-              <Info label="Thời gian làm việc" value={jobDetail.working_time} />
-              <Info label="Địa điểm" value={jobDetail.working_location} />
-              <Info label="Cách ứng tuyển" value={jobDetail.apply_by} />
-              <Info
-                label="Hạn nộp hồ sơ"
-                value={
-                  jobDetail.due_date
-                    ? new Date(jobDetail.due_date).toLocaleDateString("vi-VN")
-                    : undefined
-                }
-              />
-            </div> */}
           </section>
-
         </div>
         <div className="job-detail__body-right">
           <JobCompanyCard company={company} />
@@ -103,12 +108,3 @@ export default async function JobDetailPage({ params }: Props) {
   );
 }
 
-// function Info({ label, value }: { label: string; value?: string }) {
-//   if (!value) return null;
-//   return (
-//     <div className="job-info">
-//       <span className="label">{label}</span>
-//       <span className="value">{value}</span>
-//     </div>
-//   );
-// }

@@ -6,7 +6,7 @@ export interface GeneralInformation {
 }
 
 export async function getGeneralInformationByJobId(
-  jobId: string
+  jobId: number
 ): Promise<GeneralInformation | null> {
   try {
     const res = await fetch(

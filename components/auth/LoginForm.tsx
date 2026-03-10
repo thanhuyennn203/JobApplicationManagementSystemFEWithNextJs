@@ -42,7 +42,7 @@ export default function LoginForm() {
 
     try {
       const data = await login(email, password);
-      console.log("user: ", data);
+      // console.log("user: ", data);
       const roles = data.user?.roles || [];
 
       if (roles.includes("RECRUITER")) {

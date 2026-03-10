@@ -7,35 +7,38 @@ import { useAuth } from "@/context/AuthContext"
 
 export default function SavedJobsList() {
 
-    const auth = useAuth()
-    const candidateId = auth?.user?.candidateId
+    const auth = useAuth();
+    const candidateId = auth?.user?.candidateId;
 
-    const [jobs, setJobs] = useState<SavedJob[]>([])
+    const [jobs, setJobs] = useState<SavedJob[]>([]);
 
     useEffect(() => {
 
         const fetchJobs = async () => {
-            if (!candidateId) return
+            if (!candidateId) return;
 
-            const data = await getSavedJobs(Number(candidateId))
-            setJobs(data)
-
-            console.log("jobs saved:", data)
+            const data = await getSavedJobs(Number(candidateId));
+            setJobs(data);
+            
+            console.log("jobs saved:", data);
         }
 
-        fetchJobs()
+        fetchJobs();
 
-    }, [candidateId])   // ✅ important
+    }, [candidateId]);
 
     return (
-        <div>
+        <div className="saved_job_list_Wrapper">
             <h2>
                 Danh sách <span>{jobs.length}</span> việc làm đã lưu
             </h2>
 
-            {jobs.map(job => (
-                <SavedJobCard key={job.jobId} job={job} />
-            ))}
+            <div className="saved_jobs_list_grid">
+                {jobs.map(job => (
+                    <SavedJobCard key={job.jobId} job={job} />
+                ))}
+            </div>
+
         </div>
     )
 }

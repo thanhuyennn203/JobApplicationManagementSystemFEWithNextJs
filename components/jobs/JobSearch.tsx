@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import "@/styles/JobSearch.css";
 
 type Province = {
-  id: number;
+  code: string;
   name: string;
 };
 
@@ -107,7 +107,7 @@ export default function JobSearch() {
 
               {locations.map((loc) => (
                 <li
-                  key={loc.id}
+                  key={loc.code}
                   onClick={() => {
                     setSelectedLocation(loc);
                     setOpenLocation(false);
@@ -131,3 +131,4 @@ export default function JobSearch() {
     </div>
   );
 }
+

@@ -13,7 +13,7 @@ export default function SavedJobsPage() {
       <div className="right">
 
         <img
-          src="/images/cv-banner.png"
+          src="/no-spotlight-mau-cv.png"
           className="banner"
         />
 

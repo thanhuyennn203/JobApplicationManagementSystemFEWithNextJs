@@ -15,14 +15,23 @@ export interface Job {
   locations?: Location[];
   logo?: string;
   tags?: string[];
+  description?: string;
+  dueDate: Date;
+  experienceRequired: string;
+  posted_date: Date;
 }
 
-
 export interface JobDetail {
-  requirement: string;
-  income: string;
-  working_time: string;
-  working_location: string;
-  apply_by: string;
-  due_date: Date;
+  id: number;
+  job_id: number | null;
+  description: string | null;
+  requirement: string | null;
+  income: string | null;
+  interest: string | null;
+  allowance: string | null;
+  working_equipment: string | null;
+  working_location: string | null;
+  working_time: string | null;
+  apply_by: string | null;
+  due_date: string | null;
 }
