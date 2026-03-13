@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import "@/styles/JobDetailHeader.css";
+import "@/styles/candidate/JobDetailHeader.css";
 import {
   checkSavedJob,
   saveJob,

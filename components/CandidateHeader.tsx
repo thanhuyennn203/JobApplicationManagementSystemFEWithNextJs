@@ -1,16 +1,16 @@
 "use client";
 
-import "@/styles/Header.css";
+import "@/styles/candidate/Header.css";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ProfileDropdown from "./profile/ProfileDropdown";
 import { useAuth } from "@/context/AuthContext";
 
-export default function Header() {
+export default function CandidateHeader() {
   const router = useRouter();
   const auth = useAuth();
 
-  const role = auth?.user?.roles?.[0]; // get role from context
+  const role = auth?.user?.roles?.[0];
 
   return (
     <header className="header">
@@ -70,26 +70,12 @@ export default function Header() {
                 <span>Bạn là nhà tuyển dụng?</span>
                 <button
                   className="btn-link"
-                  onClick={() => router.push("/recruiter/register")}
+                  onClick={() => router.push("/landing")}
                 >
                   Đăng tuyển ngay »
                 </button>
               </div>
             </>
-          )}
-
-          {/* Recruiter */}
-          {role === "RECRUITER" && (
-            <>
-            <button
-              className="btn btn-primary"
-              onClick={() => router.push("/recruiter/hiring")}
-            >
-              Quản lý tuyển dụng
-            </button>
-            <ProfileDropdown />
-            </>
-            
           )}
 
           {/* Guest */}
@@ -123,4 +109,6 @@ export default function Header() {
     </header>
   );
 }
+
+
 

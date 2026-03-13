@@ -1,7 +1,7 @@
 import { getJobById, getJobDetailById } from "@/services/jobs/jobs.service";
 import JobRequirement from "@/components/jobs/JobRequirement";
 import JobDetailHeader from "@/components/jobs/JobDetailHeader";
-import "@/styles/JobDetail.css";
+import "@/styles/candidate/JobDetail.css";
 import JobCompanyCard from "@/components/jobs/JobCompanyCard";
 import { getCompanyById } from "@/services/companies/company.service";
 import { getGeneralInformationByJobId } from "@/services/jobs/jobGeneralInfor.service";

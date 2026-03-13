@@ -1,0 +1,82 @@
+.login-card {
+  width: 420px;
+  margin: auto;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+}
+
+.login-card h2 {
+  margin-bottom: 20px;
+}
+
+.input-wrapper {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 10px 35px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.icon {
+  position: absolute;
+  left: 10px;
+  top: 12px;
+  color: #888;
+}
+
+.toggle-icon {
+  position: absolute;
+  right: 10px;
+  top: 12px;
+  cursor: pointer;
+}
+
+.submit-btn {
+  width: 100%;
+  background: #00b14f;
+  border: none;
+  color: white;
+  padding: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background: #009944;
+}
+
+.google-btn {
+  width: 100%;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.divider {
+  text-align: center;
+  margin: 15px 0;
+  color: #777;
+}
+
+.error {
+  color: red;
+  margin-bottom: 10px;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.login-link span {
+  color: #00b14f;
+  cursor: pointer;
+}

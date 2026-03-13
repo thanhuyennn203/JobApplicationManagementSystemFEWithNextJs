@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import "@/styles/Register.css";
+import "@/styles/candidate/Register.css";
 import useAuth from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
@@ -63,12 +63,18 @@ export default function RegisterForm() {
     }
 
     try {
-      await register({ fullName, email, password });
+      const data = await register({ fullName, email, password });
 
-      clearForm();
-      console.log(localStorage.getItem("token"));
-      
-      router.push(`/login?email=${email}&password=${password}`);
+      // console.log("success: ", fullName);
+      if (!data.success) {
+        console.log("Register failed: ", data.message );
+      } else {
+        clearForm();
+
+        router.push(`/login?email=${email}&password=${password}`);
+
+      }
+
     } catch (err) {
       alert("Register failed");
     }

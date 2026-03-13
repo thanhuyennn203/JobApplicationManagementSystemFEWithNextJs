@@ -1,5 +1,5 @@
 
-import "@/styles/JobGeneralInformation.css";
+import "@/styles/candidate/JobGeneralInformation.css";
 import { GeneralInformation } from "@/services/jobs/jobGeneralInfor.service";
 
 interface Props {

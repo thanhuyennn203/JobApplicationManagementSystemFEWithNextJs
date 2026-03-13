@@ -1,4 +1,4 @@
-import RecruiterHeader from "@/components/RecruiterHeader";
+import LandingHeader from "@/components/LandingHeader";
 
 export default function RecruiterLayout({
   children,
@@ -7,7 +7,7 @@ export default function RecruiterLayout({
 }) {
   return (
     <>
-      <RecruiterHeader />
+      <LandingHeader />
       {children}
     </>
   );

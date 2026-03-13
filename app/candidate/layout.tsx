@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import CandidateHeader from "@/components/CandidateHeader";
 
 export default function CandidateLayout({
   children,
@@ -8,6 +8,8 @@ export default function CandidateLayout({
   return (
     <>
       {/* <Header /> */}
+          <CandidateHeader />
+
       {children}
     </>
   );

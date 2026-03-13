@@ -1,4 +1,3 @@
-import UserProfile from "./candidate/profile/page";
 
 export default function Home() {
   return (

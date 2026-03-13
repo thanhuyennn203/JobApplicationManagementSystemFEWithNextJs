@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import "@/styles/Register.css";
+import "@/styles/candidate/Register.css";
 import useAuth from "@/hooks/useAuth";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -46,7 +46,7 @@ export default function LoginForm() {
       const roles = data.user?.roles || [];
 
       if (roles.includes("RECRUITER")) {
-        router.push("/recruitment");
+        router.push("/recruiter");
       } else {
         router.push("/candidate/jobs");
       }
@@ -66,6 +66,7 @@ export default function LoginForm() {
           <div className="form-group">
             <label>Email</label>
             <div className="input-wrapper">
+            <i className="fa-solid fa-envelope icon" />
               <input
                 type="email"
                 placeholder="Nhập email"
@@ -78,11 +79,18 @@ export default function LoginForm() {
           <div className="form-group">
             <label>Mật khẩu</label>
             <div className="input-wrapper">
+              <i className="fa-solid fa-shield-halved icon" />
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Nhập mật khẩu"
+                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+              />
+              <i
+                className={`fa-solid ${showPassword ? "fa-eye" : "fa-eye-slash"
+                  } toggle`}
+                onClick={() => setShowPassword(!showPassword)}
               />
             </div>
           </div>

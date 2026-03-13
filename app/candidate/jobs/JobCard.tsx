@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Job } from "@/types/jobs";
-import "@/styles/JobCard.css";
+import "@/styles/candidate/JobCard.css";
 import { useState, useEffect } from "react";
 import {
   checkSavedJob,
@@ -62,6 +62,7 @@ export default function JobCard({ job }: Props) {
       console.error(error);
     }
   };
+  
   return (
     <Link href={`${pathname}/${job.id}`} className="job-card-link">
       <div className="job-card">

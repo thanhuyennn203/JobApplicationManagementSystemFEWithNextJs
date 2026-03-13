@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import "@/styles/HiringForm.css";
+import "@/styles/candidate/HiringForm.css";
 
 export default function HiringForm() {
 

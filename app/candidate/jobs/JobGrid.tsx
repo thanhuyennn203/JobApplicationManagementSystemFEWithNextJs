@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import JobCard from "./JobCard";
 import { fetchJobs } from "@/services/jobs/jobs.service";
 import { Job } from "@/types/jobs"; 
-import "@/styles/JobGrid.css";
+import "@/styles/candidate/JobGrid.css";
 
 export default function JobGrid() {
   const [jobs, setJobs] = useState<Job[]>([]);

@@ -1,12 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import "@/styles/JobSearch.css";
-
-type Province = {
-  code: string;
-  name: string;
-};
+import "@/styles/candidate/JobSearch.css";
+import { getProvinces, Province } from "@/services/locations/LocationService";
 
 export default function JobSearch() {
   const [keyword, setKeyword] = useState("");
@@ -14,16 +10,10 @@ export default function JobSearch() {
   const [openLocation, setOpenLocation] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<Province | null>(null);
 
-  // Fetch provinces from backend
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
-        const res = await fetch("http://localhost:9191/api/locations/provinces");
-         if (!res.ok) {
-      throw new Error("Failed to fetch locations");
-    }
-
-        const data = await res.json();
+        const data = await getProvinces();
         setLocations(data);
       } catch (err) {
         console.error("Error fetching provinces:", err);
@@ -33,7 +23,6 @@ export default function JobSearch() {
     fetchProvinces();
   }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const close = () => setOpenLocation(false);
     window.addEventListener("click", close);
@@ -45,16 +34,13 @@ export default function JobSearch() {
 
     const searchPayload = {
       keyword,
-      provinceId: selectedLocation?.id || null,
+      provinceId: selectedLocation?.code || null,
     };
 
     console.log("Search with:", searchPayload);
-
-    // Later you will call job search API here
-    // fetch("http://localhost:9191/api/jobs/search", { ... })
   };
 
-  return (
+   return (
     <div className="header-content_search">
       <form className="group-search" onSubmit={handleSubmit}>
         {/* Keyword search */}
@@ -131,4 +117,3 @@ export default function JobSearch() {
     </div>
   );
 }
-

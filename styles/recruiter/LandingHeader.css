@@ -1,0 +1,106 @@
+.header {
+  width: 100%;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.header__container {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.header__logo {
+  height: 40px;
+}
+
+/* Navigation */
+
+.header__nav {
+  display: flex;
+  gap: 28px;
+  margin-left: 40px;
+  flex: 1;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  color: #00b14f;
+}
+
+/* Right side */
+
+.header__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Language flag */
+
+.language img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Consultation */
+
+.consultation {
+  color: #00b14f;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Buttons */
+
+.btn-login {
+  border: 1px solid #00b14f;
+  background: white;
+  color: #00b14f;
+  padding: 7px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-login:hover {
+  background: #f0fff6;
+}
+
+.btn-post {
+  background: #00b14f;
+  border: none;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-post:hover {
+  background: #009944;
+}
+
+.consultation {
+  color: #00b14f;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.consultation i {
+  font-size: 16px;
+}

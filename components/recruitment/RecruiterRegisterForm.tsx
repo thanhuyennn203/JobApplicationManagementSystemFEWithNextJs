@@ -1,9 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { recruiterRegister } from "@/services/auth/recruiterRegister.service";
+import {
+  getProvinces,
+  getWardsByProvince,
+  Province,
+  Ward
+} from "@/services/locations/LocationService";
 import { useRouter } from "next/navigation";
-import "@/styles/RecruiterRegister.css";
+import "@/styles/recruiter/RecruiterRegister.css";
 
 export default function RecruitmentRegisterForm() {
 
@@ -11,20 +17,44 @@ export default function RecruitmentRegisterForm() {
 
   const [error, setError] = useState("");
 
+  const [provinces, setProvinces] = useState<Province[]>([]);
+  const [wards, setWards] = useState<Ward[]>([]);
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     confirmPassword: "",
     fullName: "",
-    gender: "male", 
+    gender: "male",
     phone: "",
-    company: "",
-    city: "",
+    name: "",
+    province: "",
     ward: "",
     agree: false
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  // Load provinces
+  useEffect(() => {
+
+    const fetchProvinces = async () => {
+      try {
+        const data = await getProvinces();
+        setProvinces(data);
+      } catch (err) {
+        console.error("Failed to fetch provinces", err);
+      }
+    };
+
+    fetchProvinces();
+
+  }, []);
+
+  const handleChange = async (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
 
     const { name, value, type } = e.target;
 
@@ -37,18 +67,37 @@ export default function RecruitmentRegisterForm() {
         [name]: checked
       }));
 
-    } else {
-
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-
+      return;
     }
 
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    // Load wards when province changes
+    if (name === "province" && value) {
+
+      try {
+
+        const wardsData = await getWardsByProvince(value);
+
+        setWards(wardsData);
+
+        setFormData(prev => ({
+          ...prev,
+          ward: ""
+        }));
+
+      } catch (err) {
+
+        console.error("Failed to fetch wards", err);
+
+      }
+    }
   };
 
-  // ✅ VALIDATION
+  // Validation
   const validateForm = () => {
 
     if (
@@ -56,10 +105,9 @@ export default function RecruitmentRegisterForm() {
       !formData.password ||
       !formData.confirmPassword ||
       !formData.fullName ||
-      !formData.gender ||
       !formData.phone ||
-      !formData.company ||
-      !formData.city ||
+      !formData.name ||
+      !formData.province ||
       !formData.ward
     ) {
       return "All fields are required";
@@ -89,29 +137,33 @@ export default function RecruitmentRegisterForm() {
 
     try {
 
-      await recruiterRegister({
+      const data = {
+        fullName: formData.fullName,
         email: formData.email,
         password: formData.password,
         recruiterInfo: {
-          fullName: formData.fullName,
           gender: formData.gender,
-          phone: formData.phone,
-          company: formData.company,
-          city: formData.city,
+          phone: formData.phone
+        },
+        companyInfor: {
+          name: formData.name,
+          province: formData.province,
           ward: formData.ward
         }
-      });
+      };
 
-      alert("Register successful");
+      const res = await recruiterRegister(data);
 
-      router.push("/login");
+      console.log(res);
+
+      // router.push("/login");
+      router.push(`/login?email=${formData.email}&password=${formData.password}`);
 
     } catch (err: any) {
 
       setError(err?.response?.data?.message || "Registration failed");
 
     }
-
   };
 
   return (
@@ -128,42 +180,77 @@ export default function RecruitmentRegisterForm() {
 
       <p className="divider">Or sign up using email</p>
 
+      {/* Email */}
       <label>Email *</label>
-      <input
-        name="email"
-        type="email"
-        placeholder="example@company.com"
-        onChange={handleChange}
-      />
 
-      <p className="note">
-        Employers should use a company email instead of a personal email.
-      </p>
+      <div className="input-wrapper">
+        <i className="fa-solid fa-envelope icon" />
 
+        <input
+          name="email"
+          type="email"
+          placeholder="example@company.com"
+          onChange={handleChange}
+        />
+      </div>
+
+      {/* Password */}
       <label>Password *</label>
-      <input
-        name="password"
-        type="password"
-        onChange={handleChange}
-      />
 
+      <div className="input-wrapper">
+
+        <i className="fa-solid fa-lock icon" />
+
+        <input
+          name="password"
+          type={showPassword ? "text" : "password"}
+          onChange={handleChange}
+        />
+
+        <i
+          className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"} toggle-icon`}
+          onClick={() => setShowPassword(!showPassword)}
+        />
+
+      </div>
+
+      {/* Confirm Password */}
       <label>Confirm Password *</label>
-      <input
-        name="confirmPassword"
-        type="password"
-        onChange={handleChange}
-      />
+
+      <div className="input-wrapper">
+
+        <i className="fa-solid fa-lock icon" />
+
+        <input
+          name="confirmPassword"
+          type={showConfirmPassword ? "text" : "password"}
+          onChange={handleChange}
+        />
+
+        <i
+          className={`fa-solid ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"} toggle-icon`}
+          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+        />
+
+      </div>
 
       <h2>Recruiter Information</h2>
 
+      {/* Full Name */}
       <label>Full Name *</label>
-      <input
-        name="fullName"
-        type="text"
-        placeholder="Your name"
-        onChange={handleChange}
-      />
 
+      <div className="input-wrapper">
+        <i className="fa-solid fa-user icon" />
+
+        <input
+          name="fullName"
+          type="text"
+          placeholder="Your name"
+          onChange={handleChange} required
+        />
+      </div>
+
+      {/* Gender */}
       <label>Gender *</label>
 
       <div className="radio-group">
@@ -174,7 +261,7 @@ export default function RecruitmentRegisterForm() {
             name="gender"
             value="male"
             checked={formData.gender === "male"}
-            onChange={handleChange}
+            onChange={handleChange} required
           />
           Male
         </label>
@@ -185,40 +272,61 @@ export default function RecruitmentRegisterForm() {
             name="gender"
             value="female"
             checked={formData.gender === "female"}
-            onChange={handleChange}
+            onChange={handleChange} required
           />
           Female
         </label>
 
       </div>
 
+      {/* Phone */}
       <label>Phone Number *</label>
-      <input
-        name="phone"
-        type="text"
-        placeholder="Your phone number"
-        onChange={handleChange}
-      />
 
+      <div className="input-wrapper">
+        <i className="fa-solid fa-phone icon" />
+
+        <input
+          name="phone"
+          type="text"
+          placeholder="Your phone number"
+          onChange={handleChange} required
+        />
+      </div>
+
+      {/* Company */}
       <label>Company *</label>
-      <input
-        name="company"
-        type="text"
-        placeholder="Company name"
-        onChange={handleChange}
-      />
 
+      <div className="input-wrapper">
+        <i className="fa-solid fa-building icon" />
+
+        <input
+          name="name"
+          type="text"
+          placeholder="Company name"
+          onChange={handleChange} required
+        />
+      </div>
+
+      {/* Location */}
       <div className="row">
 
         <div>
 
           <label>Work Location *</label>
 
-          <select name="city" onChange={handleChange}>
+          <select
+            name="province"
+            value={formData.province}
+            onChange={handleChange} required
+          >
 
-            <option value="">Select city</option>
-            <option value="Hanoi">Hanoi</option>
-            <option value="Ho Chi Minh">Ho Chi Minh</option>
+            <option value="">Select province</option>
+
+            {provinces.map((province) => (
+              <option key={province.code} value={province.code}>
+                {province.name}
+              </option>
+            ))}
 
           </select>
 
@@ -228,11 +336,20 @@ export default function RecruitmentRegisterForm() {
 
           <label>Ward *</label>
 
-          <select name="ward" onChange={handleChange}>
+          <select
+            name="ward"
+            value={formData.ward}
+            onChange={handleChange}
+            disabled={!formData.province} required
+          >
 
             <option value="">Select ward</option>
-            <option value="Ward 1">Ward 1</option>
-            <option value="Ward 2">Ward 2</option>
+
+            {wards.map((ward) => (
+              <option key={ward.code} value={ward.code}>
+                {ward.name}
+              </option>
+            ))}
 
           </select>
 
@@ -240,15 +357,15 @@ export default function RecruitmentRegisterForm() {
 
       </div>
 
+      {/* Agree */}
       <label className="agree">
-
         <input
           type="checkbox"
           name="agree"
           onChange={handleChange}
+          required
         />
-
-        I agree to the Terms of Service and Privacy Policy
+        <span>I agree to the Terms of Service and Privacy Policy</span>
 
       </label>
 
@@ -265,5 +382,4 @@ export default function RecruitmentRegisterForm() {
 
     </form>
   );
-
 }

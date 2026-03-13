@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import Header from "@/components/CandidateHeader";
 
 export default function JobLayout({
   children,

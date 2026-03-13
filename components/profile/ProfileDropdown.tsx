@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import "@/styles/ProfileDropdown.css";
+import "@/styles/candidate/ProfileDropdown.css";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 

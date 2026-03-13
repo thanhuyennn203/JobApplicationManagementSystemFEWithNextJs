@@ -1,15 +1,18 @@
 export interface RecruiterRegisterRequest {
+  fullName: string,
   email: string;
   password: string;
 
   recruiterInfo: {
-    fullName: string;
     gender: string;
     phone: string;
-    company: string;
-    city: string;
-    ward: string;
   };
+
+  companyInfor:{
+    name: string;
+    province: string;
+    ward: string;
+  }
 }
 
 export const recruiterRegister = async (

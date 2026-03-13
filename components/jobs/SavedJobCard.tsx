@@ -2,7 +2,7 @@
 
 import "@/styles/SavedJobCard.css";
 import { Job } from "@/types/jobs";
-import "@/styles/JobCard.css";
+import "@/styles/candidate/JobCard.css";
 import { useState, useEffect } from "react";
 import {
   checkSavedJob,

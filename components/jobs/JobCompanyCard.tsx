@@ -1,4 +1,4 @@
-import "@/styles/JobCompanyCard.css";
+import "@/styles/candidate/JobCompanyCard.css";
 
 interface Props {
   company: {

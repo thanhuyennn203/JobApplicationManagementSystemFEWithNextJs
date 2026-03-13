@@ -1,0 +1,143 @@
+.recruiter-header{
+  height:64px;
+  background:#1f3447;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  /* padding:0 20px; */
+  color:white;
+}
+
+/* left */
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.menu-icon{
+  font-size:20px;
+  cursor:pointer;
+}
+
+.logo{
+  height:32px;
+}
+
+/* center nav */
+
+.header-center{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+/* .nav-pill{
+  background:#2d4760;
+  padding:8px 16px;
+  border-radius:20px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:14px;
+  cursor:pointer;
+} */
+
+.nav-pill:hover{
+  background:#3a5876;
+}
+
+.nav-pill.highlight{
+  background:#1fa45b;
+}
+
+.nav-pill.highlight:hover{
+  background:#1b8f4f;
+}
+
+/* notification dot */
+
+.dot{
+  width:8px;
+  height:8px;
+  background:#ff3b30;
+  border-radius:50%;
+  margin-left:4px;
+}
+
+/* right */
+
+.header-right{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.icon-btn{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:#2d4760;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.icon-btn:hover{
+  background:#3a5876;
+}
+
+/* cart */
+
+.cart{
+  position:relative;
+}
+
+.badge{
+  position:absolute;
+  top:-5px;
+  right:-5px;
+  background:#ff3b30;
+  color:white;
+  font-size:11px;
+  padding:2px 6px;
+  border-radius:12px;
+}
+
+/* avatar */
+
+.avatar{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#2d4760;
+  padding:4px 10px;
+  border-radius:20px;
+  cursor:pointer;
+}
+
+.avatar img{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+}
+
+.nav-pill {
+  background:#2d4760;
+  padding:8px 16px;
+  border-radius:20px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:14px;
+  cursor:pointer;
+  transition:all 0.2s ease;
+  text-decoration:none;
+  color:white;
+}
+
+.nav-pill.active{
+  box-shadow:0 0 0 2px white;
+}
