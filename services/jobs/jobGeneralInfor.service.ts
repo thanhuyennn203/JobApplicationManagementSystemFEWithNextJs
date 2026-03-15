@@ -1,9 +1,4 @@
-export interface GeneralInformation {
-  rank: string;
-  education: string;
-  numberOfRecruitment: number;
-  workingStyle: string;
-}
+import { GeneralInformation } from "@/types/jobs";
 
 export async function getGeneralInformationByJobId(
   jobId: number

@@ -36,3 +36,10 @@ export interface JobDetail {
   apply_by: string | null;
   due_date: string | null;
 }
+
+export interface GeneralInformation {
+  rank: string;
+  education: string;
+  numberOfRecruitment: number;
+  workingStyle: string;
+}

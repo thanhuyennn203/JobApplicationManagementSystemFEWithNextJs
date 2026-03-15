@@ -56,7 +56,7 @@ export default function LoginForm() {
       // console.log(res);
       if (res.sucess) {
         alert("Login successfully!")
-        router.push("recruiter/");
+        router.push("/recruiter");
       }else{
         alert(res.message);
       }

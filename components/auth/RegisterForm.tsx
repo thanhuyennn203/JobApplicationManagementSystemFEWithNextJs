@@ -67,11 +67,12 @@ export default function RegisterForm() {
 
       // console.log("success: ", fullName);
       if (!data.success) {
+        alert(data.message);
         console.log("Register failed: ", data.message );
       } else {
         clearForm();
 
-        router.push(`/login?email=${email}&password=${password}`);
+        router.push(`/candidate/login?email=${email}`);
 
       }
 

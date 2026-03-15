@@ -124,6 +124,20 @@ export default function RecruitmentRegisterForm() {
     return null;
   };
 
+  const clearForm = () => {
+    setFormData({
+      email: "",
+      password: "",
+      confirmPassword: "",
+      fullName: "",
+      gender: "male",
+      phone: "",
+      name: "",
+      province: "",
+      ward: "",
+      agree: false
+    });
+  };
   const handleSubmit = async (e: React.FormEvent) => {
 
     e.preventDefault();
@@ -154,13 +168,20 @@ export default function RecruitmentRegisterForm() {
 
       const res = await recruiterRegister(data);
 
-      console.log(res);
+      if (res.success) {
 
-      // router.push("/login");
-      router.push(`/login?email=${formData.email}&password=${formData.password}`);
+        clearForm();
+
+        router.push(`/recruiter/login?email=${formData.email}`);
+
+      } else {
+        alert(res.message);
+        setError(res.message || "Registration failed");
+
+      }
 
     } catch (err: any) {
-
+      alert("Register failed.")
       setError(err?.response?.data?.message || "Registration failed");
 
     }

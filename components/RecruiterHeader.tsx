@@ -1,12 +1,43 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import "@/styles/recruiter/RecruiterHeader.css";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function RecruiterHeader() {
 
   const pathname = usePathname();
+  const auth = useAuth();
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleLogout = () => {
+    auth?.logout();
+    router.push("/landing")
+     // call logout from context
+  };
+
+  // close dropdown when click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <header className="recruiter-header">
@@ -78,9 +109,34 @@ export default function RecruiterHeader() {
           <span className="badge">0</span>
         </div>
 
-        <div className="avatar">
+        {/* Avatar */}
+        <div
+          className="avatar"
+          onClick={() => setOpen(!open)}
+          ref={dropdownRef}
+        >
           <img src="/default-avatar.png" />
           <i className="fa-solid fa-chevron-down"></i>
+
+          {open && (
+            <div className="avatar-dropdown">
+
+              <div className="dropdown-item">
+                <i className="fa-regular fa-circle-question"></i>
+                Hỗ trợ
+              </div>
+
+              <div
+                className="dropdown-item logout"
+                onClick={handleLogout}
+              >
+                <i className="fa-solid fa-right-from-bracket"></i>
+                Đăng xuất
+              </div>
+
+            </div>
+          )}
+
         </div>
 
       </div>

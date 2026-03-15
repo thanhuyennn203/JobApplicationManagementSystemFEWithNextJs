@@ -1,6 +1,5 @@
 "use client";
 
-import "@/styles/SavedJobCard.css";
 import { Job } from "@/types/jobs";
 import "@/styles/candidate/JobCard.css";
 import { useState, useEffect } from "react";
