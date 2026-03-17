@@ -15,7 +15,7 @@ interface Props {
     jobId: number;
     title: string;
     income: string;
-    locations: string[];
+    locations: Location[];
     experience: string;
     due_date: Date;
   };

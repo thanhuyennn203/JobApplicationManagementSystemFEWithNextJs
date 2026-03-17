@@ -11,6 +11,7 @@ export default function CandidateHeader() {
   const auth = useAuth();
 
   const role = auth?.user?.roles?.[0];
+  console.log("role now: ", role);
 
   return (
     <header className="header">
@@ -52,8 +53,9 @@ export default function CandidateHeader() {
 
         {/* Right Section */}
         <div className="header__right">
-
           {/* Candidate */}
+
+          {!role && (
             <>
               <button
                 className="btn btn-outline"
@@ -64,7 +66,7 @@ export default function CandidateHeader() {
 
               <button
                 className="btn btn-primary"
-                onClick={() => router.push("/login")}
+                onClick={() => router.push("/candidate/login")}
               >
                 Đăng nhập
               </button>
@@ -76,6 +78,8 @@ export default function CandidateHeader() {
                 Đăng tuyển & tìm hồ sơ
               </button>
             </>
+
+          )}
 
           {/* Guest */}
           {role && (
@@ -101,6 +105,8 @@ export default function CandidateHeader() {
               </div>
             </>
           )}
+
+
 
         </div>
       </div>

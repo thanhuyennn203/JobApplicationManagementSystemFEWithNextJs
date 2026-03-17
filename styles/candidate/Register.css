@@ -40,15 +40,18 @@
 
 .input-wrapper {
   position: relative;
+  display: block;
 }
 
 .input-wrapper input {
+  display: block;
   width: 100%;
   padding: 10px 40px;
   border-radius: 6px;
   border: 1px solid #ddd;
   outline: none;
   font-size: 14px;
+  box-sizing: border-box;
 }
 
 .input-wrapper input:focus {

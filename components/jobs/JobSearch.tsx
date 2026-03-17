@@ -2,26 +2,16 @@
 
 import { useState, useEffect } from "react";
 import "@/styles/candidate/JobSearch.css";
-import { getProvinces, Province } from "@/services/locations/LocationService";
+import { useLocation } from "@/context/LocationContext";
+import { Province } from "@/services/locations/LocationService";
 
 export default function JobSearch() {
   const [keyword, setKeyword] = useState("");
-  const [locations, setLocations] = useState<Province[]>([]);
   const [openLocation, setOpenLocation] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<Province | null>(null);
+  const [selectedLocation, setSelectedLocation] =
+    useState<Province | null>(null);
 
-  useEffect(() => {
-    const fetchProvinces = async () => {
-      try {
-        const data = await getProvinces();
-        setLocations(data);
-      } catch (err) {
-        console.error("Error fetching provinces:", err);
-      }
-    };
-
-    fetchProvinces();
-  }, []);
+  const { provinces, loading } = useLocation();
 
   useEffect(() => {
     const close = () => setOpenLocation(false);
@@ -40,10 +30,10 @@ export default function JobSearch() {
     console.log("Search with:", searchPayload);
   };
 
-   return (
+  return (
     <div className="header-content_search">
       <form className="group-search" onSubmit={handleSubmit}>
-        {/* Keyword search */}
+        {/* Keyword */}
         <div className="item item-search">
           <i className="fa-solid fa-magnifying-glass"></i>
 
@@ -66,7 +56,7 @@ export default function JobSearch() {
           )}
         </div>
 
-        {/* Location select */}
+        {/* Location */}
         <div
           className="item item-location"
           onClick={(e) => {
@@ -76,10 +66,9 @@ export default function JobSearch() {
         >
           <div className="select-multi-location">
             <i className="fa-solid fa-location-dot"></i>
-            <span>{selectedLocation ? selectedLocation.name : "Địa điểm"}</span>
-            {/* <span className="dropdown">
-              <i className="fa-solid fa-chevron-down"></i>
-            </span> */}
+            <span>
+              {selectedLocation ? selectedLocation.name : "Địa điểm"}
+            </span>
           </div>
 
           {openLocation && (
@@ -87,26 +76,25 @@ export default function JobSearch() {
               className="location-dropdown"
               onClick={(e) => e.stopPropagation()}
             >
-              {locations.length === 0 && (
-                <li className="loading">Đang tải...</li>
-              )}
+              {loading && <li className="loading">Đang tải...</li>}
 
-              {locations.map((loc) => (
-                <li
-                  key={loc.code}
-                  onClick={() => {
-                    setSelectedLocation(loc);
-                    setOpenLocation(false);
-                  }}
-                >
-                  {loc.name}
-                </li>
-              ))}
+              {!loading &&
+                provinces.map((loc) => (
+                  <li
+                    key={loc.code}
+                    onClick={() => {
+                      setSelectedLocation(loc);
+                      setOpenLocation(false);
+                    }}
+                  >
+                    {loc.name}
+                  </li>
+                ))}
             </ul>
           )}
         </div>
 
-        {/* Search button */}
+        {/* Button */}
         <div className="btn-search-job-wrapper">
           <button className="btn-search-job" type="submit">
             <i className="fa-solid fa-magnifying-glass"></i>

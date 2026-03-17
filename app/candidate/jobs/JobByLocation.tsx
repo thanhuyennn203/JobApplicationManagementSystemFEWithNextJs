@@ -3,74 +3,73 @@
 import { useEffect, useState } from "react";
 import JobCard from "@/components/jobs/JobCard";
 import Pagination from "@/components/jobs/Pagination";
-import "@/styles/jobs/JobsPage.css";
+import "@/styles/jobs/JobsByLocations.css";
+import { fetchJobs } from "@/services/jobs/jobs.service";
+import { Job } from "@/types/jobs";
+import JobFilterBar from "@/components/jobs/JobFilterBar";
 
 export default function JobsByLocation() {
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [page, setPage] = useState(1);
 
-    const [jobs, setJobs] = useState<any[]>([]);
-    const [page, setPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 8;
 
-    const fetchJobs = async (page: number) => {
-        const res = await fetch(
-            `http://localhost:8080/api/jobs?page=${page}&size=12`
-        );
-
-        const data = await res.json();
-
-        setJobs(data.content);
-        setTotalPages(data.totalPages);
+  useEffect(() => {
+    const loadJobs = async () => {
+      try {
+        const data = await fetchJobs();
+        setJobs(data);
+        setPage(1);
+      } catch (error) {
+        console.error("Failed to fetch jobs:", error);
+      }
     };
 
-    useEffect(() => {
-        fetchJobs(page);
-    }, [page]);
+    loadJobs();
+  }, []);
 
-    return (
-        <div className="jobs-by-locations">
-            <div className="left">
+  const totalPages = Math.ceil(jobs.length / pageSize);
 
-                {/* header */}
-                <div className="jobs-header">
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages || 1);
+    }
+  }, [jobs, totalPages]);
 
-                    <h2>
-                        Việc làm tốt nhất
-                        <span className="ai-badge">TOPPY AI</span>
-                    </h2>
+  const paginatedJobs = jobs.slice(
+    (page - 1) * pageSize,
+    page * pageSize
+  );
 
-                    <a className="view-all">Xem tất cả</a>
+  return (
+    <div className="jobs-by-locations">
+      <div className="left">
 
-                </div>
+        <JobFilterBar
+          onFilterChange={(type: string, value: string) => {
+            console.log(type, value);
+            // call API or filter jobs here
+          }}
+        />
 
-                {/* filter chips */}
-                <div className="job-filters">
-                    <button className="active">Ngẫu Nhiên</button>
-                    <button>Hà Nội</button>
-                    <button>Thành phố Hồ Chí Minh</button>
-                    <button>Miền Bắc</button>
-                    <button>Miền Nam</button>
-                </div>
-
-                {/* job grid */}
-                <div className="job-grid">
-
-                    {jobs.map((job) => (
-                        <JobCard key={job.id} job={job} />
-                    ))}
-
-                </div>
-
-                {/* pagination */}
-                <Pagination
-                    page={page}
-                    totalPages={totalPages}
-                    setPage={setPage}
-                />
-
-            </div>
-            <div className="right">
-                    <img src="/no-spotlight-mau-cv.png" alt="" />
-            </div>
+        {/* job grid */}
+        <div className="job-grid">
+          {paginatedJobs.map((job) => (
+            <JobCard key={job.id} job={job} />
+          ))}
         </div>
-    );
+
+        {/* pagination */}
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          setPage={setPage}
+        />
+      </div>
+
+      <div className="right">
+        <img src="/no-spotlight-mau-cv.png" alt="" />
+      </div>
+    </div>
+  );
 }

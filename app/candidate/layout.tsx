@@ -8,8 +8,7 @@ export default function CandidateLayout({
   return (
     <>
       {/* <Header /> */}
-          <CandidateHeader />
-
+      <CandidateHeader />
       {children}
     </>
   );

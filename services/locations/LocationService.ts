@@ -3,11 +3,13 @@
 export type Province = {
   code: string;
   name: string;
+  nameEn: string
 };
 
 export type Ward = {
   code: string;
   name: string;
+  nameEn: string;
 };
 
 const BASE_URL = "http://localhost:9191/api/locations";

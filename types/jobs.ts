@@ -3,6 +3,9 @@ export interface Location {
   detailAddress: string;
   ward: string;
   province: string;
+  provinceName: string;
+  wardName: string;
+  
 }
 
 export interface Job {
@@ -13,7 +16,7 @@ export interface Job {
   salary_min: number;
   salary_max: number;
   locations?: Location[];
-  logo?: string;
+  logo_url?: string;
   tags?: string[];
   description?: string;
   dueDate: Date;

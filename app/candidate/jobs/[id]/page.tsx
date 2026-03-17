@@ -1,12 +1,11 @@
+// "use client";
 import { getJobById, getJobDetailById } from "@/services/jobs/jobs.service";
-import JobRequirement from "@/components/jobs/JobRequirement";
-import JobDetailHeader from "@/components/jobs/JobDetailHeader";
+import JobDetailHeaderClient from "@/components/jobs/JobDetailHeaderClient";
 import "@/styles/candidate/JobDetail.css";
 import JobCompanyCard from "@/components/jobs/JobCompanyCard";
 import { getCompanyById } from "@/services/companies/company.service";
 import { getGeneralInformationByJobId } from "@/services/jobs/jobGeneralInfor.service";
 import JobGeneralInformation from "@/components/jobs/JobGeneralInformation";
-
 interface Props {
   params: {
     id: number;
@@ -15,14 +14,21 @@ interface Props {
 
 export default async function JobDetailPage({ params }: Props) {
   const { id: jobId } = await params;
-
   const [job, jobDetail] = await Promise.all([
     getJobById(jobId),
     getJobDetailById(jobId),
   ]);
+  const sections = [
+    { title: "Job Description", value: jobDetail?.description },
+    { title: "Candidate Requirements", value: jobDetail?.requirement },
+    { title: "Benefits", value: jobDetail?.interest },
+    { title: "Allowance", value: jobDetail?.allowance },
+    { title: "Income", value: jobDetail?.income || "Negotiable" },
+    { title: "Working Time", value: jobDetail?.working_time },
+    { title: "How to Apply", value: jobDetail?.apply_by },
+  ];
+  console.log("job: ", job.locations);
 
-  // console.log("job: ",job);
-  // console.log("job detail: ", jobDetail);
   const company = await getCompanyById(job?.company_id);
   const generalInfo = await getGeneralInformationByJobId(jobId);
 
@@ -38,64 +44,48 @@ export default async function JobDetailPage({ params }: Props) {
     <div className="job-detail__wrapper">
       <div className="job-detail-body">
         <div className="job-detail__body-left">
-
-          {/* HEADER */}
-          <JobDetailHeader
-            data={{
-              jobId,
-              title: job.title,
-              income:
-                job.salary_min && job.salary_max
-                  ? `${job.salary_min} - ${job.salary_max}`
-                  : "Negotiable",
-
-              locations: job.locations?.map((l: any) => l.province) ?? [],
-              experience: job.experienceRequired
-                ? job.experienceRequired.split("\n")[0]
-                : "Not required",
-              due_date: job.dueDate,
-            }} />
-
+          <JobDetailHeaderClient job={job} jobId={jobId} />
           {/* BODY */}
           <section className="job-detail-box__left">
-            <JobRequirement title="Job Description" content={jobDetail.description || "Not specified"} />
-            <JobRequirement title="Candidate Requirements" content={jobDetail.requirement || "Not specified"} />
-            <JobRequirement title="Benefits" content={jobDetail.interest || "Not specified"} />
-            <JobRequirement title="Allowance" content={jobDetail.allowance || "Not specified"} />
-            <JobRequirement title="Income" content={jobDetail.income || "Negotiable"} />
-            <JobRequirement title="Working Time" content={jobDetail.working_time || "Not specified"} />
+            {sections.map((sec, idx) => (
+              <div className="job-section" key={idx}>
+                <h3>{sec.title}</h3>
 
-            <ul >
-            <h3>Working Locations</h3>
+                <ul>
+                  {(sec.value || "Not specified")
+                    .split("\n")
+                    .filter((item: string) => item.trim() !== "")
+                    .map((item: string, i: number) => (
+                      <li key={i}>{item}</li>
+                    ))}
+                </ul>
+              </div>
+            ))}
 
-              {job?.locations?.map((loc) => (
-                <li key={loc.id}>
-                  - {loc.detailAddress}, {loc.ward}, {loc.province}
-                </li>
-              ))}
-            </ul>
-
-            <JobRequirement title="How to Apply" content={jobDetail.apply_by || "Not specified"} />
-
+            {/* Locations */}
             <div className="job-section">
-              <h3>
-                Application Deadline:{" "}
-                <span>
-                  {jobDetail.due_date
-                    ? new Date(jobDetail.due_date).toLocaleDateString("en-US")
-                    : "Not specified"}
-                </span>
-              </h3>
+              <h3>Working Locations</h3>
+              <ul>
+                {job.locations?.map((loc: any) => (
+                  <li key={loc.id}>
+                    {loc.detailAddress}, {loc.ward}, {loc.province}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Deadline */}
+            <div className="job-section deadline">
+              <h3>Application Deadline</h3>
+              <p>
+                {jobDetail.due_date
+                  ? new Date(jobDetail.due_date).toLocaleDateString("en-US")
+                  : "Not specified"}
+              </p>
             </div>
 
             <div className="group-btn">
-              <button className="apply-btn">
-                Apply Now
-              </button>
-
-              {/* <button className="save-btn">
-      Save Job
-    </button> */}
+              <button className="apply-btn">Apply Now</button>
             </div>
           </section>
         </div>

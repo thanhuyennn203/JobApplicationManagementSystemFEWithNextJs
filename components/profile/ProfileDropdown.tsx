@@ -31,6 +31,7 @@ export default function ProfileDropdown() {
 
   const logout = () => {
     auth?.logout();
+    router.push("/candidate/")
   };
 
   return (
