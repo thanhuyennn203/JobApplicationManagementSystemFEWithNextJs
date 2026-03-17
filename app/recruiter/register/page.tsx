@@ -1,4 +1,4 @@
-import RecruitmentRegisterForm from "@/components/recruitment/RecruiterRegisterForm";
+import RecruitmentRegisterForm from "@/components/recruiter/RecruiterRegisterForm";
 
 export default function RecruiterRegisterPage() {
   return (

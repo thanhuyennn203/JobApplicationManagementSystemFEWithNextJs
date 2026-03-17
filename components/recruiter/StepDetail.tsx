@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "@/styles/recruiter/CreateJobDetail.css";
+import { useRouter } from "next/navigation";
 
 export default function StepDetail({ jobId, prevStep, nextStep }: any) {
+    const router = useRouter();
 
     const [formData, setFormData] = useState({
         description: "",
@@ -22,6 +24,7 @@ export default function StepDetail({ jobId, prevStep, nextStep }: any) {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState("");
+    const [hasDetail, setHasDetail] = useState(false);
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -46,10 +49,12 @@ export default function StepDetail({ jobId, prevStep, nextStep }: any) {
 
         try {
 
+            const method = hasDetail ? "PATCH" : "POST";
+
             const res = await fetch(
                 `http://localhost:9191/api/jobs/${jobId}/details`,
                 {
-                    method: "POST",
+                    method: method,
                     headers: {
                         "Content-Type": "application/json"
                     },
@@ -79,6 +84,51 @@ export default function StepDetail({ jobId, prevStep, nextStep }: any) {
 
     };
 
+    useEffect(() => {
+
+        if (!jobId) return;
+
+        const fetchJobDetail = async () => {
+
+            try {
+
+                const res = await fetch(
+                    `http://localhost:9191/api/jobs/${jobId}/details`
+                );
+
+                if (!res.ok) return;
+
+                const data = await res.json();
+
+                console.log("Fetched job detail:", data);
+
+                setFormData({
+                    description: data.description || "",
+                    requirement: data.requirement || "",
+                    income: data.income || "",
+                    interest: data.interest || "",
+                    allowance: data.allowance || "",
+                    working_equipment: data.working_equipment || "",
+                    working_location: data.working_location || "",
+                    working_time: data.working_time || "",
+                    apply_by: data.apply_by || "",
+                    due_date: data.due_date || ""
+                });
+
+                setHasDetail(true);
+                setSuccess(true);
+
+            } catch (err) {
+
+                console.error("Failed to fetch job detail", err);
+
+            }
+
+        };
+
+        fetchJobDetail();
+
+    }, [jobId]);
     return (
 
         <div className="step-container">
@@ -217,10 +267,7 @@ export default function StepDetail({ jobId, prevStep, nextStep }: any) {
                         </div>
 
                     </div>
-
-                    <button className="submit-btn" disabled={loading}>
-                        {loading ? "Saving..." : "Save Job Detail"}
-                    </button>
+                    <button className="submit-btn" disabled={loading}> {loading ? "Saving..." : hasDetail ? "Update Job Detail" : "Create Job Detail"} </button>
 
                     {success && (
                         <p className="success-msg">
@@ -245,9 +292,9 @@ export default function StepDetail({ jobId, prevStep, nextStep }: any) {
                 </button>
 
                 <button
-                    onClick={nextStep}
+                    onClick={() => router.push("/recruiter/jobs/")}
                     className="submit-btn"
-                    disabled={!success}
+                // disabled={!success}
                 >
                     Submit
                 </button>

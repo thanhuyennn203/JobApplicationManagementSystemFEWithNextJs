@@ -8,9 +8,13 @@ import {
     Province,
     Ward
 } from "@/services/locations/LocationService";
+import { useAuth } from "@/context/AuthContext"
 
-export default function StepJobCard({ nextStep, setJobId }: any) {
 
+export default function StepJobCard({ nextStep, setJobId, jobId }: any) {
+    const auth = useAuth();
+    // const candidateId = auth?.user?.candidateId;
+    const companyId = auth?.user?.companyId;
     const [success, setSuccess] = useState(false);
     const [provinces, setProvinces] = useState<Province[]>([]);
     const [wards, setWards] = useState<{ [key: number]: Ward[] }>({});
@@ -28,6 +32,43 @@ export default function StepJobCard({ nextStep, setJobId }: any) {
             { province: "", ward: "", detailAddress: "" }
         ]
     });
+
+    useEffect(() => {
+
+        if (!jobId) return;
+
+        const fetchJob = async () => {
+
+            try {
+
+                const res = await fetch(`http://localhost:9191/api/jobs/${jobId}`);
+                const data = await res.json();
+
+                console.log("Fetched job:", data);
+
+                setFormData({
+                    title: data.title || "",
+                    description: data.description || "",
+                    salary_min: data.salary_min || "",
+                    salary_max: data.salary_max || "",
+                    experienceRequired: data.experienceRequired || "",
+                    dueDate: data.dueDate || "",
+                    postedDate: data.postedDate || "",
+                    status: data.status || "OPEN",
+                    locations: data.locations || [
+                        { province: "", ward: "", detailAddress: "" }
+                    ]
+                });
+
+            } catch (err) {
+                console.error("Failed to fetch job", err);
+            }
+
+        };
+
+        fetchJob();
+
+    }, [jobId]);
 
     // Load provinces
     useEffect(() => {
@@ -124,27 +165,22 @@ export default function StepJobCard({ nextStep, setJobId }: any) {
 
         e.preventDefault();
 
-        if (formData.locations.length < 1) {
-            alert("Please add at least 1 location");
-            return;
-        }
-
-        if (formData.locations.length > 3) {
-            alert("Maximum 3 locations allowed");
-            return;
-        }
-
         try {
 
             const payload = {
                 ...formData,
+                company_id: companyId,
                 postedDate: new Date().toISOString()
             };
 
-            console.log("Sending data:", payload);
+            const url = jobId
+                ? `http://localhost:9191/api/jobs/${jobId}`
+                : "http://localhost:9191/api/jobs";
 
-            const res = await fetch("http://localhost:9191/api/jobs", {
-                method: "POST",
+            const method = jobId ? "PUT" : "POST";
+
+            const res = await fetch(url, {
+                method: method,
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -155,9 +191,11 @@ export default function StepJobCard({ nextStep, setJobId }: any) {
 
             console.log("result job:", data);
 
-            setJobId(data.id);
-            if (data)
-                setSuccess(true);
+            if (!jobId) {
+                setJobId(data.id);
+            }
+
+            setSuccess(true);
 
         } catch (err) {
             console.error(err);
@@ -421,13 +459,27 @@ export default function StepJobCard({ nextStep, setJobId }: any) {
                         />
 
                     </div>
-
                     <button type="submit" className="submit-btn">
-                        Save Job Card
+                        {jobId ? "Update Job Card" : "Save Job Card"}
                     </button>
 
                 </form>
 
+                <div className="btn-group">
+
+                {/* <button onClick={prevStep} className="back-btn">
+                    Back
+                </button> */}
+
+                <button
+                    onClick={nextStep}
+                    className="next-btn"
+                    // disabled={!success}
+                >
+                    Next
+                </button>
+
+            </div>
             </div>
 
         </div>

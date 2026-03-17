@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { login } from "@/services/auth/auth.service";
+import useAuth from "@/hooks/useAuth";
 import "@/styles/recruiter/Login.css";
 
 export default function LoginForm() {
@@ -10,8 +10,9 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [error, setError] = useState("");
+  const { login, user } = useAuth(); // ⭐ get user from context
 
+  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -51,26 +52,27 @@ export default function LoginForm() {
 
     try {
 
-      const res = await login(formData.email, formData.password);
+      await login(formData.email, formData.password);
 
-      // console.log(res);
-      if (res.sucess) {
-        alert("Login successfully!")
+      // ⭐ roles come from AuthContext
+      const roles = user?.roles || [];
+      console.log(roles);
+
+      if (roles.includes("RECRUITER")) {
         router.push("/recruiter");
-      }else{
-        alert(res.message);
+      } else {
+        alert("You are not a recruiter");
       }
-
 
     } catch (err: any) {
 
+      console.log("Login error:", err);
       setError(err?.response?.data?.message || "Login failed");
 
     }
   };
 
   return (
-
     <form className="login-card" onSubmit={handleSubmit}>
 
       <h2>Login</h2>
@@ -83,13 +85,10 @@ export default function LoginForm() {
 
       <p className="divider">Or login using email</p>
 
-      {/* Email */}
       <label>Email</label>
 
       <div className="input-wrapper">
-
         <i className="fa-solid fa-envelope icon"></i>
-
         <input
           name="email"
           type="email"
@@ -97,16 +96,12 @@ export default function LoginForm() {
           value={formData.email}
           onChange={handleChange}
         />
-
       </div>
 
-      {/* Password */}
       <label>Password</label>
 
       <div className="input-wrapper">
-
         <i className="fa-solid fa-lock icon"></i>
-
         <input
           name="password"
           type={showPassword ? "text" : "password"}
@@ -118,7 +113,6 @@ export default function LoginForm() {
           className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"} toggle-icon`}
           onClick={() => setShowPassword(!showPassword)}
         ></i>
-
       </div>
 
       <button type="submit" className="submit-btn">

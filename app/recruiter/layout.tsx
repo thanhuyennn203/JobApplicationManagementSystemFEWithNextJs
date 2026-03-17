@@ -1,4 +1,5 @@
-import RecruiterHeader from "@/components/RecruiterHeader";
+import RecruiterSidebar from "@/components/recruiter/RecruiterSidebar";
+import "@/styles/recruiter/layout.css";
 
 export default function RecruiterLayout({
   children,
@@ -6,9 +7,12 @@ export default function RecruiterLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <RecruiterHeader />
-      {children}
-    </>
+    <div className="recruiter-layout">
+      <RecruiterSidebar />
+
+      <main className="recruiter-content">
+        {children}
+      </main>
+    </div>
   );
 }

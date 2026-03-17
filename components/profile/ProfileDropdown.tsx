@@ -30,8 +30,7 @@ export default function ProfileDropdown() {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/login";
+    auth?.logout();
   };
 
   return (

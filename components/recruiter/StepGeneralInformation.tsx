@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "@/styles/recruiter/GeneralInformation.css";
 import { useAuth } from "@/context/AuthContext";
 
-export default function StepBasic({ nextStep, jobId }: any) {
+export default function StepBasic({ prevStep, nextStep, jobId }: any) {
 
     const auth = useAuth();
     const companyId = auth?.user?.companyId;
@@ -71,6 +71,41 @@ export default function StepBasic({ nextStep, jobId }: any) {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+
+    if (!jobId) return;
+
+    const fetchGeneralInformation = async () => {
+
+        try {
+
+            const res = await fetch(
+                `http://localhost:9191/api/jobs/${jobId}/general-information`
+            );
+
+            if (!res.ok) return;
+
+            const data = await res.json();
+
+            console.log("Fetched general info:", data);
+
+            setFormData({
+                rank: data.rank || "",
+                education: data.education || "",
+                numberOfRecruitment: data.numberOfRecruitment || 1,
+                workingStyle: data.workingStyle || ""
+            });
+
+        } catch (err) {
+            console.error("Failed to fetch general information", err);
+        }
+
+    };
+
+    fetchGeneralInformation();
+
+}, [jobId]);
 
     return (
 
@@ -181,14 +216,14 @@ export default function StepBasic({ nextStep, jobId }: any) {
 
             <div className="btn-group">
 
-                {/* <button onClick={prevStep} className="back-btn">
+                <button onClick={prevStep} className="back-btn">
                     Back
-                </button> */}
+                </button>
 
                 <button
                     onClick={nextStep}
                     className="next-btn"
-                    disabled={!success}
+                    // disabled={!success}
                 >
                     Next
                 </button>

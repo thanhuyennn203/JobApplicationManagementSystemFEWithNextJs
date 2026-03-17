@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { recruiterRegister } from "@/services/auth/recruiterRegister.service";
-import {
+import useAuth from "@/hooks/useAuth"; import {
   getProvinces,
   getWardsByProvince,
   Province,
@@ -12,7 +11,7 @@ import { useRouter } from "next/navigation";
 import "@/styles/recruiter/RecruiterRegister.css";
 
 export default function RecruitmentRegisterForm() {
-
+  const { recruiterRegister } = useAuth();
   const router = useRouter();
 
   const [error, setError] = useState("");
@@ -396,7 +395,7 @@ export default function RecruitmentRegisterForm() {
 
       <p className="login-link">
         Already have an account?{" "}
-        <span onClick={() => router.push("/login")}>
+        <span onClick={() => router.push("/recruiter/login")}>
           Login now
         </span>
       </p>

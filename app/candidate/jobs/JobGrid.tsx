@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import JobCard from "./JobCard";
+import JobCard from "../../../components/jobs/JobCard";
 import { fetchJobs } from "@/services/jobs/jobs.service";
 import { Job } from "@/types/jobs"; 
 import "@/styles/candidate/JobGrid.css";

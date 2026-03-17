@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import StepBasic from "./StepGeneralInformation";
-import StepDetail from "./StepDetail";
-import StepJobcard from "./StepJobCard";
+
+import StepJobcard from "@/components/recruiter/StepJobCard";
+import StepGeneralInformation from "@/components/recruiter/StepGeneralInformation";
+import StepDetail from "@/components/recruiter/StepDetail";
 import "@/styles/recruiter/JobOnboarding.css";
 
 export default function CreateJobPage() {
-
+    
   const [step, setStep] = useState(1);
   const [jobId, setJobId] = useState<number | null>(null);
 
   const nextStep = () => setStep((prev) => prev + 1);
+  const prevStep = () => setStep((prev) => prev -1 );
+
 
   return (
 
@@ -27,14 +30,15 @@ export default function CreateJobPage() {
       )}
 
       {step === 2 && (
-        <StepBasic
+        <StepGeneralInformation
+        prevStep={prevStep}
           jobId={jobId}
           nextStep={nextStep}
         />
       )}
 
       {step === 3 && (
-        <StepDetail
+        <StepDetail prevStep={prevStep}
           jobId={jobId}
         />
       )}

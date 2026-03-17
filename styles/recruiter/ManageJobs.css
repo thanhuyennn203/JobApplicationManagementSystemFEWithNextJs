@@ -1,0 +1,35 @@
+.job-card{
+padding:20px;
+border-radius:10px;
+background:white;
+cursor:pointer;
+border:1px solid #eee;
+transition:0.2s;
+}
+
+.job-card:hover{
+transform:translateY(-3px);
+box-shadow:0 5px 20px rgba(0,0,0,0.08);
+}
+
+.badge{
+display:inline-block;
+margin-top:10px;
+padding:5px 10px;
+border-radius:6px;
+font-size:12px;
+}
+
+.warning{
+background:#fff3cd;
+color:#856404;
+}
+
+.success{
+background:#d4edda;
+color:#155724;
+}
+.manage-jobs-container{
+  display: block;
+  width: 100%;
+}

@@ -54,32 +54,6 @@ export default function CandidateHeader() {
         <div className="header__right">
 
           {/* Candidate */}
-          {role === "CANDIDATE" && (
-            <>
-              <button className="icon-btn">
-                <i className="fa-regular fa-bell"></i>
-              </button>
-
-              <button className="icon-btn">
-                <i className="fa-regular fa-comment-dots"></i>
-              </button>
-
-              <ProfileDropdown />
-
-              <div className="recruiter-link">
-                <span>Bạn là nhà tuyển dụng?</span>
-                <button
-                  className="btn-link"
-                  onClick={() => router.push("/landing")}
-                >
-                  Đăng tuyển ngay »
-                </button>
-              </div>
-            </>
-          )}
-
-          {/* Guest */}
-          {!role && (
             <>
               <button
                 className="btn btn-outline"
@@ -101,6 +75,30 @@ export default function CandidateHeader() {
               >
                 Đăng tuyển & tìm hồ sơ
               </button>
+            </>
+
+          {/* Guest */}
+          {role && (
+            <>
+              <button className="icon-btn">
+                <i className="fa-regular fa-bell"></i>
+              </button>
+
+              <button className="icon-btn">
+                <i className="fa-regular fa-comment-dots"></i>
+              </button>
+
+              <ProfileDropdown />
+
+              <div className="recruiter-link">
+                <span>Bạn là nhà tuyển dụng?</span>
+                <button
+                  className="btn-link"
+                  onClick={() => router.push("/landing")}
+                >
+                  Đăng tuyển ngay »
+                </button>
+              </div>
             </>
           )}
 
