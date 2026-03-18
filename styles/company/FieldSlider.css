@@ -1,0 +1,73 @@
+.box-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* SCROLL LIST */
+.box-field__list {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 10px 40px; /* space for buttons */
+}
+
+/* hide scrollbar */
+.box-field__list::-webkit-scrollbar {
+    display: none;
+}
+
+/* ITEM */
+.box-field__list--item {
+    white-space: nowrap;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: #e3eae5;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+/* ACTIVE */
+.box-field__list--item.active {
+    background: #ff7a00;
+    color: white;
+    font-weight: 500;
+}
+
+/* HOVER */
+.box-field__list--item:hover {
+    background: #ffe0c2;
+}
+
+/* BUTTONS */
+.box-field__btn-prev,
+.box-field__btn-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    cursor: pointer;
+    z-index: 2;
+}
+
+.box-field__btn-prev {
+    left: 0;
+}
+
+.box-field__btn-next {
+    right: 0;
+}
+
+/* disabled state */
+.box-field__btn-prev.disabled,
+.box-field__btn-next.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}

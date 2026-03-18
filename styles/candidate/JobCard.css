@@ -36,9 +36,10 @@
   padding: 6px;
   position: relative;
   width: 64px;
+
 }
 
-.avatar {
+.box-comapny-logo .avatar {
   align-items: center;
   background: #fff;
   border-radius: 3px;
@@ -46,6 +47,8 @@
   height: 100%;
   justify-content: center;
   width: 100%;
+  object-fit: cover;
+  overflow: hidden;
 }
 
 /* .job-card__logo {

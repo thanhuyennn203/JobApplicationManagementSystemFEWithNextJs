@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import {
   getProvinces,
+  getWardList,
   getWardsByProvince,
   Province,
   Ward,
@@ -10,12 +11,13 @@ import {
 
 type LocationContextType = {
   provinces: Province[];
+  wardList: Ward[];
   wardsMap: Record<string, Ward[]>;
   loading: boolean;
 
   // actions
   getWards: (provinceCode: string) => Promise<void>;
-
+  getWardNameFromList: (wardCode: string) => string;
   // helpers (for forms only)
   getProvinceName: (code: string) => string;
   getWardName: (provinceCode: string, wardCode: string) => string;
@@ -31,6 +33,7 @@ export const LocationProvider = ({
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [wardsMap, setWardsMap] = useState<Record<string, Ward[]>>({});
   const [loading, setLoading] = useState(true);
+  const [wardList, setWardList] = useState<Ward[]>([]);
 
   // Load provinces once
   useEffect(() => {
@@ -38,6 +41,10 @@ export const LocationProvider = ({
       try {
         const data = await getProvinces();
         setProvinces(data);
+
+        const wardList = await getWardList();
+        setWardList(wardList);
+        // console.log(wardList);
       } catch (err) {
         console.error("Error fetching provinces:", err);
       } finally {
@@ -59,29 +66,45 @@ export const LocationProvider = ({
         ...prev,
         [provinceCode]: wards,
       }));
+      // console.log("found",wards);
+
     } catch (err) {
       console.error("Error fetching wards:", err);
     }
   };
 
+  const getWardNameFromList = (wardCode: string) => {
+    if (!wardList || !wardCode) return "";
+
+    const found = wardList.find((w) => w.code === wardCode);
+    return found?.nameEn || wardCode;
+  };
+
   // Helpers (optional now)
   const getProvinceName = (code: string) => {
-    const found = provinces.find((p) => p.code === code);
-    return found?.nameEn || code;
+    if (code != null && code != undefined) {
+      const found = provinces.find((p) => p.code === code);
+      return found?.nameEn || code;
+    } else return "";
+
   };
 
   const getWardName = (provinceCode: string, wardCode: string) => {
-    const wards = wardsMap[provinceCode] || [];
-    const found = wards.find((w) => w.code === wardCode);
-    return found?.nameEn || wardCode;
+    if (provinceCode != null && provinceCode != undefined) {
+      const wards = wardsMap[provinceCode] || [];
+      const found = wards.find((w) => w.code === wardCode);
+      return found?.nameEn || wardCode;
+    } else return "";
   };
 
   return (
     <LocationContext.Provider
       value={{
         provinces,
+        wardList,
         wardsMap,
         loading,
+        getWardNameFromList,
         getWards,
         getProvinceName,
         getWardName,

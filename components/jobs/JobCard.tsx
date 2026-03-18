@@ -68,7 +68,7 @@ export default function JobCard({ job }: Props) {
   };
 
   return (
-    <Link href={`${pathname}/${job.id}`} className="job-card-link">
+    <Link href={`/candidate/jobs/${job.id}`} className="job-card-link">
       <div className="job-card">
         <div className="job-card__header">
           <div className="box-comapny-logo">

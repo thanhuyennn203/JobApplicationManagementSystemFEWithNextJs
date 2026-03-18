@@ -37,3 +37,14 @@ export const getWardsByProvince = async (
 
   return res.json();
 };
+
+// Get all wards
+export const getWardList = async (): Promise<Ward[]> => {
+  const res = await fetch(`${BASE_URL}/wards`);
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch wards");
+  }
+
+  return res.json();
+};

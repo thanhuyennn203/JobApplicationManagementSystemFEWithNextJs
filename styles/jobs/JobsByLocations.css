@@ -1,7 +1,7 @@
 .jobs-by-locations {
     display: flex;
     gap: 10px;
-    /* padding: 30px 30px; */
+    padding: 40px 60px;
     box-sizing: border-box;
     flex-wrap: wrap;
 }
@@ -109,48 +109,48 @@
 }
 
 .filter-box {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-  padding: 14px 18px;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
+    padding: 14px 18px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
 
-  cursor: pointer;
-  transition: all 0.2s ease;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .filter-box:hover {
-  background: #f3f4f6;
+    background: #f3f4f6;
 }
 
 /* LEFT */
 .filter-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .filter-left i {
-  color: #9ca3af;
-  font-size: 16px;
+    color: #9ca3af;
+    font-size: 16px;
 }
 
 .label {
-  color: #9ca3af;
-  font-size: 15px;
+    color: #9ca3af;
+    font-size: 15px;
 }
 
 .value {
-  color: #111827;
-  font-weight: 500;
-  font-size: 15px;
+    color: #111827;
+    font-weight: 500;
+    font-size: 15px;
 }
 
 /* RIGHT ICON */
-.filter-box > i {
-  color: #6b7280;
-  font-size: 14px;
+.filter-box>i {
+    color: #6b7280;
+    font-size: 14px;
 }

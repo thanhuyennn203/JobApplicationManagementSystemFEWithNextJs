@@ -1,0 +1,252 @@
+.top-company-page-wrapper{
+  padding-bottom: 60px;
+  padding-top: 60px;
+    padding: 40px 60px;
+  background-color: #ffffff;
+}
+
+.list-top-company-wrapper {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+  transition: .3s;
+}
+
+.list-company {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+.list-company__item {
+  align-items: flex-start;
+  background: linear-gradient(179deg, #fff4df -11.29%, #fff 25.75%);
+  border: 1px solid #ffbb50;
+  border-radius: 16px;
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 0;
+}
+
+.company-header {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.company-header__image {
+  border: 1px solid #dfdfdf;
+  border-radius: 8px;
+  flex-shrink: 0;
+  height: 82px;
+  padding: 5px;
+  width: 82px;
+}
+
+.company-header__image img {
+  height: 100%;
+  -o-object-fit: contain;
+  object-fit: contain;
+  width: 100%;
+}
+
+.company__item .company-header__desc {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 6px;
+}
+
+.company-header__desc--name {
+  margin: 0;
+}
+
+.company-header__desc--field {
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  color: #263a4d;
+  display: -webkit-box;
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: .175px;
+  line-height: 22px;
+  opacity: .7;
+  overflow: hidden;
+}
+
+.list-company__item--info {
+  align-items: center;
+  align-self: stretch;
+  display: flex;
+  justify-content: space-between;
+  min-height: 32px;
+  padding: 0 16px;
+}
+
+.company__item--info .number-job {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+.list-company__item--info .number-job i {
+  color: #263a4d;
+  font-size: 14px;
+}
+
+.btn-follow {
+  border: 1px solid #00b14f;
+  color: #00b14f;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.btn-follow:hover {
+  background: #00b14f;
+  color: #fff;
+}
+
+
+/* top company */
+
+.banner-featured-company {
+  align-items: center;
+  align-self: stretch;
+  background: url(https://cdn-new.topcv.vn/unsafe/https://static.topcv.vn/v4/image/topcv-pro/bg-featured-company.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  grid-column: auto / span 1;
+  grid-row: auto / span 3;
+  height: 506px;
+  justify-content: start;
+  padding: 48px 20px;
+  width: 348px;
+}
+
+.banner-featured-company__image {
+  align-items: center;
+  aspect-ratio: 1 / 1;
+  background: #fff;
+  border: 1px solid #ebebeb;
+  border-radius: 10px;
+  display: flex;
+  height: 120px;
+  justify-content: start;
+  padding: 5px;
+  width: 120px;
+}
+
+.banner-featured-company__image img {
+  height: 100%;
+  -o-object-fit: contain;
+  object-fit: contain;
+  width: 100%;
+}
+
+.banner-featured-company__desc {
+  align-items: center;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.banner-featured-company__desc--name {
+  font-weight: 600;
+  font-size: 22px;
+  margin: 0;
+  color: #dfdfdf;
+}
+
+.banner-featured-company__desc--field {
+  font-feature-settings: "liga" off, "clig" off;
+  color: #fff;
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: .175px;
+  line-height: 20px;
+}
+
+.banner-featured-company__info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.number-job {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.banner-featured-company__info .number-job {
+  align-items: center;
+  background: rgba(0, 0, 0, .3);
+  border-radius: 40px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: 6px 16px;
+}
+
+.banner-featured-company__info .number-job i,
+.banner-featured-company__info .number-job span {
+  color: #dfdfdf;
+  font-size: 14px;
+}
+
+
+element.style {}
+
+ .job-pro-icon {
+  font-feature-settings: "liga" off, "clig" off;
+  align-items: center;
+  background: linear-gradient(259deg, #ffb94b -3.83%, #ffe7bf 44.19%, #ffb94b 92.22%) padding-box, linear-gradient(90deg, #e88a1e, #ffe7bf) border-box;
+  border: 1.257px solid #e88a1e;
+  border-radius: 45.259px;
+  color: #591e00;
+  display: flex;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  gap: 2px;
+  justify-content: center;
+  letter-spacing: .16px;
+  line-height: 100%;
+  padding: 8px 16px;
+}
+
+.btn-follow {
+  border: 1px solid #00b14f;
+  color: #00b14f;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.btn-follow:hover {
+  background: #00b14f;
+  color: #fff;
+}
+

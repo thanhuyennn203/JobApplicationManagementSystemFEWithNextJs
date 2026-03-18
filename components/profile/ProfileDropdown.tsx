@@ -38,15 +38,18 @@ export default function ProfileDropdown() {
     <div className="profile-wrapper" ref={ref}>
 
       {/* Avatar */}
-      <img
-        src="/avatar.png"
-        className="avatar"
-        onClick={() => setOpen(!open)}
-      />
+      <div className="candidate-profile-img-box">
+        <img
+          src="/images/default-avatar.jpg"
+          className="avatar"
+          onClick={() => setOpen(!open)}
+        />
+      </div>
+
 
       {/* Dropdown */}
       {open && (
-        <div className="dropdown">
+        <div className="profile_dropdown">
 
           {/* Profile */}
           <div className="profile-header">
