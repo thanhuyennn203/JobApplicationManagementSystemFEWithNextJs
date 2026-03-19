@@ -10,15 +10,15 @@ import {
   removeSavedJob,
 } from "@/services/candidate/savedJob.service";
 import { useAuth } from "@/context/AuthContext";
-import { usePathname } from "next/navigation";
 import { useLocation } from "@/context/LocationContext"; 
+import { useRouter } from "next/navigation";
 
 interface Props {
   job: Job;
 }
 
 export default function JobCard({ job }: Props) {
-  const pathname = usePathname();
+  const router = useRouter();
   const locations = job.locations ?? [];
   const firstLocation = locations[0];
   const remainingCount = locations.length - 1;
@@ -68,8 +68,8 @@ export default function JobCard({ job }: Props) {
   };
 
   return (
-    <Link href={`/candidate/jobs/${job.id}`} className="job-card-link">
-      <div className="job-card">
+    // <Link href={`/candidate/jobs/${job.id}`} className="job-card-link">
+      <div className="job-card" onClick={() => router.push(`/candidate/jobs/${job.id}`)}>
         <div className="job-card__header">
           <div className="box-comapny-logo">
             <div className="avatar">
@@ -120,6 +120,6 @@ export default function JobCard({ job }: Props) {
           </div>
         </div>
       </div>
-    </Link>
+    // </Link>
   );
 }

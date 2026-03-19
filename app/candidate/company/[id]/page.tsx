@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { Company } from "@/types/company";
 import { useLocation } from "@/context/LocationContext";
 import { useAuth } from "@/context/AuthContext";
+import { followCompany, unfollowCompany, checkFollowCompany } from "@/services/companies/company.service";
 
 export default function CompanyProfilePage() {
     const params = useParams();
@@ -13,7 +14,8 @@ export default function CompanyProfilePage() {
     const auth = useAuth();
     const [company, setCompany] = useState<Company | null>(null);
     const { getProvinceName, getWardNameFromList } = useLocation();
-
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [loadingFollow, setLoadingFollow] = useState(false);
     useEffect(() => {
         if (!id) return;
 
@@ -28,22 +30,63 @@ export default function CompanyProfilePage() {
         };
 
         fetchCompany();
-    }, [id]);
 
-    const handleFollow = () => {
+        if (!auth?.user || !company?.id) return;
+
+        const checkFollow = async () => {
+            try {
+                const res = await checkFollowCompany(auth?.user?.candidateId, company?.id);
+                setIsFollowing(res);
+                // console.log("followed: ",res);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        checkFollow();
+    }, [id, auth?.user, company?.id]);
+
+    const handleFollow = async () => {
         if (!auth?.user) {
             alert("You have to login first to follow this company");
             return;
         }
 
-        // Optional: check role (only candidate can follow)
         if (auth.user.roles?.[0] !== "CANDIDATE") {
             alert("Only candidates can follow companies");
             return;
         }
 
-        // TODO: call API follow company
-        console.log("Follow company:", company?.id);
+        if (!company?.id) return;
+
+        try {
+            setLoadingFollow(true);
+
+            if (isFollowing) {
+                await unfollowCompany(auth?.user?.candidateId, company.id);
+
+                setCompany(prev => prev ? {
+                    ...prev,
+                    followerNumber: Math.max(0, (prev.followerNumber || 0) - 1)
+                } : prev);
+
+                setIsFollowing(false);
+            } else {
+                await followCompany(auth?.user?.candidateId, company.id);
+
+                setCompany(prev => prev ? {
+                    ...prev,
+                    followerNumber: (prev.followerNumber || 0) + 1
+                } : prev);
+
+                setIsFollowing(true);
+            }
+
+        } catch (err) {
+            console.error("Follow error:", err);
+        } finally {
+            setLoadingFollow(false);
+        }
     };
 
     return (
@@ -93,10 +136,17 @@ export default function CompanyProfilePage() {
                     </div>
                 </div>
                 <button
-                    className="follow-btn"
+                    className={`follow-btn ${isFollowing ? "following" : ""}`}
                     onClick={handleFollow}
+                    disabled={loadingFollow}
                 >
-                    {auth?.user ? "+ Follow company" : "Login to follow"}
+                    {loadingFollow
+                        ? "Processing..."
+                        : !auth?.user
+                            ? "Login to follow"
+                            : isFollowing
+                                ? "Following"
+                                : "+ Follow company"}
                 </button>
             </div >
 

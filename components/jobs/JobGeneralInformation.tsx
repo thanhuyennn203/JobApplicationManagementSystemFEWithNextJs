@@ -7,7 +7,7 @@ interface Props {
   data: GeneralInformation | null;
 }
 
-const EMPTY_TEXT = "Đang cập nhật";
+const EMPTY_TEXT = "Loading...";
 
 function display(value?: string | number) {
   if (value === null || value === undefined || value === "") {
@@ -19,14 +19,14 @@ function display(value?: string | number) {
 export default function JobGeneralInformation({ data }: Props) {
   return (
     <div className="general-info-card">
-      <h3 className="general-info-title">Thông tin chung</h3>
+      <h3 className="general-info-title">General Information</h3>
 
       <div className="general-info-item">
         <div className="icon green">
           <i className="fa-solid fa-briefcase"></i>
         </div>
         <div>
-          <span className="label">Cấp bậc</span>
+          <span className="label">Postion</span>
           <p className="value">{display(data?.rank)}</p>
         </div>
       </div>
@@ -36,7 +36,7 @@ export default function JobGeneralInformation({ data }: Props) {
           <i className="fa-solid fa-graduation-cap"></i>
         </div>
         <div>
-          <span className="label">Học vấn</span>
+          <span className="label">Education Level</span>
           <p className="value">{display(data?.education)}</p>
         </div>
       </div>
@@ -46,10 +46,10 @@ export default function JobGeneralInformation({ data }: Props) {
           <i className="fa-solid fa-users"></i>
         </div>
         <div>
-          <span className="label">Số lượng tuyển</span>
+          <span className="label">Recruitment Number</span>
           <p className="value">
             {data?.numberOfRecruitment
-              ? `${data.numberOfRecruitment} người`
+              ? `${data.numberOfRecruitment} staff`
               : EMPTY_TEXT}
           </p>
         </div>
@@ -60,7 +60,7 @@ export default function JobGeneralInformation({ data }: Props) {
           <i className="fa-solid fa-clock"></i>
         </div>
         <div>
-          <span className="label">Hình thức làm việc</span>
+          <span className="label">Working Style</span>
           <p className="value">{display(data?.workingStyle)}</p>
         </div>
       </div>

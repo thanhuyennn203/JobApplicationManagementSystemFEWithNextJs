@@ -39,7 +39,7 @@ export default function JobSearch() {
 
           <input
             className="form-control"
-            placeholder="Vị trí tuyển dụng, tên công ty"
+            placeholder="Search for postions, locations, industries,..."
             autoComplete="off"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
@@ -67,7 +67,7 @@ export default function JobSearch() {
           <div className="select-multi-location">
             <i className="fa-solid fa-location-dot"></i>
             <span>
-              {selectedLocation ? selectedLocation.name : "Địa điểm"}
+              {selectedLocation ? selectedLocation.name : "Location"}
             </span>
           </div>
 
@@ -76,7 +76,7 @@ export default function JobSearch() {
               className="location-dropdown"
               onClick={(e) => e.stopPropagation()}
             >
-              {loading && <li className="loading">Đang tải...</li>}
+              {loading && <li className="loading">Loading...</li>}
 
               {!loading &&
                 provinces.map((loc) => (
@@ -98,7 +98,7 @@ export default function JobSearch() {
         <div className="btn-search-job-wrapper">
           <button className="btn-search-job" type="submit">
             <i className="fa-solid fa-magnifying-glass"></i>
-            Tìm kiếm
+            Search
           </button>
         </div>
       </form>

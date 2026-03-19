@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import CompanyItem from "@/components/company/CompanyItem";
 import { getTopCompanies } from "@/services/companies/company.service";
 import FieldSlider from "@/components/company/FieldSlider";
+import { useFollowCompany } from "@/hooks/useFollowCompany";
 
 export default function TopCompanies() {
     const [companies, setCompanies] = useState<any[]>([]);
@@ -15,9 +16,10 @@ export default function TopCompanies() {
         };
 
         fetch();
-    }, []);
+    }, [companies]);
 
     const topCompany = companies[0];
+    const { isFollowing, loading, toggleFollow } = useFollowCompany(topCompany?.id);
 
     return (
         <div className="top-company-page-wrapper">
@@ -62,15 +64,20 @@ export default function TopCompanies() {
                             </span>
                         )}
                         <button
-                            className="btn btn-follow"
-                            onClick={() => console.log("Follow", topCompany?.id)}
+                            className={`btn btn-follow ${isFollowing ? "following" : ""}`}
+                            onClick={toggleFollow}
+                            disabled={loading}
                         >
-                            Theo dõi
+                            {loading
+                                ? "Processing..."
+                                : isFollowing
+                                    ? "Following"
+                                    : "+ Follow"}
                         </button>
                     </div>
                 </div>
                 {/* <div className="list-company"> */}
-                {companies.map((company) => (
+                {companies.slice(1, 10).map((company) => (
                     <CompanyItem key={company.id} company={company} />
                 ))}
                 {/* </div> */}

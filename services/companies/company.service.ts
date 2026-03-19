@@ -37,3 +37,60 @@ export const getTopCompanies = async () => {
 
   return res.json();
 };
+
+export const followCompany = async (candidateId: number, companyId: number) => {
+  const res = await fetch(`http://localhost:9191/api/candidates/follow-company`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      candidateId,
+      companyId,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Follow failed");
+  }
+
+  return res.json();
+};
+
+export const unfollowCompany = async (candidateId: number, companyId: number) => {
+  const res = await fetch(`http://localhost:9191/api/candidates/follow-company`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      candidateId,
+      companyId,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Unfollow failed");
+  }
+
+  return res.json();
+};
+
+export const checkFollowCompany = async (candidateId: number, companyId: number) => {
+  const res = await fetch(`http://localhost:9191/api/candidates/follow-company/check`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      candidateId,
+      companyId,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Check follow failed");
+  }
+
+  return res.json();
+};

@@ -40,6 +40,7 @@ export default function FieldSlider() {
 
         return () => el.removeEventListener("scroll", checkScroll);
     }, []);
+    
     const scroll = (direction: "left" | "right") => {
         if (!listRef.current) return;
 

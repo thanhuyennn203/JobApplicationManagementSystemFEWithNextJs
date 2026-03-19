@@ -6,13 +6,16 @@ import { useLocation } from "@/context/LocationContext";
 export default function JobDetailHeaderClient({ job, jobId }: any) {
   const { provinces } = useLocation();
 
+  if(!job){
+    return null;
+  }
   // map code -> name
   const provinceMap = Object.fromEntries(
     provinces.map((p) => [p.code, p.nameEn])
   );
 
   const locations =
-    job.locations?.map((l: any) => provinceMap[l.province] || l.province) || [];
+    job?.locations?.map((l: any) => provinceMap[l.province] || l.province) || [];
 
   return (
     <JobDetailHeader

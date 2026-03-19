@@ -1,45 +1,42 @@
 import "@/styles/candidate/JobCompanyCard.css";
+import { Company } from "@/types/company";
+import { useRouter } from "next/navigation";
 
 interface Props {
-  company: {
-    name: string;
-    description?: string;
-    size?: number;
-    industry?: string;
-    headquarters_city?: string;
-    logo_url?: string;
-  };
+  company: Company | null;
 }
 
 export default function JobCompanyCard({ company }: Props) {
-  //  if (!company) return null;
-   
+  const router = useRouter();
   return (
     <div className="job-company-card">
-      <div className="company-header">
-        <img
-          src={company?.logo_url || "/default-company.png"}
-          alt={company?.name}
-          className="company-logo"
-        />
+      <div className="company-header" onClick={() => router.push(`/candidate/company/${company?.id}`)}>
+        <div className="company-logo-img-box">
+          <img
+            src={company?.logo_url || "/images/company-logo-default.jpg"}
+            alt={company?.name}
+            className="company-logo"
+          />
+        </div>
+
 
         <h3 className="company-name">{company?.name ?? "Loading..."}</h3>
       </div>
 
       <div className="company-info">
-        <InfoRow icon="fa-users" label="Quy mô" value={String(company?.size ?? "")} />
-        <InfoRow icon="fa-box" label="Lĩnh vực" value={company?.industry} />
-        <InfoRow icon="fa-location-dot" label="Địa điểm" value={company?.headquarters_city} />
+        <InfoRow icon="fa-users" label="Scale" value={String(company?.size ?? "")} />
+        <InfoRow icon="fa-box" label="Industry" value={company?.industry} />
+        <InfoRow icon="fa-location-dot" label="Location" value={company?.province} />
       </div>
-<a
-          href={company?.logo_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="company-link"
-        >
-          Xem trang công ty{" "}
-          <i className="fa-solid fa-arrow-up-right-from-square" />
-        </a>
+      <a
+        href={company?.website}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="company-link"
+      >
+        Visit company website{" "}
+        <i className="fa-solid fa-arrow-up-right-from-square" />
+      </a>
       {/* {company.logo_url && (
         <a
           href={company.logo_url}
@@ -89,7 +86,7 @@ function InfoRow({
       <i className={`fa-solid ${icon}`} />
       <span className="label">{label}</span>
       <span className="value">
-        {value && value.trim() !== "" ? value : "Đang cập nhật"}
+        {value && value.trim() !== "" ? value : "Loading..."}
       </span>
     </div>
   );

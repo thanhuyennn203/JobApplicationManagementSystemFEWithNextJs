@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef,useEffect } from "react";
 import "@/styles/jobs/JobFilterBar.css";
 
 const FILTER_OPTIONS = ["Location", "Salary", "Experience", "Category"];
@@ -16,7 +16,36 @@ export default function JobFilterBar({ onFilterChange }: any) {
     const [open, setOpen] = useState(false);
     const [selectedFilter, setSelectedFilter] = useState("Location");
     const [activeValue, setActiveValue] = useState("All");
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(true);
+    const listRef = useRef<HTMLDivElement>(null);
 
+    useEffect(() => {
+        const el = listRef.current;
+        if (!el) return;
+
+        checkScroll();
+        el.addEventListener("scroll", checkScroll);
+
+        return () => el.removeEventListener("scroll", checkScroll);
+    }, []);
+    const checkScroll = () => {
+        const el = listRef.current;
+        if (!el) return;
+
+        setCanScrollLeft(el.scrollLeft > 0);
+        setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth);
+    };
+
+    const scroll = (direction: "left" | "right") => {
+        if (!listRef.current) return;
+
+        const scrollAmount = 200;
+        listRef.current.scrollBy({
+            left: direction === "left" ? -scrollAmount : scrollAmount,
+            behavior: "smooth",
+        });
+    };
     const handleSelectFilter = (filter: string) => {
         setSelectedFilter(filter);
 
@@ -73,12 +102,12 @@ export default function JobFilterBar({ onFilterChange }: any) {
             <div className="filter-values-box">
 
                 {/* LEFT ARROW */}
-                <div className="prev-location btn-slick-arrow">
+                <div className="prev-location btn-slick-arrow" onClick={() => scroll("left")}>
                     <i className="fa-solid fa-angle-left"></i>
                 </div>
 
                 {/* SCROLL AREA */}
-                <div className="filter-values">
+                <div className="filter-values" ref={listRef}>
                     {FILTER_VALUES[selectedFilter].map((item: string) => (
                         <button
                             key={item}
@@ -91,8 +120,8 @@ export default function JobFilterBar({ onFilterChange }: any) {
                 </div>
 
                 {/* RIGHT ARROW */}
-                <div className="next-location btn-slick-arrow">
-                    <i className="fa-solid fa-angle-right"></i>
+                <div className="next-location btn-slick-arrow" onClick={() => scroll("right")}>
+                    <i className="fa-solid fa-angle-right" ></i>
                 </div>
 
             </div>

@@ -29,7 +29,7 @@
 
 /* HEADER */
 
-.company-header {
+.company-container .company-header {
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -277,9 +277,14 @@
 }
 
 .follow-btn{
-    font-size: 16px;
+    font-size: 14px;
     margin-right: 11px;
     background-color: #ffffff;
     padding: 8px 20px;
     border-radius: 8px;
+}
+
+.follow-btn.following {
+    background: #e6f4ea;
+    color: #1a7f37;
 }
