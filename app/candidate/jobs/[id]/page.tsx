@@ -11,17 +11,19 @@ import { useEffect, useState } from "react";
 import { Company } from "@/types/company";
 import { GeneralInformation, Job, JobDetail } from "@/types/jobs";
 import { useParams } from "next/navigation";
+import ApplyJobModal from "@/components/application/ApplyJobModal";
 
 export default function JobDetailPage() {
   // const { id: jobId } = params;
   const params = useParams();
-  const jobId = params.id;
-  console.log(params.id);
+  const jobId = Number(params.id);
+  // console.log(params.id);
 
   const [company, setCompany] = useState<Company | null>(null);
   const [job, setJob] = useState<Job | null>(null);
   const [jobDetail, setJobDetail] = useState<JobDetail | null>(null);
   const [generalInfo, setGeneralInfo] = useState<GeneralInformation | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -40,21 +42,25 @@ export default function JobDetailPage() {
     fetchJob();
   }, [jobId]);
 
-  const fetchMoreDetail = async () => {
-    try {
-      const companyData = await getCompanyById(job?.company_id);
-      setCompany(companyData);
 
-      const generalInfo = await getGeneralInformationByJobId(jobId);
-      setGeneralInfo(generalInfo);
-    } catch {
-      console.error("Fetch company error:", err);
-    }
-  }
-  if (job?.company_id) {
+  useEffect(() => {
+    if (!job?.company_id) return;
+
+    const fetchMoreDetail = async () => {
+      try {
+        const companyData = await getCompanyById(job.company_id);
+        setCompany(companyData);
+
+        const generalInfoData = await getGeneralInformationByJobId(jobId);
+        setGeneralInfo(generalInfoData);
+      } catch (err) {
+        console.error("Fetch more detail error:", err);
+      }
+    };
 
     fetchMoreDetail();
-  }
+  }, [job?.company_id, jobId]);
+
 
   const sections = [
     { title: "Job Description", value: jobDetail?.description },
@@ -65,15 +71,6 @@ export default function JobDetailPage() {
     { title: "Working Time", value: jobDetail?.working_time },
     { title: "How to Apply", value: jobDetail?.apply_by },
   ];
-  // console.log("job: ", job?.locations);
-
-  // if (!jobDetail) {
-  //   return (
-  //     <div className="job-detail__wrapper">
-  //       <p>There is no job detail for this job.</p>
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="job-detail__wrapper">
@@ -119,7 +116,7 @@ export default function JobDetailPage() {
               </p>
             </div>
 
-            <div className="group-btn">
+            <div className="group-btn" onClick={() => setShowModal(true)}>
               <button className="apply-btn">Apply Now</button>
             </div>
           </section>
@@ -128,7 +125,19 @@ export default function JobDetailPage() {
           <JobCompanyCard company={company} />
           <JobGeneralInformation data={generalInfo} />
         </div>
+
+
       </div>
+      {showModal && (
+        <>
+          <div className="modal-backdrop" onClick={() => setShowModal(false)}></div>
+          <ApplyJobModal
+            jobTitle={job?.title || ""}
+            jobId={jobId}
+            onClose={() => setShowModal(false)}
+          />
+        </>
+      )}
     </div>
   );
 }

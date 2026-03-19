@@ -1,3 +1,10 @@
+.manage-jobs-container .jobs-grid{
+  display: grid;
+  gap: 10px;
+}
+
+
+
 .job-card{
 padding:20px;
 border-radius:10px;

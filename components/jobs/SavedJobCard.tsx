@@ -1,7 +1,7 @@
 "use client";
 
 import { Job } from "@/types/jobs";
-import "@/styles/candidate/JobCard.css";
+import "@/styles/candidate/SavedJobCard.css";
 import { useState, useEffect } from "react";
 import {
   checkSavedJob,
@@ -35,7 +35,7 @@ export default function SavedJobCard({ job }: Props) {
     };
 
     detectSaved();
-  }, [candidateId, job.id]);
+  }, []);
 
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault(); // stop link navigation
@@ -61,11 +61,14 @@ export default function SavedJobCard({ job }: Props) {
     <div>
       <div className="job-card">
         <div className="job-card__header">
-          <img
-            src={job.logo}
-            className="job-card__logo"
-            alt={job.company_name}
-          />
+          <div className="image-box">
+            <img
+              src={job.logo_url || "/images/company-logo-default.jpg"}
+              className="job-card__logo"
+              alt={job.company_name}
+            />
+          </div>
+
 
           <div className="job-card__info">
             <h3 className="job-card__title">{job.title}</h3>
@@ -76,7 +79,7 @@ export default function SavedJobCard({ job }: Props) {
               {job.salary_min && job.salary_max
                 ? `${job.salary_min} - ${job.salary_max}`
                 : "Negotiable"}
-             </span>
+            </span>
 
           </div>
         </div>

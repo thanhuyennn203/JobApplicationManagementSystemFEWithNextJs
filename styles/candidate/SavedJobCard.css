@@ -19,12 +19,19 @@
   align-items: flex-start;
 }
 
-.job-card__logo {
-  width: 56px;
-  height: 56px;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
+.job-card__header .image-box {
+  width: 80px;
+  height: 80px;
   object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  object-fit: contain;
+  overflow: hidden;
+}
+
+.job-card__logo {
+  width: 100%;
+  height: 100%;
 }
 
 .job-card__info {

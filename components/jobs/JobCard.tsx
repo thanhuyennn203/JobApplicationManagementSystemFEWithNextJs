@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Job } from "@/types/jobs";
 import "@/styles/candidate/JobCard.css";
 import { useState, useEffect } from "react";
@@ -29,7 +28,7 @@ export default function JobCard({ job }: Props) {
   const [saved, setSaved] = useState(false);
 
   const { provinces, getProvinceName } = useLocation();
-  // console.log("locations: ", provinces);
+  // console.log("locations: ", candidateId);
   
   useEffect(() => {
     const detectSaved = async () => {
@@ -44,7 +43,7 @@ export default function JobCard({ job }: Props) {
     };
 
     detectSaved();
-  }, [candidateId, job.id]);
+  }, [candidateId]);
 
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();

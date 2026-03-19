@@ -40,3 +40,13 @@ export const getJobDetailById = async (id: number) => {
   const data: JobDetail = await res.json();
   return data;
 };
+
+export const getJobsByIds = async (ids: number[]) => {
+  const query = ids.join(",");
+
+  const res = await fetch(
+    `http://localhost:9191/api/jobs/batch?ids=${query}`
+  );
+
+  return res.json();
+};

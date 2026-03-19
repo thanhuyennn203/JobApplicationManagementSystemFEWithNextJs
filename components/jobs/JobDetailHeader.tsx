@@ -9,6 +9,7 @@ import {
   removeSavedJob,
 } from "@/services/candidate/savedJob.service";
 import { useAuth } from "@/context/AuthContext";
+import ApplyJobModal from "../application/ApplyJobModal";
 
 interface Props {
   data: {
@@ -27,6 +28,7 @@ export default function JobDetailHeader({ data }: Props) {
   const auth = useAuth();
   const [saved, setSaved] = useState(false);
   const candidateId = auth?.user?.candidateId;
+  const [showModal, setShowModal] = useState(false);
   // console.log("candidateId: ", candidateId);
 
   useEffect(() => {
@@ -80,6 +82,16 @@ export default function JobDetailHeader({ data }: Props) {
 
   return (
     <div className="job-apply-card">
+      {showModal && (
+        <>
+          <div className="modal-backdrop" onClick={() => setShowModal(false)}></div>
+          <ApplyJobModal
+            jobTitle={data?.title || ""}
+            jobId={data.jobId}
+            onClose={() => setShowModal(false)}
+          />
+        </>
+      )}
       <h1 className="job-title">{data.title}</h1>
 
       <div className="job-meta-row">
@@ -119,7 +131,7 @@ export default function JobDetailHeader({ data }: Props) {
       </p>
 
       <div className="job-actions">
-        <button className="apply-btn">
+        <button className="apply-btn" onClick={() => setShowModal(true)}>
           <i className="fa-solid fa-paper-plane" />
           Apply Now
         </button>

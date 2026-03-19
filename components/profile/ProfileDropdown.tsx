@@ -31,12 +31,11 @@ export default function ProfileDropdown() {
 
   const logout = () => {
     auth?.logout();
-    router.push("/candidate/")
+    router.push("/candidate/");
   };
 
   return (
     <div className="profile-wrapper" ref={ref}>
-
       {/* Avatar */}
       <div className="candidate-profile-img-box">
         <img
@@ -45,7 +44,6 @@ export default function ProfileDropdown() {
           onClick={() => setOpen(!open)}
         />
       </div>
-
 
       {/* Dropdown */}
       {open && (
@@ -56,7 +54,7 @@ export default function ProfileDropdown() {
             <img src="/avatar.png" className="avatar-large" />
             <div>
               <p className="name">{auth?.user?.email}</p>
-              <p className="verify">Tài khoản đã xác thực</p>
+              <p className="verify">Verified Account</p>
               <p className="email">{auth?.user?.email}</p>
             </div>
           </div>
@@ -67,21 +65,24 @@ export default function ProfileDropdown() {
               className="menu-title"
               onClick={() => toggleSection("jobs")}
             >
-              Quản lý tìm việc
+              Job Management
               <i
-                className={`fa-solid fa-chevron-down arrow ${activeSection === "jobs" ? "rotate" : ""
-                  }`}
+                className={`fa-solid fa-chevron-down arrow ${
+                  activeSection === "jobs" ? "rotate" : ""
+                }`}
               ></i>
             </p>
 
             {activeSection === "jobs" && (
               <div className="menu-items">
                 <Link href="/candidate/jobs/saved">
-                  Việc làm đã lưu
+                  Saved Jobs
                 </Link>
-                <a>Việc làm đã ứng tuyển</a>
-                <a>Việc làm phù hợp với bạn</a>
-                <a>Cài đặt gợi ý việc làm</a>
+                <Link href="/candidate/jobs/applied">
+                  Applied Jobs
+                </Link>
+                <a>Recommended Jobs</a>
+                <a>Job Alerts Settings</a>
               </div>
             )}
           </div>
@@ -92,19 +93,20 @@ export default function ProfileDropdown() {
               className="menu-title"
               onClick={() => toggleSection("cv")}
             >
-              Quản lý CV & Cover letter
+              CV & Cover Letter
               <i
-                className={`fa-solid fa-chevron-down arrow ${activeSection === "cv" ? "rotate" : ""
-                  }`}
+                className={`fa-solid fa-chevron-down arrow ${
+                  activeSection === "cv" ? "rotate" : ""
+                }`}
               ></i>
             </p>
 
             {activeSection === "cv" && (
               <div className="menu-items">
-                <a>CV của tôi</a>
-                <a>Cover Letter của tôi</a>
-                <a>Nhà tuyển dụng muốn kết nối</a>
-                <a>Nhà tuyển dụng xem hồ sơ</a>
+                <a>My CV</a>
+                <a>My Cover Letters</a>
+                <a>Employers Want to Connect</a>
+                <a>Employers Viewed Profile</a>
               </div>
             )}
           </div>
@@ -115,17 +117,18 @@ export default function ProfileDropdown() {
               className="menu-title"
               onClick={() => toggleSection("email")}
             >
-              Cài đặt email & thông báo
+              Email & Notifications
               <i
-                className={`fa-solid fa-chevron-down arrow ${activeSection === "email" ? "rotate" : ""
-                  }`}
+                className={`fa-solid fa-chevron-down arrow ${
+                  activeSection === "email" ? "rotate" : ""
+                }`}
               ></i>
             </p>
 
             {activeSection === "email" && (
               <div className="menu-items">
-                <a>Cài đặt email</a>
-                <a>Thông báo hệ thống</a>
+                <a>Email Settings</a>
+                <a>System Notifications</a>
               </div>
             )}
           </div>
@@ -136,17 +139,18 @@ export default function ProfileDropdown() {
               className="menu-title"
               onClick={() => toggleSection("security")}
             >
-              Cá nhân & Bảo mật
+              Account & Security
               <i
-                className={`fa-solid fa-chevron-down arrow ${activeSection === "security" ? "rotate" : ""
-                  }`}
+                className={`fa-solid fa-chevron-down arrow ${
+                  activeSection === "security" ? "rotate" : ""
+                }`}
               ></i>
             </p>
 
             {activeSection === "security" && (
               <div className="menu-items">
-                <a>Thông tin cá nhân</a>
-                <a>Đổi mật khẩu</a>
+                <a>Personal Information</a>
+                <a>Change Password</a>
               </div>
             )}
           </div>
@@ -157,23 +161,24 @@ export default function ProfileDropdown() {
               className="menu-title"
               onClick={() => toggleSection("upgrade")}
             >
-              Nâng cấp tài khoản
+              Upgrade Account
               <i
-                className={`fa-solid fa-chevron-down arrow ${activeSection === "upgrade" ? "rotate" : ""
-                  }`}
+                className={`fa-solid fa-chevron-down arrow ${
+                  activeSection === "upgrade" ? "rotate" : ""
+                }`}
               ></i>
             </p>
 
             {activeSection === "upgrade" && (
               <div className="menu-items">
                 <a>TopCV Pro</a>
-                <a>Quyền lợi tài khoản</a>
+                <a>Account Benefits</a>
               </div>
             )}
           </div>
 
           <button className="logout" onClick={logout}>
-            Đăng xuất
+            Logout
           </button>
 
         </div>

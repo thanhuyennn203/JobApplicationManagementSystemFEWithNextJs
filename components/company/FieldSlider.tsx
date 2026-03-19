@@ -3,18 +3,18 @@
 import "@/styles/company/FieldSlider.css";
 import { useEffect, useState, useRef } from "react";
 const fields = [
-    "Tất cả",
-    "Ngân hàng",
-    "Bất động sản",
-    "Xây dựng",
-    "IT - Phần mềm",
-    "Tài chính",
-    "Bán lẻ - FMCG",
-    "Sản xuất",
-    "Logistics - Vận tải",
-    "Viễn thông",
-    "Bảo hiểm",
-    "Nhà hàng / Khách sạn",
+  "All",
+  "Banking",
+  "Real Estate",
+  "Construction",
+  "IT - Software",
+  "Finance",
+  "Retail - FMCG",
+  "Manufacturing",
+  "Logistics - Transportation",
+  "Telecommunications",
+  "Insurance",
+  "Restaurant / Hotel",
 ];
 
 export default function FieldSlider() {

@@ -25,7 +25,7 @@ export default function RecruiterSidebar() {
     {
       name: "Applications",
       icon: "fa-solid fa-file-lines",
-      path: "/recruiter/applications",
+      path: "/recruiter/application",
     },
     {
       name: "Company",

@@ -27,7 +27,7 @@ export default function JobCard({ job }: Props) {
         <div className="job-row__main">
 
           <img
-            src={job.logo || "/images/company-default.png"}
+            src={job.logo_url || "/images/company-logo-default.jpg"}
             className="job-row__logo"
             alt={job.company_name || "Company"}
           />

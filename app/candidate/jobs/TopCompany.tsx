@@ -16,7 +16,7 @@ export default function TopCompanies() {
         };
 
         fetch();
-    }, [companies]);
+    }, []);
 
     const topCompany = companies[0];
     const { isFollowing, loading, toggleFollow } = useFollowCompany(topCompany?.id);

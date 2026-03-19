@@ -26,12 +26,12 @@ export default function SavedJobsList() {
 
         fetchJobs();
 
-    }, [candidateId, jobs]);
+    }, []);
 
     return (
         <div className="saved_job_list_Wrapper">
             <h2>
-                Danh sách <span>{jobs.length}</span> việc làm đã lưu
+               List <span>{jobs.length}</span> saved jobs.
             </h2>
 
 

@@ -271,13 +271,13 @@ export default function StepDetail({ jobId, prevStep, nextStep }: any) {
 
                     {success && (
                         <p className="success-msg">
-                            ✅ Job detail saved successfully
+                            {/* ✅ Job detail saved successfully */}
                         </p>
                     )}
 
                     {error && (
                         <p className="error-msg">
-                            ❌ {error}
+                            {/* ❌ {error} */}
                         </p>
                     )}
 
@@ -296,7 +296,7 @@ export default function StepDetail({ jobId, prevStep, nextStep }: any) {
                     className="submit-btn"
                 // disabled={!success}
                 >
-                    Submit
+                    Publish
                 </button>
 
             </div>
