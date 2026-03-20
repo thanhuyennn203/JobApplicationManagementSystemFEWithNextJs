@@ -33,3 +33,13 @@ export const getAppliedJobByJobId = async (id: number) => {
   const data: Application[] = await res.json();
   return data;
 };
+
+export const getAppliedJobByCompanyId = async (id: number) => {
+  const res = await fetch(
+    `http://localhost:9191/api/applications/company/${id}`,
+    { cache: "no-store" }
+  );
+  if (!res.ok) throw new Error("Failed to fetch job");
+  const data: Application[] = await res.json();
+  return data;
+};

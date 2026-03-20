@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useAuth } from "@/context/AuthContext"
-import { getAppliedJobByJobId } from "@/services/application/application.service"
+import { getAppliedJobByCompanyId } from "@/services/application/application.service"
 import { Application } from "@/types/application"
 import ApplicationCard from "@/components/application/ApplicationCard"
 
@@ -10,25 +10,26 @@ export default function ApplicationCandidateList() {
 
     const auth = useAuth();
     // const candidateId = auth?.user?.candidateId;
-    const candidateId = 58;
+    const companyId = auth?.user?.companyId;
+
     const [applications, setApplications] = useState<Application[]>([]);
 
     useEffect(() => {
         const fetchApplications = async () => {
-            if (!candidateId) return;
+            if (!companyId) return;
 
             try {
                 // 1. Get applications
-                const applications = await getAppliedJobByJobId(Number(candidateId));
+                const applications = await getAppliedJobByCompanyId(Number(companyId));
                 setApplications(applications);
-console.log(applications);
+                console.log(applications);
             } catch (error) {
                 console.error("Error fetching jobs:", error);
             }
         };
 
         fetchApplications();
-    }, [candidateId]);
+    }, [companyId]);
 
     return (
         <div className="saved_job_list_Wrapper">

@@ -8,4 +8,5 @@ export interface Application {
   letter?: string;
   phone?: string;
   status?: string;
+  companyId?: number;
 }

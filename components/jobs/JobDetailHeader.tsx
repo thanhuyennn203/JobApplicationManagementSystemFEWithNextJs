@@ -19,6 +19,7 @@ interface Props {
     locations: Location[];
     experience: string;
     due_date: Date;
+    companyId: number;
   };
 }
 
@@ -88,6 +89,7 @@ export default function JobDetailHeader({ data }: Props) {
           <ApplyJobModal
             jobTitle={data?.title || ""}
             jobId={data.jobId}
+            companyId={data.companyId}
             onClose={() => setShowModal(false)}
           />
         </>

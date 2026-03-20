@@ -8,13 +8,15 @@ import { useAuth } from "@/context/AuthContext";
 interface Props {
     jobId: number;
     jobTitle: string;
+    companyId: number;
     onClose: () => void;
 }
 
-export default function ApplyJobModal({ jobId, jobTitle, onClose }: Props) {
+export default function ApplyJobModal({ jobId, jobTitle, companyId, onClose }: Props) {
     const auth = useAuth();
     const candidateId = auth?.user?.candidateId;
-
+    // const companyId = auth?.user?.companyId;
+    console.log("companyId in modal: ", companyId);
     const [file, setFile] = useState<File | null>(null);
     const [form, setForm] = useState({
         fullName: "",
@@ -46,9 +48,9 @@ export default function ApplyJobModal({ jobId, jobTitle, onClose }: Props) {
         formData.append("phone", form.phone);
         formData.append("letter", form.letter);
         formData.append("candidateId", String(candidateId));
-
+        formData.append("companyId", String(companyId));
         if (file) formData.append("cvFile", file);
-
+        console.log(formData);
         try {
             await applyJob(formData);
             alert("Application submitted successfully!");

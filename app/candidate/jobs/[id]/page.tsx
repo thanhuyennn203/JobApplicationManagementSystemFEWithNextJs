@@ -42,6 +42,7 @@ export default function JobDetailPage() {
     fetchJob();
   }, [jobId]);
 
+  console.log("companyId in detail:" ,job?.company_id);
 
   useEffect(() => {
     if (!job?.company_id) return;
@@ -134,6 +135,7 @@ export default function JobDetailPage() {
           <ApplyJobModal
             jobTitle={job?.title || ""}
             jobId={jobId}
+            companyId={job?.company_id}
             onClose={() => setShowModal(false)}
           />
         </>

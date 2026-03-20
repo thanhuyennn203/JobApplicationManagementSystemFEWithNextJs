@@ -31,6 +31,7 @@ export default function JobDetailHeaderClient({ job, jobId }: any) {
           ? job.experienceRequired.split("\n")[0]
           : "Not required",
         due_date: job.dueDate,
+        companyId: job.company_id,
       }}
     />
   );
