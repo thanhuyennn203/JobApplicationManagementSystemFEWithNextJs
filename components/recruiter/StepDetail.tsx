@@ -132,17 +132,10 @@ export default function StepDetail({ jobId, prevStep, nextStep }: any) {
     return (
 
         <div className="step-container">
-
-            <h2>Job Detail</h2>
-
             <div className="job-detail-container">
-
-                <h1 className="page-title">Job Detail</h1>
-
                 <form className="job-detail-form" onSubmit={handleSubmit}>
-
                     <div className="form-section">
-                        <h3>Job Description</h3>
+                        <h3 className="page-tile">Job Description</h3>
 
                         <textarea
                             name="description"
@@ -283,23 +276,24 @@ export default function StepDetail({ jobId, prevStep, nextStep }: any) {
 
                 </form>
 
+                <div className="job-form-step-btn back-next-btn">
+
+                    <button onClick={prevStep} className="back-btn">
+                        <i className="fa-solid fa-angle-left"></i>
+                        <span>Back</span>
+                    </button>
+
+                    <button
+                        onClick={() => router.push("/recruiter/jobs/")}
+                        className="finish-btn"
+                    >
+                        <span>Finish</span>
+                        <i className="fa-solid fa-angle-right"></i>
+                    </button>
+                </div>
+
             </div>
 
-            <div className="btn-group">
-
-                <button onClick={prevStep} className="back-btn">
-                    Back
-                </button>
-
-                <button
-                    onClick={() => router.push("/recruiter/jobs/")}
-                    className="submit-btn"
-                // disabled={!success}
-                >
-                    Publish
-                </button>
-
-            </div>
 
         </div>
 

@@ -19,31 +19,31 @@ export default function CandidateHeader() {
 
         {/* Logo */}
         <div className="header__left">
-          <Link href="/">
+          {/* <Link href="/">
             <img
               src="/topcv-logo.png"
               alt="TopCV"
               className="header__logo"
             />
-          </Link>
+          </Link> */}
         </div>
 
         {/* Navigation */}
         <nav className="header__nav">
           <Link href="/candidate/jobs" className="nav-item">
-            Việc làm
+           Job
           </Link>
 
           <Link href="/cv-builder" className="nav-item">
-            Tạo CV
+            Create CV
           </Link>
 
           <Link href="/tools" className="nav-item">
-            Công cụ
+            Tools
           </Link>
 
           <Link href="/career-guide" className="nav-item">
-            Cẩm nang nghề nghiệp
+            Career Resources
           </Link>
 
           <Link href="/pro" className="nav-item nav-item--pro">
@@ -61,21 +61,21 @@ export default function CandidateHeader() {
                 className="btn btn-outline"
                 onClick={() => router.push("/candidate/register")}
               >
-                Đăng ký
+                Register
               </button>
 
               <button
                 className="btn btn-primary"
                 onClick={() => router.push("/candidate/login")}
               >
-                Đăng nhập
+                Login
               </button>
 
               <button
                 className="btn btn-gray"
                 onClick={() => router.push("/recruiter/register")}
               >
-                Đăng tuyển & tìm hồ sơ
+                Post Jobs & Find Candidates
               </button>
             </>
 
@@ -95,12 +95,12 @@ export default function CandidateHeader() {
               <ProfileDropdown />
 
               <div className="recruiter-link">
-                <span>Bạn là nhà tuyển dụng?</span>
+                <span>Are you hiring?</span>
                 <button
                   className="btn-link"
                   onClick={() => router.push("/landing")}
                 >
-                  Đăng tuyển ngay »
+                  Post a job now »
                 </button>
               </div>
             </>

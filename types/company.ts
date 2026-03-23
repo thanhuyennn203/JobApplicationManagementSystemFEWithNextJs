@@ -10,4 +10,7 @@ export interface Company {
   followerNumber?: number;
   backgroundUrl?: string;
   website?: string;
+  certificateUrl?: string;
+  verificationStatus?: string;
+  rejectionReason?: string;
 }

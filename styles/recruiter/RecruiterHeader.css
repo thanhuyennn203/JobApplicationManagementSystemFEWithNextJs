@@ -4,7 +4,7 @@
   display:flex;
   align-items:center;
   justify-content:space-between;
-  /* padding:0 20px; */
+  padding:0 60px;
   color:white;
 }
 
@@ -169,6 +169,7 @@
 }
 
 .dropdown-item {
+  color: black;
   padding: 12px 14px;
   display: flex;
   align-items: center;
@@ -183,4 +184,33 @@
 
 .logout {
   color: #e53935;
+}
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.header-user-info {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+}
+
+.recruiter-content{
+  padding: 40px;
 }

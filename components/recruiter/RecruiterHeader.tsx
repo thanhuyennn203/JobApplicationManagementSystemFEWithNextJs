@@ -17,8 +17,8 @@ export default function RecruiterHeader() {
 
   const handleLogout = () => {
     auth?.logout();
-    router.push("/landing")
-     // call logout from context
+    router.push("/recruiter/login")
+    // call logout from context
   };
 
   // close dropdown when click outside
@@ -44,7 +44,7 @@ export default function RecruiterHeader() {
 
       {/* Left */}
       <div className="header-left">
-        <i className="fa-solid fa-bars menu-icon"></i>
+        {/* <i className="fa-solid fa-bars menu-icon"></i> */}
 
         <Link href="/">
           <img src="/topcv-logo-white.png" className="logo" />
@@ -63,11 +63,19 @@ export default function RecruiterHeader() {
         </Link>
 
         <Link
-          href="/recruiter/post"
-          className={`nav-pill ${pathname === "/recruiter/post" ? "active" : ""}`}
+          href="/recruiter/jobs"
+          className={`nav-pill ${pathname === "/recruiter/jobs" ? "active" : ""}`}
         >
-          <i className="fa-solid fa-pen"></i>
+          <i className="fa-solid fa-briefcase"></i>
           Posting Job
+        </Link>
+
+        <Link
+          href="/recruiter/application"
+          className={`nav-pill ${pathname === "/recruiter/application" ? "active" : ""}`}
+        >
+          <i className="fa-solid fa-file-lines"></i>
+          Applications
         </Link>
 
         <Link
@@ -75,23 +83,15 @@ export default function RecruiterHeader() {
           className={`nav-pill ${pathname === "/recruiter/search" ? "active" : ""}`}
         >
           <i className="fa-solid fa-magnifying-glass"></i>
-          Search for CV
+          Search
         </Link>
 
         <Link
-          href="/recruiter/connect"
-          className={`nav-pill ${pathname === "/recruiter/connect" ? "active" : ""}`}
+          href="/recruiter/company"
+          className={`nav-pill ${pathname === "/recruiter/company" ? "active" : ""}`}
         >
-          <i className="fa-solid fa-comment-dots"></i>
-          Connect
-        </Link>
-
-        <Link
-          href="/recruiter/insights"
-          className={`nav-pill ${pathname === "/recruiter/insights" ? "active" : ""}`}
-        >
-          <i className="fa-solid fa-lightbulb"></i>
-          Insights
+          <i className="fa-solid fa-building"></i>
+          About company
           <span className="dot"></span>
         </Link>
 
@@ -115,15 +115,15 @@ export default function RecruiterHeader() {
           onClick={() => setOpen(!open)}
           ref={dropdownRef}
         >
-          <img src="/default-avatar.png" />
+          <img src={"/images/company-logo-default.jpg"} />
           <i className="fa-solid fa-chevron-down"></i>
 
           {open && (
             <div className="avatar-dropdown">
 
-              <div className="dropdown-item">
+              <div className="dropdown-item" onClick={()=> router.push("/recruiter/company/verify")}>
                 <i className="fa-regular fa-circle-question"></i>
-                Hỗ trợ
+                <p>Verify Company</p>
               </div>
 
               <div
@@ -131,7 +131,7 @@ export default function RecruiterHeader() {
                 onClick={handleLogout}
               >
                 <i className="fa-solid fa-right-from-bracket"></i>
-                Đăng xuất
+                <p>Logout</p>
               </div>
 
             </div>

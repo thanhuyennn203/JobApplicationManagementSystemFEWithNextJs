@@ -1,5 +1,5 @@
-import RecruiterSidebar from "@/components/recruiter/RecruiterSidebar";
-import "@/styles/recruiter/layout.css";
+import RecruiterHeader from "@/components/recruiter/RecruiterHeader";
+// import "@/styles/recruiter/RecruiterHeader.css";
 
 export default function RecruiterLayout({
   children,
@@ -8,7 +8,7 @@ export default function RecruiterLayout({
 }) {
   return (
     <div className="recruiter-layout">
-      <RecruiterSidebar />
+      <RecruiterHeader />
 
       <main className="recruiter-content">
         {children}

@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import "@/styles/recruiter/RecruiterSidebar.css";
 
 export default function RecruiterSidebar() {
 
   const pathname = usePathname();
+  const router = useRouter();
   const auth = useAuth();
   const user = auth?.user;
 
@@ -15,31 +16,35 @@ export default function RecruiterSidebar() {
     {
       name: "Dashboard",
       icon: "fa-solid fa-chart-line",
-      path: "/recruiter/dashboard",
+      path: "/admin/dashboard",
     },
     {
       name: "Jobs Posting",
       icon: "fa-solid fa-briefcase",
-      path: "/recruiter/jobs",
+      path: "/admin/job",
     },
     {
       name: "Applications",
       icon: "fa-solid fa-file-lines",
-      path: "/recruiter/application",
+      path: "/admin/application",
     },
     {
-      name: "Company",
+      name: "Companies",
       icon: "fa-solid fa-building",
-      path: "/recruiter/company",
+      path: "/admin/company",
     },
   ];
+
+  const handleLogout = () => {
+    auth?.logout(); // call your context logout
+    router.push("/recruiter/login"); // redirect after logout
+  };
 
   return (
     <aside className="sidebar">
 
       {/* User info */}
       <div className="sidebar-user">
-
         <img
           src={user?.avatar || "/images/default-avatar.jpg"}
           alt="avatar"
@@ -47,7 +52,6 @@ export default function RecruiterSidebar() {
         />
 
         <div className="sidebar-user-info">
-
           <div className="sidebar-name">
             {user?.name || "Recruiter"}
           </div>
@@ -55,14 +59,11 @@ export default function RecruiterSidebar() {
           <div className="sidebar-email">
             {user?.email || "email@example.com"}
           </div>
-
         </div>
-
       </div>
 
       {/* Menu */}
       {menu.map((item) => {
-
         const isActive = pathname.startsWith(item.path);
 
         return (
@@ -76,6 +77,12 @@ export default function RecruiterSidebar() {
           </Link>
         );
       })}
+
+      {/* Logout */}
+      <div className="sidebar-item logout" onClick={handleLogout}>
+        <i className="fa-solid fa-right-from-bracket"></i>
+        <span className="sidebar-text">Logout</span>
+      </div>
 
     </aside>
   );

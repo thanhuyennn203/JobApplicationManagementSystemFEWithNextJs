@@ -43,3 +43,20 @@ export const getAppliedJobByCompanyId = async (id: number) => {
   const data: Application[] = await res.json();
   return data;
 };
+
+export const updateApplicationStatus = async (applicationId: number, status: string) => {
+  const res = await fetch(
+    `http://localhost:9191/api/applications/${applicationId}/status?status=${status}`,
+    {
+      method: "PATCH",
+    }
+  );
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || "Failed to update application status");
+  }
+
+  const data: Application = await res.json();
+  return data;
+};

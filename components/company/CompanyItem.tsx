@@ -18,7 +18,7 @@ export default function CompanyItem({ company }: { company: Company }) {
                     {/* Logo */}
                     <div className="company-header__image">
                         <img
-                            src={company?.logo_url || "/images/company-logo-default.jpg"}
+                            src={ "/images/company-logo-default.jpg"}
                             alt={company?.name}
                         />
                     </div>

@@ -1,4 +1,5 @@
 import CandidateHeader from "@/components/CandidateHeader";
+import Footer from "@/components/Footer";
 
 export default function CandidateLayout({
   children,
@@ -10,6 +11,7 @@ export default function CandidateLayout({
       {/* <Header /> */}
       <CandidateHeader />
       {children}
+      <Footer />
     </>
   );
 }

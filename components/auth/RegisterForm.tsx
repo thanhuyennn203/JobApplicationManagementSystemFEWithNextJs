@@ -84,13 +84,13 @@ export default function RegisterForm() {
   return (
     <div className="register-wrapper">
       <div className="register-card">
-        <h2 className="title">Chào mừng bạn đến với TopCV</h2>
+        <h2 className="title">Welcome to Job Application Management</h2>
 
         <form className="register-form" onSubmit={handleSubmit}>
 
           {/* Full name */}
           <div className="form-group">
-            <label>Họ và tên</label>
+            <label>Full name</label>
             <div className="input-wrapper">
               <i className="fa-solid fa-user icon" />
               <input
@@ -120,7 +120,7 @@ export default function RegisterForm() {
 
           {/* Password */}
           <div className="form-group">
-            <label>Mật khẩu</label>
+            <label>Password</label>
             <div className="input-wrapper">
               <i className="fa-solid fa-shield-halved icon" />
               <input
@@ -140,7 +140,7 @@ export default function RegisterForm() {
 
           {/* Confirm password */}
           <div className="form-group">
-            <label>Xác nhận mật khẩu</label>
+            <label>Confirm password</label>
             <div className="input-wrapper">
               <i className="fa-solid fa-shield-halved icon" />
               <input
@@ -167,12 +167,12 @@ export default function RegisterForm() {
               onChange={(e) => setAgree(e.target.checked)}
             />
             <label>
-              Tôi đã đọc và đồng ý với <span>Điều khoản</span>
+              I agree to the <span>Terms and Conditions</span>
             </label>
           </div>
 
           <button type="submit" className="register-btn">
-            Đăng ký
+            Register
           </button>
 
         </form>

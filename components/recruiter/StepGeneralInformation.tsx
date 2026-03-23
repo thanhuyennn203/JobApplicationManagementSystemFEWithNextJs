@@ -74,50 +74,47 @@ export default function StepBasic({ prevStep, nextStep, jobId }: any) {
 
     useEffect(() => {
 
-    if (!jobId) return;
+        if (!jobId) return;
 
-    const fetchGeneralInformation = async () => {
+        const fetchGeneralInformation = async () => {
 
-        try {
+            try {
 
-            const res = await fetch(
-                `http://localhost:9191/api/jobs/${jobId}/general-information`
-            );
+                const res = await fetch(
+                    `http://localhost:9191/api/jobs/${jobId}/general-information`
+                );
 
-            if (!res.ok) return;
+                if (!res.ok) return;
 
-            const data = await res.json();
+                const data = await res.json();
 
-            console.log("Fetched general info:", data);
+                console.log("Fetched general info:", data);
 
-            setFormData({
-                rank: data.rank || "",
-                education: data.education || "",
-                numberOfRecruitment: data.numberOfRecruitment || 1,
-                workingStyle: data.workingStyle || ""
-            });
+                setFormData({
+                    rank: data.rank || "",
+                    education: data.education || "",
+                    numberOfRecruitment: data.numberOfRecruitment || 1,
+                    workingStyle: data.workingStyle || ""
+                });
 
-        } catch (err) {
-            console.error("Failed to fetch general information", err);
-        }
+            } catch (err) {
+                console.error("Failed to fetch general information", err);
+            }
 
-    };
+        };
 
-    fetchGeneralInformation();
+        fetchGeneralInformation();
 
-}, [jobId]);
+    }, [jobId]);
 
     return (
 
         <div className="step-container">
 
-            <h2>Job Basic Information</h2>
-
             <div className="general-info-container">
 
-                <h2 className="section-title">General Information</h2>
-
                 <form className="general-info-form" onSubmit={handleSubmit}>
+                <h2 className="page-title">General Information</h2>
 
                     <div className="grid-2">
 
@@ -211,24 +208,23 @@ export default function StepBasic({ prevStep, nextStep, jobId }: any) {
                     )}
 
                 </form>
+                <div className="job-form-step-btn back-next-btn">
+                    <button onClick={prevStep} className="back-btn">
+                        Back
+                    </button>
 
-            </div>
-
-            <div className="btn-group">
-
-                <button onClick={prevStep} className="back-btn">
-                    Back
-                </button>
-
-                <button
-                    onClick={nextStep}
-                    className="next-btn"
+                    <button
+                        onClick={nextStep}
+                        className="next-btn"
                     // disabled={!success}
-                >
-                    Next
-                </button>
+                    >
+                        Next
+                    </button>
 
+                </div>
             </div>
+
+
 
         </div>
     );

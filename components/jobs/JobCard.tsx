@@ -65,6 +65,7 @@ export default function JobCard({ job }: Props) {
       console.error(error);
     }
   };
+  console.log(job);
 
   return (
     // <Link href={`/candidate/jobs/${job.id}`} className="job-card-link">
@@ -73,7 +74,7 @@ export default function JobCard({ job }: Props) {
           <div className="box-comapny-logo">
             <div className="avatar">
               <img
-                src={job.logo_url || "/images/company-logo-default.jpg"}
+                src={"/images/company-logo-default.jpg"}
                 className="job-card__logo"
                 alt={job.company_name}
               />

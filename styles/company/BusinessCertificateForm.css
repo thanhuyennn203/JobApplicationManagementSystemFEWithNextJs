@@ -1,0 +1,13 @@
+.bg-white {
+    display: block;
+    width: 100%;
+}
+
+.illustration {
+    padding: 0 60px;
+    overflow: hidden;
+}
+
+.illustration-sample-img {
+    /* width: 40%; */
+}

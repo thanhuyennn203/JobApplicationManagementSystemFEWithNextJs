@@ -1,0 +1,275 @@
+.job-form-step-btn {
+  display: flex;
+  justify-content: space-between;
+  /* push to 2 sides */
+  align-items: center;
+  margin-top: 20px;
+}
+
+.back-btn,
+.finish-btn,
+.next-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Back button style */
+.back-btn {
+  background: #dce0dc;
+  color: #333;
+}
+
+/* Finish button style */
+.finish-btn,
+.next-btn {
+  background: #1677ff;
+  color: white;
+}
+
+.finish-btn:hover {
+  opacity: 0.9;
+}
+
+
+.container {
+  padding: 30px;
+  background: #f5f6fa;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab {
+  padding: 10px 20px;
+  border: none;
+  background: #eee;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: #00b14f;
+  color: white;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background: #00b14f;
+  color: white;
+  border: none;
+}
+
+.btn.purple {
+  background: #00b14f;
+  color: white;
+}
+
+.btn.login {
+  background: #00b14f;
+  color: white;
+  border: none;
+}
+
+/* Table */
+.table {
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* Status */
+.status {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.status.active {
+  background: #d4f5e9;
+  color: green;
+}
+
+.status.inactive {
+  background: #fde2e2;
+  color: red;
+}
+
+/* Icons */
+.icons i {
+  margin-right: 12px;
+  cursor: pointer;
+  /* color: #00b14f; */
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+.icons i:hover {
+  opacity: 0.7;
+}
+
+.btn.approve {
+  border-radius: 10px;
+  border-color: #00b14f;
+  font-size: 12px;
+  margin-right: 6px;
+}
+
+.btn.approve:hover {
+  background-color: #00b14f;
+  color: white;
+}
+
+.btn.reject {
+  border-radius: 10px;
+  border-color: #dc3545;
+  font-size: 12px;
+  margin-right: 6px;
+}
+
+.btn.reject:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.status.open {
+  color: #1677ff;
+}
+
+.status.closed {
+  color: red;
+}
+
+.status.draft {
+  color: gray;
+}
+
+.status.expired {
+  color: orange;
+}
+
+.btn.active {
+  background: #1677ff;
+  color: white;
+}
+
+.btn.active {
+  background: #00b14f;
+  color: white;
+}
+
+.container {
+  padding: 20px;
+  background: #f5f6fa;
+  min-height: 100vh;
+}
+
+.table {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.all-job-row,
+.row {
+  display: grid;
+  grid-template-columns: 20px 1fr 150px 1fr 100px 90px 180px 60px;
+  align-items: center;
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  transition: background 0.2s;
+}
+
+.all-job-row:hover,
+.row:hover {
+  background: #f0f8ff;
+}
+
+.all-job-row.head,
+.row.head {
+  background: #fafafa;
+  font-weight: bold;
+}
+
+.status {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.status.open {
+  background: #d4f5e9;
+  color: green;
+}
+
+.status.closed {
+  background: #fde2e2;
+  color: red;
+}
+
+.status.draft {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status.expired {
+  background: #e2e3e5;
+  color: #6c757d;
+}
+
+.btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+}
+
+.btn.primary {
+  background: #00b14f;
+  color: #fff;
+}
+
+.onboarding-container.card-shadow {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}

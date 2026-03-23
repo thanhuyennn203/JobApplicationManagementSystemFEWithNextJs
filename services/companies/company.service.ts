@@ -94,3 +94,69 @@ export const checkFollowCompany = async (candidateId: number, companyId: number)
 
   return res.json();
 };
+
+export async function uploadCertificate(
+  file: File,
+  companyId: number
+) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(
+    `http://localhost:9191/api/companies/${companyId}/certificate`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Upload failed");
+  }
+
+  return res.json(); // ✅ correct
+}
+
+
+export const getAllCompanies = async () => {
+  const res = await fetch(
+    `http://localhost:9191/api/companies`,
+    { cache: "no-store" }
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error("Failed to fetch company");
+  }
+
+  return res.json();
+};
+
+
+const BASE_URL = "http://localhost:9191/api/companies";
+
+export const approveCompany = async (id: number) => {
+  const res = await fetch(`${BASE_URL}/admin/${id}/approve`, {
+    method: "POST",
+  });
+
+  if (!res.ok) {
+    throw new Error("Approve failed");
+  }
+
+  return res.json();
+};
+
+export const rejectCompany = async (id: number, reason: string) => {
+  const res = await fetch(
+    `${BASE_URL}/admin/${id}/reject?reason=${encodeURIComponent(reason)}`,
+    {
+      method: "POST",
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Reject failed");
+  }
+
+  return res.json();
+};

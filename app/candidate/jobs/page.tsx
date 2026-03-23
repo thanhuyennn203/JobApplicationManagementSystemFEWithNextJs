@@ -1,6 +1,7 @@
 import JobSearch from "@/components/jobs/JobSearch";
 import JobsByLocation from "./JobByLocation";
 import TopCompanies from "./TopCompany";
+import CenterBanner from "@/components/Banner";
 
 export default async function JobsPage() {
 
@@ -10,6 +11,7 @@ export default async function JobsPage() {
       <div className="main-container">
         <JobsByLocation />
         <TopCompanies />
+        <CenterBanner />
       </div>
     </div>
   );

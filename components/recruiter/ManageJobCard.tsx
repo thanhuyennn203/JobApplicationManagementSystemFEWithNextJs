@@ -36,9 +36,9 @@ export default function JobCard({ job }: Props) {
 
             <h3 className="job-row__title">{job.title}</h3>
 
-            <p className="job-row__company">
+            {/* <p className="job-row__company">
               {job.company_name || "Unknown Company"}
-            </p>
+            </p> */}
 
           </div>
 
