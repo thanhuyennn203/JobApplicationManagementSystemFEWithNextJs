@@ -207,8 +207,7 @@
   overflow: hidden;
 }
 
-.all-job-row,
-.row {
+.all-job-row {
   display: grid;
   grid-template-columns: 20px 1fr 150px 1fr 100px 90px 180px 60px;
   align-items: center;
@@ -272,4 +271,15 @@
   padding: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   margin-top: 20px;
+}
+
+.row-status{
+  display: grid;
+  grid-template-columns: 20px 1fr 150px 230px;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  transition: background 0.2s;
+  overflow: hidden;
 }

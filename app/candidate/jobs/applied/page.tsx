@@ -1,5 +1,5 @@
 import AppliedJobsList from "@/components/jobs/AppliedJobList";
-// import "@/styles/candidate/AppliedJobPage.css";
+import "@/styles/candidate/AppliedJobPage.css";
 import "@/styles/candidate/SavedJobsPage.css";
 
 export default function AppliedJobsPage() {

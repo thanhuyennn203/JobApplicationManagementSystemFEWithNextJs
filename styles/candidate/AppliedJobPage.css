@@ -1,0 +1,87 @@
+.applied_job_card {
+  border: 1px solid #e5e7eb;
+  padding: 16px;
+  border-radius: 10px;
+  background: #fff;
+  transition: 0.2s;
+}
+
+.applied_job_card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.saved_jobs_list_grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.applied_job_card {
+  display: flex;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  transition: 0.2s;
+}
+
+.applied_job_card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* LEFT COLOR BAR */
+.status_bar {
+  width: 6px;
+}
+
+/* CONTENT */
+.card_content {
+  flex: 1;
+  padding: 16px;
+}
+
+/* HEADER */
+.card_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.card_header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+/* STATUS BADGE */
+.status_badge {
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+/* BODY */
+.card_body p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+/* FOOTER */
+.card_footer {
+  margin-top: 12px;
+}
+
+/* BUTTON */
+.cv_button {
+  display: inline-block;
+  padding: 6px 12px;
+  background: #2563eb;
+  color: #fff;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.cv_button:hover {
+  background: #1d4ed8;
+}

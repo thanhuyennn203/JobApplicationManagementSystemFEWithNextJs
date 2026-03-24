@@ -50,3 +50,30 @@ export const getJobsByIds = async (ids: number[]) => {
 
   return res.json();
 };
+
+export const getJobByCompanyId = async (companyId: number) => {
+  try {
+    const res = await fetch(
+      `http://localhost:9191/api/jobs/company/${companyId}`,
+      { cache: "no-store" }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch jobs by company");
+    }
+
+    const data: Job[] = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error fetching jobs by company:", err);
+    return [];
+  }
+};
+
+export async function getAllJobs() {
+  const res = await fetch(API_URL);
+
+  if (!res.ok) throw new Error("Failed to fetch jobs");
+
+  return res.json();
+}

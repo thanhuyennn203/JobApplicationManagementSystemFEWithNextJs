@@ -153,3 +153,11 @@
   background: #1677ff;
   color: white;
 }
+
+.table .row > div {
+  border-right: 1px solid #ddd;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}

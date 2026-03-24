@@ -1,5 +1,6 @@
 "use client";
 
+import "@/styles/Pagination.css";
 export default function Pagination({ page, totalPages, setPage }: any) {
   return (
     <div className="pagination">

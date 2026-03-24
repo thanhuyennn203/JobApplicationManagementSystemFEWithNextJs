@@ -60,3 +60,27 @@ export const updateApplicationStatus = async (applicationId: number, status: str
   const data: Application = await res.json();
   return data;
 };
+
+export const getAppliedFormByCandidateId = async (
+  id: number
+): Promise<Application[]> => {
+  const res = await fetch(
+    `http://localhost:9191/api/applications/candidate/${id}`,
+    { cache: "no-store" }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch applications");
+  }
+
+  const data: Application[] = await res.json();
+  return data;
+};
+
+const API_URL = "http://localhost:9191/api/applications";
+
+export async function getAllApplications() {
+  const res = await fetch(API_URL);
+  if (!res.ok) throw new Error("Failed to fetch applications");
+  return res.json();
+}

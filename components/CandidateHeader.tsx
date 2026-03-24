@@ -98,7 +98,7 @@ export default function CandidateHeader() {
                 <span>Are you hiring?</span>
                 <button
                   className="btn-link"
-                  onClick={() => router.push("/landing")}
+                  onClick={() => router.push("/recruiter/register")}
                 >
                   Post a job now »
                 </button>

@@ -10,7 +10,7 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const { login, user } = useAuth(); // ⭐ get user from context
+  const { login, user } = useAuth();
 
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -54,16 +54,12 @@ export default function LoginForm() {
 
       await login(formData.email, formData.password);
 
-      // ⭐ roles come from AuthContext
       const roles = user?.roles || [];
       console.log(roles);
 
       if (roles.includes("RECRUITER")) {
         router.push("/recruiter");
-      } else {
-        alert("You are not a recruiter");
-      }
-
+      } 
     } catch (err: any) {
 
       console.log("Login error:", err);

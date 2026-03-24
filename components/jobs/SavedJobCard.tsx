@@ -9,6 +9,7 @@ import {
   removeSavedJob,
 } from "@/services/candidate/savedJob.service";
 import { useAuth } from "@/context/AuthContext";
+import { useLocation } from "@/context/LocationContext";
 interface Props {
   job: Job;
 }
@@ -20,7 +21,8 @@ export default function SavedJobCard({ job }: Props) {
   const auth = useAuth();
   const [saved, setSaved] = useState(false);
   const candidateId = auth?.user?.candidateId;
-  // console.log("candidateId: ", candidateId);
+  console.log("candidateId: ", job);
+  const {getProvinceName} = useLocation();
 
   useEffect(() => {
     const detectSaved = async () => {
@@ -87,13 +89,13 @@ export default function SavedJobCard({ job }: Props) {
         <div className="job-card__footer">
           {firstLocation && (
             <span className="job-card__badge">
-              {firstLocation.province}
+              {getProvinceName(firstLocation.province)}
               {remainingCount > 0 && ` +${remainingCount}`}
             </span>
           )}
 
           <span className="job-card__badge">
-            {job?.experienceRequired ? job.experienceRequired : "Not Required"}
+            {job?.experienceRequired ? job.experienceRequired : "No Experience"}
           </span>
 
         </div>

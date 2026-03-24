@@ -10,6 +10,7 @@
 
 .right {
   flex: 2;
+  padding: 0;
 }
 
 .banner {

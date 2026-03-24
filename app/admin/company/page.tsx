@@ -3,11 +3,20 @@
 import { useEffect, useState } from "react";
 import "@/styles/admin/AdminPage.css";
 import { getAllCompanies, approveCompany, rejectCompany } from "@/services/companies/company.service";
+import Pagination from "@/components/jobs/Pagination"; // adjust path
 
 export default function CompanyPage() {
     const [companies, setCompanies] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const itemsPerPage = 10;
 
+    const totalPages = Math.ceil(companies.length / itemsPerPage);
+
+    const currentCompanies = companies.slice(
+        (page - 1) * itemsPerPage,
+        page * itemsPerPage
+    );
     const handleReject = async (id: number) => {
         const reason = prompt("Enter rejection reason:");
         if (!reason) return;
@@ -78,9 +87,8 @@ export default function CompanyPage() {
                         <div>Action</div>
                     </div>
 
-                    {companies.map((c) => (
+                    {currentCompanies.map((c) => (
                         <div className="row" key={c.id}>
-
                             {/* Logo */}
                             <div>
                                 <img
@@ -104,10 +112,10 @@ export default function CompanyPage() {
                             <div>
                                 <span
                                     className={`status ${c.verificationStatus === "APPROVED"
-                                            ? "active"
-                                            : c.verificationStatus === "REJECTED"
-                                                ? "inactive"
-                                                : "pending"
+                                        ? "active"
+                                        : c.verificationStatus === "REJECTED"
+                                            ? "inactive"
+                                            : "pending"
                                         }`}
                                 >
                                     {c.verificationStatus || "PENDING"}
@@ -147,8 +155,12 @@ export default function CompanyPage() {
                             </div>
                         </div>
                     ))}
+
                 </div>
+                
             )}
+                    <Pagination page={page} totalPages={totalPages} setPage={setPage} />
+
         </div>
     );
 }

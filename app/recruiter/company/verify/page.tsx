@@ -72,7 +72,7 @@ export default function EmployerVerify() {
                 <div className="verify-content">
                     <VerifyItem title="Phone number verification" />
                     <VerifyItem title="Update company information" url="/recruiter/company/" />
-                    <VerifyItem title="Update Business Registration Certificate" url="/recruiter/verify/verify-upload/" />
+                    <VerifyItem title="Update Business Registration Certificate" url="/recruiter/company/verify/verify-upload/" />
                     {/* <VerifyItem title="Update Personal Data Processing Agreement" /> */}
                     <VerifyItem title="Post your first job advertisement (+2)" disabled />
                 </div>

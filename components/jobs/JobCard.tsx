@@ -74,7 +74,7 @@ export default function JobCard({ job }: Props) {
           <div className="box-comapny-logo">
             <div className="avatar">
               <img
-                src={"/images/company-logo-default.jpg"}
+                src={job.logo_url || "/images/company-logo-default.jpg"}
                 className="job-card__logo"
                 alt={job.company_name}
               />

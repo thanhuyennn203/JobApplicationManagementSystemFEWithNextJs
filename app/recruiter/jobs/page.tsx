@@ -157,7 +157,7 @@ export default function ManageJobsPage() {
   {!loading && activeTab === "STATUS" && (
     <div className="table">
 
-      <div className="row head">
+      <div className="row-status head">
         <div></div>
         <div>Title</div>
         <div>Status</div>
@@ -167,7 +167,7 @@ export default function ManageJobsPage() {
       </div>
 
       {jobs.map(job => (
-        <div key={job.id} className="row" style={{ display: "flex", alignItems: "center" }}>
+        <div key={job.id} className="row-status" >
 
           {/* Left color bar */}
           <div

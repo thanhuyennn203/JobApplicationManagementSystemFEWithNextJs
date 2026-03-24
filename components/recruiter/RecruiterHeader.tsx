@@ -46,9 +46,9 @@ export default function RecruiterHeader() {
       <div className="header-left">
         {/* <i className="fa-solid fa-bars menu-icon"></i> */}
 
-        <Link href="/">
+        {/* <Link href="/">
           <img src="/topcv-logo-white.png" className="logo" />
-        </Link>
+        </Link> */}
       </div>
 
       {/* Center Navigation */}

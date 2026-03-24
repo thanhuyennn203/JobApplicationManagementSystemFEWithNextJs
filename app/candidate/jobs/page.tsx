@@ -9,9 +9,12 @@ export default async function JobsPage() {
     <div className="container">
       <JobSearch />
       <div className="main-container">
-        <JobsByLocation />
-        <TopCompanies />
+        <JobsByLocation /> 
         <CenterBanner />
+        <TopCompanies />
+       <div>
+        <img src="/images/tuvan.png" alt="" />
+       </div>
       </div>
     </div>
   );
