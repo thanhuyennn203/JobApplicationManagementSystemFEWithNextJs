@@ -4,10 +4,27 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-const PUBLIC_ROUTES = ["/", "/candidate", "/recruiter"];
+// Routes anyone can access without login
+const PUBLIC_ROUTES = [
+    "/",
+    "/candidate",
+    "/candidate/login",
+    "/candidate/register",
+    "/recruiter/login",
+    "/recruiter/register",
+    "/admin/login",
+    "/jobs",
+    "/companies",
+];
 
+// Route prefix → required roles
 const ROLE_ROUTES: Record<string, string[]> = {
-    "/recruiter/jobs": ["RECRUITER"],
+    "/candidate/profile":   ["CANDIDATE"],
+    "/candidate/saved":     ["CANDIDATE"],
+    "/candidate/applied":   ["CANDIDATE"],
+    "/candidate/settings":  ["CANDIDATE"],
+    "/recruiter":           ["RECRUITER"],
+    "/admin":               ["ADMIN"],
 };
 
 export default function AuthGuard({ children }: any) {
@@ -15,42 +32,54 @@ export default function AuthGuard({ children }: any) {
     const pathname = usePathname();
     const auth = useAuth();
 
-    // useEffect(() => {
-    //     if (!auth || auth.loading) return;
+   useEffect(() => {
+    if (!auth || auth.loading) return;
 
-    //     const user = auth.user;
+    const user = auth.user;
 
-    //     // 1. Not logged in
-    //     if (!user) {
-    //         if (!PUBLIC_ROUTES.includes(pathname)) {
-    //             router.replace("/");
-    //         }
-    //         return;
-    //     }
+    // 1. PUBLIC routes: everyone can access
+    const isPublic = PUBLIC_ROUTES.some(route =>
+        pathname === route || pathname.startsWith(route + "/")
+    );
 
-    //     // 2. Must complete register
-    //     if (
-    //         user.roles?.includes("REGISTER") &&
-    //         pathname !== "/register"
-    //     ) {
-    //         router.replace("/register");
-    //         return;
-    //     }
+    if (isPublic) {
+        return; // allow guest + any logged-in role
+    }
 
-    //     //  3. Role-based protection
-    //     const requiredRoles = ROLE_ROUTES[pathname];
-    //     if (requiredRoles) {
-    //         const hasRole = requiredRoles.some(role =>
-    //             user.roles?.includes(role)
-    //         );
+    // 2. Non-public routes require login
+    if (!user) {
+        router.replace("/");
+        return;
+    }
 
-    //         if (!hasRole) {
-    //             router.replace("/"); // or 403 page
-    //             return;
-    //         }
-    //     }
+    // 3. Check role-based protected routes
+    const matchedPrefix = Object.keys(ROLE_ROUTES).find(prefix =>
+        pathname.startsWith(prefix)
+    );
 
-    // }, [auth, pathname]);
+    if (matchedPrefix) {
+
+        const requiredRoles = ROLE_ROUTES[matchedPrefix];
+
+        const hasRole = requiredRoles.some(role =>
+            user.roles?.includes(role)
+        );
+
+        if (!hasRole) {
+
+            if (user.roles?.includes("ADMIN")) {
+                router.replace("/admin");
+            } else if (user.roles?.includes("RECRUITER")) {
+                router.replace("/recruiter");
+            } else if (user.roles?.includes("CANDIDATE")) {
+                router.replace("/candidate");
+            } else {
+                router.replace("/");
+            }
+        }
+    }
+
+}, [auth, pathname]);
 
     return children;
 }

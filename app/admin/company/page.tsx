@@ -17,6 +17,8 @@ export default function CompanyPage() {
         (page - 1) * itemsPerPage,
         page * itemsPerPage
     );
+                    console.log(localStorage.getItem("token"));
+
     const handleReject = async (id: number) => {
         const reason = prompt("Enter rejection reason:");
         if (!reason) return;

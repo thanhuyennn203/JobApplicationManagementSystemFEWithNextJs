@@ -59,7 +59,10 @@ export default function LoginForm() {
 
       if (roles.includes("RECRUITER")) {
         router.push("/recruiter");
+      }else if(roles.includes("ADMIN")){
+        router.push("/admin");
       } 
+      
     } catch (err: any) {
 
       console.log("Login error:", err);

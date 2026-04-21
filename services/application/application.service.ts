@@ -1,8 +1,20 @@
 import { Application } from "@/types/application";
 
+const getAuthHeader = () => {
+  const token = localStorage.getItem("token");
+  return {
+    "Authorization": `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+};
+
 export const applyJob = async (data: FormData) => {
+  const token = localStorage.getItem("token");
   const res = await fetch("http://localhost:9191/api/applications/apply", {
     method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`, // no Content-Type for FormData
+    },
     body: data,
   });
 
@@ -11,13 +23,16 @@ export const applyJob = async (data: FormData) => {
     throw new Error(errorText || "Failed to apply");
   }
 
-  return res.text(); // or res.json() if your BE returns JSON
+  return res.text();
 };
 
 export const getAppliedJobByCandidateId = async (id: number) => {
   const res = await fetch(
     `http://localhost:9191/api/applications/candidate/${id}`,
-    { cache: "no-store" }
+    {
+      cache: "no-store",
+      headers: getAuthHeader(),
+    }
   );
   if (!res.ok) throw new Error("Failed to fetch job");
   const data: Application = await res.json();
@@ -27,7 +42,10 @@ export const getAppliedJobByCandidateId = async (id: number) => {
 export const getAppliedJobByJobId = async (id: number) => {
   const res = await fetch(
     `http://localhost:9191/api/applications/job/${id}`,
-    { cache: "no-store" }
+    {
+      cache: "no-store",
+      headers: getAuthHeader(),
+    }
   );
   if (!res.ok) throw new Error("Failed to fetch job");
   const data: Application[] = await res.json();
@@ -37,7 +55,10 @@ export const getAppliedJobByJobId = async (id: number) => {
 export const getAppliedJobByCompanyId = async (id: number) => {
   const res = await fetch(
     `http://localhost:9191/api/applications/company/${id}`,
-    { cache: "no-store" }
+    {
+      cache: "no-store",
+      headers: getAuthHeader(),
+    }
   );
   if (!res.ok) throw new Error("Failed to fetch job");
   const data: Application[] = await res.json();
@@ -49,6 +70,7 @@ export const updateApplicationStatus = async (applicationId: number, status: str
     `http://localhost:9191/api/applications/${applicationId}/status?status=${status}`,
     {
       method: "PATCH",
+      headers: getAuthHeader(),
     }
   );
 
@@ -66,7 +88,10 @@ export const getAppliedFormByCandidateId = async (
 ): Promise<Application[]> => {
   const res = await fetch(
     `http://localhost:9191/api/applications/candidate/${id}`,
-    { cache: "no-store" }
+    {
+      cache: "no-store",
+      headers: getAuthHeader(),
+    }
   );
 
   if (!res.ok) {
@@ -77,10 +102,10 @@ export const getAppliedFormByCandidateId = async (
   return data;
 };
 
-const API_URL = "http://localhost:9191/api/applications";
-
 export async function getAllApplications() {
-  const res = await fetch(API_URL);
+  const res = await fetch("http://localhost:9191/api/applications", {
+    headers: getAuthHeader(),
+  });
   if (!res.ok) throw new Error("Failed to fetch applications");
   return res.json();
 }

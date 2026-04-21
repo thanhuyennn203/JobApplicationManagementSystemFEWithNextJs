@@ -1,12 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import useAuth from "@/hooks/useAuth"; import {
-  getProvinces,
-  getWardsByProvince,
-  Province,
-  Ward
-} from "@/services/locations/LocationService";
+import useAuth from "@/hooks/useAuth"; 
+import { useLocation } from "@/context/LocationContext";
 import { useRouter } from "next/navigation";
 import "@/styles/recruiter/RecruiterRegister.css";
 
@@ -16,11 +12,9 @@ export default function RecruitmentRegisterForm() {
 
   const [error, setError] = useState("");
 
-  const [provinces, setProvinces] = useState<Province[]>([]);
-  const [wards, setWards] = useState<Ward[]>([]);
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+const { provinces, wardsMap, getWards } = useLocation();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -35,21 +29,6 @@ export default function RecruitmentRegisterForm() {
     agree: false
   });
 
-  // Load provinces
-  useEffect(() => {
-
-    const fetchProvinces = async () => {
-      try {
-        const data = await getProvinces();
-        setProvinces(data);
-      } catch (err) {
-        console.error("Failed to fetch provinces", err);
-      }
-    };
-
-    fetchProvinces();
-
-  }, []);
 
   const handleChange = async (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -79,9 +58,7 @@ export default function RecruitmentRegisterForm() {
 
       try {
 
-        const wardsData = await getWardsByProvince(value);
-
-        setWards(wardsData);
+        await getWards(value);
 
         setFormData(prev => ({
           ...prev,
@@ -344,7 +321,7 @@ export default function RecruitmentRegisterForm() {
 
             {provinces.map((province) => (
               <option key={province.code} value={province.code}>
-                {province.name}
+                {province.nameEn}
               </option>
             ))}
 
@@ -365,9 +342,9 @@ export default function RecruitmentRegisterForm() {
 
             <option value="">Select ward</option>
 
-            {wards.map((ward) => (
+            {((formData.province && wardsMap[formData.province]) || []).map((ward) => (
               <option key={ward.code} value={ward.code}>
-                {ward.name}
+                {ward.nameEn}
               </option>
             ))}
 
