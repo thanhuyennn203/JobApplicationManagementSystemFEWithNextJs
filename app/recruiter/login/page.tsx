@@ -55,7 +55,7 @@ export default function LoginForm() {
       await login(formData.email, formData.password);
 
       const roles = user?.roles || [];
-      console.log(roles);
+      // console.log(roles);
 
       if (roles.includes("RECRUITER")) {
         router.push("/recruiter");

@@ -65,7 +65,7 @@ export default function JobCard({ job }: Props) {
       console.error(error);
     }
   };
-  console.log(job);
+  // console.log(job);
 
   return (
     // <Link href={`/candidate/jobs/${job.id}`} className="job-card-link">
