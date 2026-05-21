@@ -23,3 +23,4 @@ export async function getGeneralInformationByJobId(
     return null;
   }
 }
+

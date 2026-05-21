@@ -1,59 +1,179 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import StepJobcard from "@/components/recruiter/StepJobCard";
-import StepGeneralInformation from "@/components/recruiter/StepGeneralInformation";
+import StepJobCard from "@/components/recruiter/StepJobCard";
+import StepBasic from "@/components/recruiter/StepGeneralInformation";
 import StepDetail from "@/components/recruiter/StepDetail";
+
 import "@/styles/recruiter/JobOnboarding.css";
 
 export default function CreateJobPage() {
-    
-  const [step, setStep] = useState(1);
-  const [jobId, setJobId] = useState<number | null>(null);
 
-  const nextStep = () => setStep((prev) => prev + 1);
-  const prevStep = () => setStep((prev) => prev -1 );
+    const [step, setStep] = useState(1);
 
+    const [jobId, setJobId] = useState<number | null>(null);
 
-  return (
+    const [completedSteps, setCompletedSteps] = useState({
+        step1: false,
+        step2: false,
+        step3: false
+    });
 
-    <div className="onboarding-container">
+    // =====================================
+    // WARNING BEFORE LEAVING
+    // =====================================
 
-      {/* Steps */}
+    useEffect(() => {
 
-      {step === 1 && (
-        <StepJobcard
-          nextStep={nextStep}
-          setJobId={setJobId}
-        />
-      )}
+        const handleBeforeUnload = (
+            e: BeforeUnloadEvent
+        ) => {
 
-      {step === 2 && (
-        <StepGeneralInformation
-        prevStep={prevStep}
-          jobId={jobId}
-          nextStep={nextStep}
-        />
-      )}
+            if (
+                !completedSteps.step3
+            ) {
 
-      {step === 3 && (
-        <StepDetail prevStep={prevStep}
-          jobId={jobId}
-        />
-      )}
+                e.preventDefault();
 
-      {/* Progress Dots */}
+                e.returnValue = "";
 
-      <div className="progress-dots">
+            }
+        };
 
-        <span className={`dot ${step >= 1 ? "active" : ""}`} />
-        <span className={`dot ${step >= 2 ? "active" : ""}`} />
-        <span className={`dot ${step >= 3 ? "active" : ""}`} />
+        window.addEventListener(
+            "beforeunload",
+            handleBeforeUnload
+        );
 
-      </div>
+        return () => {
 
-    </div>
+            window.removeEventListener(
+                "beforeunload",
+                handleBeforeUnload
+            );
 
-  );
+        };
+
+    }, [completedSteps]);
+
+    return (
+
+        <div className="onboarding-container">
+
+            {/* ================================= */}
+            {/* PROFESSIONAL STEPPER */}
+            {/* ================================= */}
+
+            <div className="stepper-container">
+
+                <div className={`step-item ${step >= 1 ? "active" : ""}`}>
+                    <div className="step-circle">
+                        1
+                    </div>
+                    <p>Job Card</p>
+                </div>
+
+                <div className="step-line" />
+
+                <div className={`step-item ${step >= 2 ? "active" : "locked"}`}>
+                    <div className="step-circle">
+                        2
+                    </div>
+                    <p>General Info</p>
+                </div>
+
+                <div className="step-line" />
+
+                <div className={`step-item ${step >= 3 ? "active" : "locked"}`}>
+                    <div className="step-circle">
+                        3
+                    </div>
+                    <p>Job Detail</p>
+                </div>
+
+            </div>
+
+            {/* ================================= */}
+            {/* STEP 1 */}
+            {/* ================================= */}
+
+            {
+                step === 1 && (
+
+                    <StepJobCard
+                        jobId={jobId || undefined}
+                        setJobId={setJobId}
+                        nextStep={() => {
+
+                            setCompletedSteps(prev => ({
+                                ...prev,
+                                step1: true
+                            }));
+
+                            setStep(2);
+
+                        }}
+                    />
+
+                )
+            }
+
+            {/* ================================= */}
+            {/* STEP 2 */}
+            {/* ================================= */}
+
+            {
+                step === 2 &&
+                jobId &&
+                completedSteps.step1 && (
+
+                    <StepBasic
+                        jobId={jobId}
+                        prevStep={() => setStep(1)}
+                        nextStep={() => {
+
+                            setCompletedSteps(prev => ({
+                                ...prev,
+                                step2: true
+                            }));
+
+                            setStep(3);
+
+                        }}
+                    />
+
+                )
+            }
+
+            {/* ================================= */}
+            {/* STEP 3 */}
+            {/* ================================= */}
+
+            {
+                step === 3 &&
+                jobId &&
+                completedSteps.step2 && (
+
+                    <StepDetail
+                        jobId={jobId}
+                        prevStep={() => setStep(2)}
+                        onPublished={() => {
+
+                            setCompletedSteps({
+                                step1: true,
+                                step2: true,
+                                step3: true
+                            });
+
+                        }}
+                    />
+
+                )
+            }
+
+        </div>
+
+    );
+
 }

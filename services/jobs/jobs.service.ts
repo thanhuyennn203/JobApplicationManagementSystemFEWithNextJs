@@ -72,3 +72,56 @@ export async function getAllJobs() {
 
   return res.json();
 }
+
+
+export const createJob = async (payload: any) => {
+
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: getAuthHeader(),
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to create job");
+  }
+
+  return res.json();
+};
+
+export const updateJob = async (id: number, payload: any) => {
+
+  console.log("data sent: ",payload);
+  const res = await fetch(`${API_URL}/${id}`, {
+    method: "PUT",
+    headers: getAuthHeader(),
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to update job");
+  }
+
+  return res.json();
+};
+
+export const saveGeneralInformation = async (
+  jobId: number,
+  payload: any
+) => {
+
+  const res = await fetch(
+    `${API_URL}/${jobId}/general-information`,
+    {
+      method: "POST",
+      headers: getAuthHeader(),
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to save general information");
+  }
+
+  return res.json();
+};

@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import Calendar from "react-calendar";
 // import { useRouter } from "next/navigation";
 import "react-calendar/dist/Calendar.css";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const auth = useAuth();
@@ -13,6 +14,7 @@ export default function DashboardPage() {
 
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  console.log(auth?.user);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -36,6 +38,7 @@ export default function DashboardPage() {
       const res = await fetch(`http://localhost:9191/api/jobs/company/${companyId}`);
       const data = await res.json();
       setJobs(data || []);
+      console.log("jobs: ",data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -45,7 +48,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (companyId) fetchJobs();
-  }, [companyId]);
+  },[companyId]);
 
   // ✅ FILTER
   const filteredJobs = jobs.filter((job) => {
@@ -71,8 +74,10 @@ export default function DashboardPage() {
   });
 
   // ✅ pagination logic
-  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
-
+const totalPages = Math.max(
+  1,
+  Math.ceil(filteredJobs.length / jobsPerPage)
+);
   const paginatedJobs = filteredJobs.slice(
     (currentPage - 1) * jobsPerPage,
     currentPage * jobsPerPage
@@ -113,7 +118,7 @@ export default function DashboardPage() {
 
             <div className="flex gap-3">
               <button
-              onClick={() => router.push("./create")}
+              onClick={() => router.push("./jobs/create")}
               className="flex items-center gap-2 bg-[#00b14f] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#009e46] transition"
             >
               + New Job
@@ -446,7 +451,6 @@ function SystemAds() {
   );
 }
 
-import { useRouter } from "next/navigation";
 
 function DraftReminder({ draftJobs }: { draftJobs: any[] }) {
   const router = useRouter();

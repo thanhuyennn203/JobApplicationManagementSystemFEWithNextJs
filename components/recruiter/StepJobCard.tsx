@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import "@/styles/recruiter/CreateJob.css";
 import { useAuth } from "@/context/AuthContext";
 import { useLocation } from "@/context/LocationContext";
+import { getJobById } from "@/services/jobs/jobs.service";
+import { createJob, updateJob } from "@/services/jobs/jobs.service";
 
 interface StepJobCardProps {
     nextStep: () => void;
@@ -17,8 +19,9 @@ export default function StepJobCard({ nextStep, setJobId, jobId }: StepJobCardPr
 
     const { provinces, wardList, wardsMap, getWards } = useLocation();
 
-    const [success, setSuccess] = useState(false);
-
+    // const [success, setSuccess] = useState(false);
+    const [loading, setLoading] =
+        useState(false);
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -32,13 +35,16 @@ export default function StepJobCard({ nextStep, setJobId, jobId }: StepJobCardPr
     });
 
     // Fetch job if editing
+
     useEffect(() => {
+
         if (!jobId) return;
 
         const fetchJob = async () => {
+
             try {
-                const res = await fetch(`http://localhost:9191/api/jobs/${jobId}`);
-                const data = await res.json();
+
+                const data = await getJobById(jobId);
 
                 setFormData({
                     title: data.title || "",
@@ -53,12 +59,17 @@ export default function StepJobCard({ nextStep, setJobId, jobId }: StepJobCardPr
                         ? data.locations
                         : [{ province: "", ward: "", detailAddress: "" }],
                 });
+
             } catch (err) {
+
                 console.error("Failed to fetch job", err);
+
             }
+
         };
 
         fetchJob();
+
     }, [jobId]);
 
     // Handle form field changes
@@ -69,18 +80,32 @@ export default function StepJobCard({ nextStep, setJobId, jobId }: StepJobCardPr
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    // Handle location changes
-    const handleLocationChange = async (index: number, field: string, value: string) => {
+    const handleLocationChange = async (
+        index: number,
+        field: string,
+        value: string
+    ) => {
+
         const updatedLocations = [...formData.locations];
-        updatedLocations[index][field] = value;
 
-        setFormData((prev) => ({ ...prev, locations: updatedLocations }));
+        updatedLocations[index] = {
+            ...updatedLocations[index],
+            [field]: value
+        };
 
-        // Lazy load wards if province changed
-        if (field === "province" && value) {
-            await getWards(value);
+        // reset ward when province changes
+        if (field === "province") {
             updatedLocations[index].ward = "";
+
+            if (value) {
+                await getWards(value);
+            }
         }
+
+        setFormData((prev) => ({
+            ...prev,
+            locations: updatedLocations
+        }));
     };
 
     const addLocation = () => {
@@ -98,47 +123,100 @@ export default function StepJobCard({ nextStep, setJobId, jobId }: StepJobCardPr
     };
 
     // Submit job card
-    const handleSubmit = async (e: React.FormEvent) => {
+
+    const handleSubmit = async (
+        e: React.FormEvent
+    ) => {
+
         e.preventDefault();
+
+        const confirmed = window.confirm(
+            jobId
+                ? "Update this Job Card?"
+                : "Are you sure you want to save this Job Card? Core information will become restricted after saving."
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
         try {
+
+            setLoading(true);
+
             const payload = {
                 ...formData,
                 company_id: companyId,
-                postedDate: new Date().toISOString(),
+                postedDate: new Date()
+                    .toLocaleString("sv-SE")
+                    .replace(" ", "T"),
+                status: "DRAFT"
             };
 
-            const url = jobId
-                ? `http://localhost:9191/api/jobs/${jobId}`
-                : "http://localhost:9191/api/jobs";
-            const method = jobId ? "PUT" : "POST";
+            // =====================================
+            // UPDATE EXISTING JOB
+            // =====================================
 
-            const res = await fetch(url, {
-                method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
+            if (jobId) {
 
-            const data = await res.json();
+                await updateJob(
+                    jobId,
+                    payload
+                );
 
-            if (!jobId && setJobId) setJobId(data.id);
+                alert(
+                    "Job card updated successfully"
+                );
 
-            setSuccess(true);
+                return;
+            }
+
+            // =====================================
+            // CREATE NEW JOB
+            // =====================================
+
+            const data = await createJob(
+                payload
+            );
+
+            if (setJobId) {
+
+                setJobId(data.id);
+
+            }
+
+            nextStep();
+
         } catch (err) {
-            console.error(err);
+
+            console.error(
+                "Failed to save job",
+                err
+            );
+
+        } finally {
+
+            setLoading(false);
+
         }
+
     };
 
-    if (success) {
-        return (
-            <div className="step-success">
-                <h2>Job Card Saved</h2>
-                <p>Your job basic information has been saved.</p>
-                <button onClick={nextStep} className="next-btn">
-                    Continue
-                </button>
-            </div>
-        );
-    }
+    const handleNextStep = () => {
+
+        if (!jobId) {
+
+            alert(
+                "Please save Job Card first"
+            );
+
+            return;
+
+        }
+
+        nextStep();
+
+    };
 
     return (
         <div className="step-container">
@@ -262,41 +340,88 @@ export default function StepJobCard({ nextStep, setJobId, jobId }: StepJobCardPr
                     {/* Due Date */}
                     <div className="form-group">
                         <label>Application Deadline</label>
-                        <input type="date" name="dueDate" value={formData.dueDate} onChange={handleChange} />
-                    </div>
+                        <input
+                            type="datetime-local"
+                            name="dueDate"
+                            value={formData.dueDate}
+                            onChange={handleChange}
+                        />                  </div>
 
                     {/* Status */}
-                    <div className="form-group">
+                    {/* <div className="form-group">
                         <label>Status</label>
                         <select name="status" value={formData.status} onChange={handleChange}>
                             <option value="OPEN">Open</option>
                             <option value="CLOSED">Closed</option>
                             <option value="DRAFT">Draft</option>
                         </select>
-                    </div>
+                    </div> */}
 
                     {/* Description */}
-                    <div className="form-group">
-                        <label>Job Description</label>
-                        <textarea
-                            name="description"
-                            rows={6}
-                            placeholder="Describe responsibilities..."
-                            value={formData.description}
-                            onChange={handleChange}
-                        />
-                    </div>
+                    
 
-                    <button type="submit" className="submit-btn">
-                        {jobId ? "Update Job Card" : "Save Job Card"}
-                    </button>
+                    <div className="flex gap-4 mt-6">
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="
+            flex-1
+            bg-[#00b14f] hover:bg-[#009944]
+            text-white
+            py-3
+            rounded-xl
+            font-semibold
+            transition
+            hover:opacity-90
+            disabled:opacity-50
+            disabled:cursor-not-allowed
+        "
+                        >
+
+                            {
+                                loading
+                                    ? "Saving..."
+                                    : jobId
+                                        ? "Update Job Card"
+                                        : "Save & Continue"
+                            }
+
+                        </button>
+
+                        {
+                            jobId && (
+
+                                <button
+                                    type="button"
+                                    onClick={handleNextStep}
+                                    className="
+                    flex-1
+                    border
+                    border-gray-300
+                    bg-white
+                    text-gray-900
+                    py-3
+                    rounded-xl
+                    font-semibold
+                    transition
+                    hover:bg-gray-100
+                "
+                                >
+                                    Next Step
+                                </button>
+
+                            )
+                        }
+
+                    </div>
                 </form>
 
-                <div className="job-form-step-btn">
+                {/* <div className="job-form-step-btn">
                     <button onClick={nextStep} className="job-edit next-btn">
                         Next
                     </button>
-                </div>
+                </div> */}
             </div>
         </div>
     );

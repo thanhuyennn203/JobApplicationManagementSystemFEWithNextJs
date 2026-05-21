@@ -1,13 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import "@/styles/recruiter/CreateJobDetail.css";
 import { useRouter } from "next/navigation";
 
-export default function StepDetail({ jobId, prevStep, nextStep }: any) {
+import {
+    createJobDetail,
+    updateJobDetail,
+    getJobDetailByJobId,
+    publishJob
+} from "@/services/jobs/jobDetailService";
+
+import { JobDetail } from "@/types/jobs";
+
+export default function StepDetail({
+    jobId,
+    prevStep,
+    onPublished
+}: any) {
+
     const router = useRouter();
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<JobDetail>({
         description: "",
         requirement: "",
         income: "",
@@ -17,14 +30,19 @@ export default function StepDetail({ jobId, prevStep, nextStep }: any) {
         working_location: "",
         working_time: "",
         apply_by: "",
-        due_date: ""
+        due_date: "",
+        job_id: null,
+        id: null,
     });
-    console.log(jobId)
 
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState("");
     const [hasDetail, setHasDetail] = useState(false);
+
+    // TEMP UI DEMO MODE
+    // đổi false -> true nếu muốn test không cần BE
+    const DEMO_MODE = true;
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -32,14 +50,16 @@ export default function StepDetail({ jobId, prevStep, nextStep }: any) {
 
         const { name, value } = e.target;
 
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
             [name]: value
         }));
 
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (
+        e: React.FormEvent
+    ) => {
 
         e.preventDefault();
 
@@ -49,26 +69,40 @@ export default function StepDetail({ jobId, prevStep, nextStep }: any) {
 
         try {
 
-            const method = hasDetail ? "PATCH" : "POST";
+            // DEMO MODE
+            if (DEMO_MODE) {
 
-            const res = await fetch(
-                `http://localhost:9191/api/jobs/${jobId}/details`,
-                {
-                    method: method,
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(formData)
-                }
-            );
+                await new Promise((resolve) =>
+                    setTimeout(resolve, 1200)
+                );
 
-            if (!res.ok) {
-                throw new Error("Failed to save job detail");
+                setSuccess(true);
+                setHasDetail(true);
+                return;
             }
 
-            const data = await res.json();
+            let data;
 
-            console.log("Saved job detail:", data);
+            if (hasDetail) {
+
+                data = await updateJobDetail(
+                    jobId,
+                    formData
+                );
+
+            } else {
+
+                data = await createJobDetail(
+                    jobId,
+                    formData
+                );
+
+            }
+
+            console.log(
+                "Saved job detail:",
+                data
+            );
 
             setSuccess(true);
 
@@ -84,23 +118,50 @@ export default function StepDetail({ jobId, prevStep, nextStep }: any) {
 
     };
 
+    const handlePublish = async () => {
+
+        const confirmed = window.confirm(
+            "Ready to publish this job?"
+        );
+
+        if (!confirmed) return;
+
+        try {
+
+            // DEMO MODE
+            if (DEMO_MODE) {
+
+                alert("Job published successfully!");
+                router.push("/recruiter/jobs");
+                return;
+            }
+
+            await publishJob(jobId);
+
+            router.push(
+                "/recruiter/jobs"
+            );
+
+        } catch (err) {
+
+            console.error(err);
+
+        }
+
+    };
+
     useEffect(() => {
 
-        if (!jobId) return;
+        if (!jobId || DEMO_MODE) return;
 
         const fetchJobDetail = async () => {
 
             try {
 
-                const res = await fetch(
-                    `http://localhost:9191/api/jobs/${jobId}/details`
-                );
+                const data =
+                    await getJobDetailByJobId(jobId);
 
-                if (!res.ok) return;
-
-                const data = await res.json();
-
-                console.log("Fetched job detail:", data);
+                if (!data) return;
 
                 setFormData({
                     description: data.description || "",
@@ -112,15 +173,19 @@ export default function StepDetail({ jobId, prevStep, nextStep }: any) {
                     working_location: data.working_location || "",
                     working_time: data.working_time || "",
                     apply_by: data.apply_by || "",
-                    due_date: data.due_date || ""
+                    due_date: data.due_date || "",
+                    id: data.id || null,
+                    job_id: data.job_id || null
                 });
 
                 setHasDetail(true);
-                setSuccess(true);
 
             } catch (err) {
 
-                console.error("Failed to fetch job detail", err);
+                console.error(
+                    "Failed to fetch job detail",
+                    err
+                );
 
             }
 
@@ -129,173 +194,326 @@ export default function StepDetail({ jobId, prevStep, nextStep }: any) {
         fetchJobDetail();
 
     }, [jobId]);
+
     return (
 
-        <div className="step-container">
-            <div className="job-detail-container">
-                <form className="job-detail-form" onSubmit={handleSubmit}>
-                    <div className="form-section">
-                        <h3 className="page-tile">Job Description</h3>
+        <div className="min-h-screen bg-[#f4f7fb] px-6 py-8">
+
+            <div className="mx-auto max-w-6xl">
+
+                {/* HEADER */}
+                <div className="mb-8 flex items-center justify-between">
+
+                    <div>
+                        <h1 className="text-3xl font-bold text-[#1f2937]">
+                            Job Details
+                        </h1>
+
+                        <p className="mt-2 text-sm text-gray-500">
+                            Complete detailed information to attract better candidates.
+                        </p>
+                    </div>
+
+                    <div className="rounded-2xl bg-white px-5 py-4 shadow-sm border border-gray-100">
+                        <p className="text-xs font-medium text-gray-400">
+                            STATUS
+                        </p>
+
+                        <div className="mt-2 flex items-center gap-2">
+
+                            <div className="h-2.5 w-2.5 rounded-full bg-[#00b14f]"></div>
+
+                            <span className="font-semibold text-[#00b14f]">
+                                Draft
+                            </span>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <form
+                    onSubmit={handleSubmit}
+                    className="space-y-6"
+                >
+
+                    {/* JOB DESCRIPTION */}
+                    <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
+
+                        <div className="mb-5">
+                            <h2 className="text-xl font-semibold text-gray-800">
+                                Job Description
+                            </h2>
+
+                            <p className="mt-1 text-sm text-gray-500">
+                                Describe responsibilities and role overview.
+                            </p>
+                        </div>
 
                         <textarea
                             name="description"
-                            rows={6}
-                            placeholder="Describe the job responsibilities..."
+                            rows={7}
+                            placeholder="Write detailed responsibilities..."
                             value={formData.description}
                             onChange={handleChange}
+                            className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 text-sm outline-none transition-all focus:border-[#00b14f] focus:bg-white"
                         />
+
                     </div>
 
-                    <div className="form-section">
-                        <h3>Job Requirements</h3>
+                    {/* REQUIREMENTS */}
+                    <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
+
+                        <div className="mb-5">
+                            <h2 className="text-xl font-semibold text-gray-800">
+                                Job Requirements
+                            </h2>
+
+                            <p className="mt-1 text-sm text-gray-500">
+                                Skills, experience, education requirements.
+                            </p>
+                        </div>
 
                         <textarea
                             name="requirement"
-                            rows={6}
-                            placeholder="Skills, experience, education..."
+                            rows={7}
+                            placeholder="Required skills and experience..."
                             value={formData.requirement}
                             onChange={handleChange}
+                            className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 text-sm outline-none transition-all focus:border-[#00b14f] focus:bg-white"
                         />
+
                     </div>
 
-                    <div className="form-section">
-                        <h3>Income</h3>
+                    {/* GRID */}
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
-                        <textarea
-                            name="income"
-                            rows={4}
-                            placeholder="Salary details, bonuses..."
-                            value={formData.income}
-                            onChange={handleChange}
-                        />
-                    </div>
+                        {/* LEFT */}
+                        <div className="space-y-6">
 
-                    <div className="form-section">
-                        <h3>Benefits</h3>
+                            {/* INCOME */}
+                            <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
 
-                        <textarea
-                            name="interest"
-                            rows={4}
-                            placeholder="Insurance, bonus, holidays..."
-                            value={formData.interest}
-                            onChange={handleChange}
-                        />
-                    </div>
+                                <h2 className="mb-4 text-xl font-semibold text-gray-800">
+                                    Income
+                                </h2>
 
-                    <div className="form-section">
-                        <h3>Allowance</h3>
+                                <textarea
+                                    name="income"
+                                    rows={5}
+                                    placeholder="Salary, bonus, compensation..."
+                                    value={formData.income}
+                                    onChange={handleChange}
+                                    className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 text-sm outline-none transition-all focus:border-[#00b14f] focus:bg-white"
+                                />
 
-                        <textarea
-                            name="allowance"
-                            rows={3}
-                            placeholder="Lunch allowance, transportation..."
-                            value={formData.allowance}
-                            onChange={handleChange}
-                        />
-                    </div>
+                            </div>
 
-                    <div className="form-section">
-                        <h3>Working Equipment</h3>
+                            {/* BENEFITS */}
+                            <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
 
-                        <textarea
-                            name="working_equipment"
-                            rows={3}
-                            placeholder="Laptop, monitor, software..."
-                            value={formData.working_equipment}
-                            onChange={handleChange}
-                        />
-                    </div>
+                                <h2 className="mb-4 text-xl font-semibold text-gray-800">
+                                    Benefits
+                                </h2>
 
-                    <div className="grid-2">
+                                <textarea
+                                    name="interest"
+                                    rows={5}
+                                    placeholder="Insurance, holidays, bonus..."
+                                    value={formData.interest}
+                                    onChange={handleChange}
+                                    className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 text-sm outline-none transition-all focus:border-[#00b14f] focus:bg-white"
+                                />
 
-                        <div>
-                            <label>Working Location</label>
+                            </div>
 
-                            <input
-                                type="text"
-                                name="working_location"
-                                placeholder="Office location"
-                                value={formData.working_location}
-                                onChange={handleChange}
-                            />
                         </div>
 
-                        <div>
-                            <label>Working Time</label>
+                        {/* RIGHT */}
+                        <div className="space-y-6">
 
-                            <input
-                                type="text"
-                                name="working_time"
-                                placeholder="Mon - Fri, 9AM - 6PM"
-                                value={formData.working_time}
-                                onChange={handleChange}
-                            />
-                        </div>
+                            {/* ALLOWANCE */}
+                            <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
 
-                    </div>
+                                <h2 className="mb-4 text-xl font-semibold text-gray-800">
+                                    Allowance
+                                </h2>
 
-                    <div className="grid-2">
+                                <textarea
+                                    name="allowance"
+                                    rows={5}
+                                    placeholder="Transportation, lunch allowance..."
+                                    value={formData.allowance}
+                                    onChange={handleChange}
+                                    className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 text-sm outline-none transition-all focus:border-[#00b14f] focus:bg-white"
+                                />
 
-                        <div>
-                            <label>Apply Method</label>
+                            </div>
 
-                            <input
-                                type="text"
-                                name="apply_by"
-                                placeholder="Send CV to email or apply via system"
-                                value={formData.apply_by}
-                                onChange={handleChange}
-                            />
-                        </div>
+                            {/* EQUIPMENT */}
+                            <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
 
-                        <div>
-                            <label>Application Deadline</label>
+                                <h2 className="mb-4 text-xl font-semibold text-gray-800">
+                                    Working Equipment
+                                </h2>
 
-                            <input
-                                type="date"
-                                name="due_date"
-                                value={formData.due_date}
-                                onChange={handleChange}
-                            />
+                                <textarea
+                                    name="working_equipment"
+                                    rows={5}
+                                    placeholder="Laptop, monitor, software..."
+                                    value={formData.working_equipment}
+                                    onChange={handleChange}
+                                    className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 text-sm outline-none transition-all focus:border-[#00b14f] focus:bg-white"
+                                />
+
+                            </div>
+
                         </div>
 
                     </div>
-                    <button className="submit-btn" disabled={loading}> {loading ? "Saving..." : hasDetail ? "Update Job Detail" : "Create Job Detail"} </button>
 
+                    {/* EXTRA INFORMATION */}
+                    <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
+
+                        <div className="mb-6">
+                            <h2 className="text-xl font-semibold text-gray-800">
+                                Additional Information
+                            </h2>
+
+                            <p className="mt-1 text-sm text-gray-500">
+                                Workplace, application and schedule details.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Working Location
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="working_location"
+                                    placeholder="Office location"
+                                    value={formData.working_location}
+                                    onChange={handleChange}
+                                    className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition-all focus:border-[#00b14f] focus:bg-white"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Working Time
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="working_time"
+                                    placeholder="Mon - Fri, 9AM - 6PM"
+                                    value={formData.working_time}
+                                    onChange={handleChange}
+                                    className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition-all focus:border-[#00b14f] focus:bg-white"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Apply Method
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="apply_by"
+                                    placeholder="Apply via email or system"
+                                    value={formData.apply_by}
+                                    onChange={handleChange}
+                                    className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition-all focus:border-[#00b14f] focus:bg-white"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Application Deadline
+                                </label>
+
+                                <input
+                                    type="date"
+                                    name="due_date"
+                                    value={formData.due_date}
+                                    onChange={handleChange}
+                                    className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition-all focus:border-[#00b14f] focus:bg-white"
+                                />
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {/* ALERT */}
                     {success && (
-                        <p className="success-msg">
-                            {/* ✅ Job detail saved successfully */}
-                        </p>
+
+                        <div className="rounded-2xl border border-[#00b14f]/20 bg-[#00b14f]/10 px-5 py-4 text-sm font-medium text-[#00b14f]">
+                            Job detail saved successfully.
+                        </div>
+
                     )}
 
                     {error && (
-                        <p className="error-msg">
-                            {/* ❌ {error} */}
-                        </p>
+
+                        <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-medium text-red-600">
+                            {error}
+                        </div>
+
                     )}
+
+                    {/* ACTION BUTTONS */}
+                    <div className="sticky bottom-4 z-50">
+
+                        <div className="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-gray-200 bg-white p-5 shadow-xl backdrop-blur">
+
+                            <button
+                                onClick={prevStep}
+                                type="button"
+                                className="rounded-2xl border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-100"
+                            >
+                                ← Back
+                            </button>
+
+                            <div className="flex items-center gap-3">
+
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="rounded-2xl bg-gray-100 px-6 py-3 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-200"
+                                >
+                                    {
+                                        loading
+                                            ? "Saving..."
+                                            : "Save Draft"
+                                    }
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={handlePublish}
+                                    className="rounded-2xl bg-[#00b14f] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-[#00b14f]/30 transition-all hover:scale-[1.02] hover:bg-[#009245]"
+                                >
+                                    Publish Job →
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                 </form>
 
-                <div className="job-form-step-btn back-next-btn">
-
-                    <button onClick={prevStep} className="back-btn">
-                        <i className="fa-solid fa-angle-left"></i>
-                        <span>Back</span>
-                    </button>
-
-                    <button
-                        onClick={() => router.push("/recruiter/jobs/")}
-                        className="finish-btn"
-                    >
-                        <span>Finish</span>
-                        <i className="fa-solid fa-angle-right"></i>
-                    </button>
-                </div>
-
             </div>
-
 
         </div>
 
     );
+
 }

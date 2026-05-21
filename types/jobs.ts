@@ -27,7 +27,7 @@ export interface Job {
 }
 
 export interface JobDetail {
-  id: number;
+  id: number | null;
   job_id: number | null;
   description: string | null;
   requirement: string | null;
@@ -47,3 +47,4 @@ export interface GeneralInformation {
   numberOfRecruitment: number;
   workingStyle: string;
 }
+
