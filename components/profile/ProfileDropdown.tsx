@@ -149,7 +149,7 @@ export default function ProfileDropdown() {
 
             {activeSection === "security" && (
               <div className="menu-items">
-                <a>Personal Information</a>
+                <Link href="/candidate/profile">Personal Information</Link>
                 <a>Change Password</a>
               </div>
             )}
