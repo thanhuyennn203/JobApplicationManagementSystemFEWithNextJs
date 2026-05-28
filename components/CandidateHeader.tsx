@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ProfileDropdown from "./profile/ProfileDropdown";
 import { useAuth } from "@/context/AuthContext";
+import NotificationBell from "./notification/NotificationBell";
 
 export default function CandidateHeader() {
   const router = useRouter();
@@ -84,9 +85,7 @@ export default function CandidateHeader() {
           {/* Guest */}
           {role && (
             <>
-              <button className="icon-btn">
-                <i className="fa-regular fa-bell"></i>
-              </button>
+              <NotificationBell variant="light" />
 
               <button className="icon-btn">
                 <i className="fa-regular fa-comment-dots"></i>

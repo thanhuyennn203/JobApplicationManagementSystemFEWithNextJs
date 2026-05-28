@@ -45,6 +45,18 @@ export default function LoginForm() {
       // console.log("user: ", data);
       const roles = data.user?.roles || [];
 
+      //call notification request
+    
+      // const token = await requestNotificationPermission();
+
+      // if (token) {
+
+      //   await axios.post(
+      //     "/api/notifications/save-token",
+      //     { token }
+      //   );
+      // }
+
       if (roles.includes("RECRUITER")) {
         router.push("/recruiter");
       } else {
@@ -66,7 +78,7 @@ export default function LoginForm() {
           <div className="form-group">
             <label>Email</label>
             <div className="input-wrapper">
-            <i className="fa-solid fa-envelope icon" />
+              <i className="fa-solid fa-envelope icon" />
               <input
                 type="email"
                 placeholder="Nhập email"

@@ -1,4 +1,5 @@
 import { Job, JobDetail } from "@/types/jobs";
+import { JobGenerateContext } from "@/types/tagging";
 
 const API_URL = "http://localhost:9191/api/jobs";
 
@@ -124,4 +125,30 @@ export const saveGeneralInformation = async (
   }
 
   return res.json();
+};
+
+export const getJobGenerateContext = async (
+  jobId?: number
+): Promise<JobGenerateContext> => {
+
+  const url = jobId
+    ? `${API_URL}/generate/context?jobPostingId=${jobId}`
+    : `${API_URL}/generate/context`;
+
+  const res = await fetch(url, {
+    headers: getAuthHeader(),
+  });
+  if (!res.ok) {
+    throw new Error("Failed to fetch job generate context");
+  }
+
+  const data = await res.json();
+  console.log(data);
+
+  return {
+    categories: data.categories ?? [],
+    templates: data.templates ?? [],
+    tags: data.tags ?? [],
+    generalInformation: data.generalInformation ?? null,
+  };
 };

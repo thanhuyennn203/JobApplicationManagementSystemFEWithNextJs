@@ -4,6 +4,7 @@ import RecruiterSidebar from "@/components/recruiter/RecruiterSidebar";
 import "@/styles/recruiter/layout.css";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import NotificationBell from "@/components/notification/NotificationBell";
 
 export default function AdminLayout({
   children,
@@ -17,6 +18,10 @@ export default function AdminLayout({
       <RecruiterSidebar />
 
       <div className="container" style={{ width: "100%" }}>
+        <div className="admin-notification-bar">
+          <NotificationBell variant="light" />
+        </div>
+
         {/* Tabs */}
         {/* <div className="tabs">
           <Link

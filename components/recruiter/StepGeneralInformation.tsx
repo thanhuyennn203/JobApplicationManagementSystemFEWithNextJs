@@ -4,35 +4,47 @@ import { useEffect, useState } from "react";
 import "@/styles/recruiter/GeneralInformation.css";
 import {
     getSuggestedTags,
-    getPopularTags,
-    saveJobPostingTags,
-    validateTagLength,
-    validateTagFormat
+    saveJobPostingTags
 } from "@/services/jobs/tagService";
-import { saveGeneralInformation } from "@/services/jobs/jobs.service";
-import { getCategories, createCategory } from "@/services/jobs/categoryService";
+import { getJobGenerateContext, saveGeneralInformation } from "@/services/jobs/jobs.service";
+import { createCategory } from "@/services/jobs/categoryService";
 import { getTemplatesByCategory, createTemplate } from "@/services/jobs/templateService";
+import { getGeneralInformationByJobId } from "@/services/jobs/jobGeneralInfor.service";
+import { getJobPostingTags } from "@/services/jobs/tagService";
 import {
     JobCategory,
     JobTemplate,
     SuggestedTagsResponse,
-    TagCategory,
-    SelectedTag
+    SelectedTag,
+    TagDTO
 } from "@/types/tagging";
-import CategorySelector from "@/components/recruiter/CategorySelector";
-import TemplateSelector from "@/components/recruiter/TemplateSelector";
-import TagSection from "@/components/recruiter/TagSection";
-import SelectedTagsPreview from "@/components/recruiter/SelectedTagsPreview";
-import CustomTagInput from "@/components/recruiter/CustomTagInput";
 import { useTagValidation } from "@/hooks/useTagValidation";
 import SearchableSelect from "@/components/jobs/SearchableSelect";
 import SearchableTagInput from "@/components/jobs/SearchableTagInput";
+
+type SupportedTagCategory = "SKILLS" | "REQUIREMENTS" | "BENEFITS";
+
+type SelectedTagsByCategory = Record<SupportedTagCategory, SelectedTag[]>;
+
+interface StepBasicProps {
+    nextStep?: () => void;
+    prevStep?: () => void;
+    jobId?: number;
+    currentUserId?: number;
+}
+
+const SUPPORTED_TAG_CATEGORIES: SupportedTagCategory[] = [
+    "SKILLS",
+    "REQUIREMENTS",
+    "BENEFITS"
+];
+
 export default function StepBasic({
-    nextStep,
-    prevStep,
+    nextStep = () => undefined,
+    prevStep = () => undefined,
     jobId,
     currentUserId
-}: any) {
+}: StepBasicProps) {
 
     // Validation Hook
     const {
@@ -56,6 +68,7 @@ export default function StepBasic({
     // Category / Template
     const [categories, setCategories] = useState<JobCategory[]>([]);
     const [templates, setTemplates] = useState<JobTemplate[]>([]);
+    const [allTemplates, setAllTemplates] = useState<JobTemplate[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
     const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
 
@@ -76,11 +89,7 @@ export default function StepBasic({
         benefits: []
     });
 
-    const [selectedTags, setSelectedTags] = useState<{
-        SKILLS: SelectedTag[];
-        REQUIREMENTS: SelectedTag[];
-        BENEFITS: SelectedTag[];
-    }>({
+    const [selectedTags, setSelectedTags] = useState<SelectedTagsByCategory>({
         SKILLS: [],
         REQUIREMENTS: [],
         BENEFITS: []
@@ -94,32 +103,217 @@ export default function StepBasic({
     const [creatingCategory, setCreatingCategory] = useState(false);
     const [creatingTemplate, setCreatingTemplate] = useState(false);
 
-    // Fetch Categories
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const data = await getCategories();
-                setCategories(data);
-            } catch (err) {
-                console.error("Error fetching categories:", err);
-                setError("Failed to load categories");
-            }
-        };
-        fetchCategories();
-    }, []);
+    const toNumberOrNull = (value: unknown): number | null => {
+        if (typeof value === "number") {
+            return value;
+        }
 
-    // Fetch Popular Tags
+        if (typeof value === "string" && value.trim()) {
+            const parsed = Number(value);
+            return Number.isNaN(parsed) ? null : parsed;
+        }
+
+        return null;
+    };
+
+    const normalizeCategory = (category: JobCategory): JobCategory => ({
+        ...category,
+        id: toNumberOrNull(category.id) ?? 0,
+        name:
+            category.name ??
+            category.categoryName ??
+            category.displayName ??
+            category.title ??
+            ""
+    });
+
+    const normalizeTemplate = (template: JobTemplate): JobTemplate => ({
+        ...template,
+        id: toNumberOrNull(template.id) ?? 0,
+        categoryId:
+            toNumberOrNull(template.categoryId) ??
+            toNumberOrNull(template.jobCategoryId) ??
+            toNumberOrNull(template.category_id) ??
+            toNumberOrNull(template.job_category_id) ??
+            toNumberOrNull(template.category?.id) ??
+            toNumberOrNull(template.jobCategory?.id) ??
+            toNumberOrNull(template.jobCategoryResponse?.id) ??
+            0,
+        name:
+            template.name ??
+            template.templateName ??
+            template.displayName ??
+            template.title ??
+            ""
+    });
+
+    const toSuggestionTags = (tags: TagDTO[] = []): SuggestedTagsResponse => {
+        return tags.reduce<SuggestedTagsResponse>(
+            (acc, tag) => {
+                const category = String(tag.category ?? "").toUpperCase();
+                const tagText =
+                    tag.tagText ??
+                    tag.tagName ??
+                    tag.name ??
+                    tag.text ??
+                    tag.value ??
+                    "";
+
+                if (!tagText) {
+                    return acc;
+                }
+
+                if (category === "SKILLS") {
+                    acc.skills.push(tagText);
+                }
+
+                if (category === "REQUIREMENTS") {
+                    acc.requirements.push(tagText);
+                }
+
+                if (category === "BENEFITS") {
+                    acc.benefits.push(tagText);
+                }
+
+                return acc;
+            },
+            {
+                skills: [],
+                requirements: [],
+                benefits: []
+            }
+        );
+    };
+
+    const toSelectedTags = (tags: TagDTO[] = []) => {
+        return tags.reduce<SelectedTagsByCategory>(
+            (acc, tag) => {
+                const category = String(tag.category ?? "").toUpperCase();
+                const tagText =
+                    tag.tagText ??
+                    tag.tagName ??
+                    tag.name ??
+                    tag.text ??
+                    tag.value ??
+                    "";
+
+                if (
+                    !tagText ||
+                    !SUPPORTED_TAG_CATEGORIES.includes(category as SupportedTagCategory)
+                ) {
+                    return acc;
+                }
+
+                const supportedCategory = category as SupportedTagCategory;
+
+                acc[supportedCategory].push({
+                    category: supportedCategory,
+                    tagText,
+                    isUserCreated: Boolean(tag.isUserCreated)
+                });
+
+                return acc;
+            },
+            {
+                SKILLS: [],
+                REQUIREMENTS: [],
+                BENEFITS: []
+            }
+        );
+    };
+
+    const clearSelectedTags = () => {
+        setSelectedTags({
+            SKILLS: [],
+            REQUIREMENTS: [],
+            BENEFITS: []
+        });
+    };
+
+    const getErrorMessage = (
+        err: unknown,
+        fallback: string
+    ) => err instanceof Error ? err.message : fallback;
+
+    // Fetch context and existing data
     useEffect(() => {
-        const fetchPopular = async () => {
+        const fetchContext = async () => {
             try {
-                const data = await getPopularTags();
-                setPopularTags(data);
+                const [context, existingGeneralInfo, existingTagsResponse] =
+                    await Promise.all([
+                        getJobGenerateContext(jobId),
+                        jobId
+                            ? getGeneralInformationByJobId(jobId)
+                            : Promise.resolve(null),
+                        jobId
+                            ? getJobPostingTags(jobId).catch(() => null)
+                            : Promise.resolve(null)
+                    ]);
+
+                const normalizedCategories = (context.categories ?? [])
+                    .map(normalizeCategory);
+                const normalizedTemplates = (context.templates ?? [])
+                    .map(normalizeTemplate);
+
+                setCategories(normalizedCategories);
+                setAllTemplates(normalizedTemplates);
+                setPopularTags(toSuggestionTags(context.tags ?? []));
+
+                const generalInfo =
+                    existingGeneralInfo ??
+                    context.generalInformation;
+
+                if (generalInfo) {
+                    setFormData({
+                        rank: generalInfo.rank ?? "",
+                        education: generalInfo.education ?? "",
+                        numberOfRecruitment: generalInfo.numberOfRecruitment ?? 1,
+                        workingStyle: generalInfo.workingStyle ?? ""
+                    });
+
+                    setSelectedCategory(
+                        toNumberOrNull(generalInfo.jobCategoryId) ??
+                        toNumberOrNull(generalInfo.categoryID) ??
+                        toNumberOrNull(generalInfo.categoryId) ??
+                        toNumberOrNull(generalInfo.job_category_id) ??
+                        toNumberOrNull(generalInfo.category?.id) ??
+                        toNumberOrNull(generalInfo.jobCategory?.id) ??
+                        null
+                    );
+
+                    setSelectedTemplate(
+                        toNumberOrNull(generalInfo.jobTemplateId) ??
+                        toNumberOrNull(generalInfo.templateID) ??
+                        toNumberOrNull(generalInfo.templateId) ??
+                        toNumberOrNull(generalInfo.jobTypeTemplateId) ??
+                        toNumberOrNull(generalInfo.job_template_id) ??
+                        toNumberOrNull(generalInfo.template?.id) ??
+                        toNumberOrNull(generalInfo.jobTemplate?.id) ??
+                        null
+                    );
+                }
+
+                const existingTags =
+                    Array.isArray(existingTagsResponse)
+                        ? existingTagsResponse
+                        : existingTagsResponse?.tags ?? [];
+
+                const selectedTagSource =
+                    existingTags.length > 0
+                        ? existingTags
+                        : context.tags ?? [];
+
+                if (selectedTagSource.length > 0) {
+                    setSelectedTags(toSelectedTags(selectedTagSource));
+                }
             } catch (err) {
-                console.error("Error fetching popular tags:", err);
+                console.error("Error fetching job generate context:", err);
+                setError("Failed to load job context");
             }
         };
-        fetchPopular();
-    }, []);
+
+        fetchContext();
+    }, [jobId]);
 
     // Fetch Templates When Category Changes
     useEffect(() => {
@@ -129,11 +323,28 @@ export default function StepBasic({
             return;
         }
 
+        const matchingTemplates = allTemplates
+            .filter(template => template.categoryId === selectedCategory);
+
+        if (matchingTemplates.length > 0) {
+            setTemplates(matchingTemplates);
+            setSelectedTemplate(prev =>
+                prev && matchingTemplates.some(template => template.id === prev)
+                    ? prev
+                    : null
+            );
+            return;
+        }
+
         const fetchTemplates = async () => {
             try {
                 const data = await getTemplatesByCategory(selectedCategory);
-                setTemplates(data);
-                setSelectedTemplate(null);
+                setTemplates(data.map(normalizeTemplate));
+                setSelectedTemplate(prev =>
+                    prev && data.some(template => template.id === prev)
+                        ? prev
+                        : null
+                );
             } catch (err) {
                 console.error("Error fetching templates:", err);
                 setError("Failed to load templates");
@@ -141,7 +352,7 @@ export default function StepBasic({
         };
 
         fetchTemplates();
-    }, [selectedCategory]);
+    }, [allTemplates, selectedCategory]);
 
     // Fetch Suggested Tags When Template Changes
     useEffect(() => {
@@ -164,15 +375,6 @@ export default function StepBasic({
         };
 
         fetchTags();
-    }, [selectedTemplate]);
-
-    // Reset Selected Tags When Template Changes
-    useEffect(() => {
-        setSelectedTags({
-            SKILLS: [],
-            REQUIREMENTS: [],
-            BENEFITS: []
-        });
     }, [selectedTemplate]);
 
     // Handle Change
@@ -204,7 +406,7 @@ export default function StepBasic({
 
     // Toggle Tag
     const toggleTag = (
-        category: TagCategory,
+        category: SupportedTagCategory,
         tag: string
     ) => {
         const exists = selectedTags[category]
@@ -242,7 +444,7 @@ export default function StepBasic({
 
     // Add Custom Tag
     const addCustomTag = (
-        category: TagCategory,
+        category: SupportedTagCategory,
         value: string
     ) => {
         if (!validateUserTag(value)) {
@@ -283,7 +485,7 @@ export default function StepBasic({
 
     // Remove Tag
     const removeTag = (
-        category: TagCategory,
+        category: SupportedTagCategory,
         tagText: string
     ) => {
         setSelectedTags(prev => ({
@@ -322,9 +524,9 @@ export default function StepBasic({
             setSuccess(true);
             setTimeout(() => setSuccess(false), 2000);
 
-        } catch (err: any) {
+        } catch (err) {
             console.error("Error creating category:", err);
-            setError(err.message || "Failed to create category");
+            setError(getErrorMessage(err, "Failed to create category"));
         } finally {
             setCreatingCategory(false);
         }
@@ -356,15 +558,20 @@ export default function StepBasic({
                 ...prev,
                 created
             ]);
+            setAllTemplates(prev => [
+                ...prev,
+                normalizeTemplate(created)
+            ]);
 
             setSelectedTemplate(created.id);
+            clearSelectedTags();
             setNewTemplateName("");
             setSuccess(true);
             setTimeout(() => setSuccess(false), 2000);
 
-        } catch (err: any) {
+        } catch (err) {
             console.error("Error creating template:", err);
-            setError(err.message || "Failed to create template");
+            setError(getErrorMessage(err, "Failed to create template"));
         } finally {
             setCreatingTemplate(false);
         }
@@ -463,11 +670,10 @@ export default function StepBasic({
                 nextStep();
             }, 1000);
 
-        } catch (err: any) {
+        } catch (err) {
             console.error("Error saving:", err);
             setError(
-                err.message ||
-                "Failed to save information and tags"
+                getErrorMessage(err, "Failed to save information and tags")
             );
         } finally {
             setLoading(false);
@@ -658,9 +864,14 @@ export default function StepBasic({
                                 ) || null
                             }
                             displayKey="name"
-                            onSelect={(item) =>
-                                setSelectedCategory(item.id)
-                            }
+                            onSelect={(item) => {
+                                if (item.id !== selectedCategory) {
+                                    setSelectedTemplate(null);
+                                    clearSelectedTags();
+                                }
+
+                                setSelectedCategory(item.id);
+                            }}
                         />
 
                     </div>
@@ -739,11 +950,15 @@ export default function StepBasic({
                                         t => t.id === selectedTemplate
                                     ) || null
                                 }
-                                displayKey="name"
-                                onSelect={(item) =>
-                                    setSelectedTemplate(item.id)
+                            displayKey="name"
+                            onSelect={(item) => {
+                                if (item.id !== selectedTemplate) {
+                                    clearSelectedTags();
                                 }
-                            />
+
+                                setSelectedTemplate(item.id);
+                            }}
+                        />
 
                         </div>
 

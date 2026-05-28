@@ -102,7 +102,9 @@ export const getJobPostingTags = async (
     if (!res.ok) {
         throw new Error("Failed to fetch job posting tags");
     }
-    return res.json();
+
+    const response = await res.json();
+    return response.data ?? response;
 };
 
 /**

@@ -17,7 +17,9 @@ export async function getGeneralInformationByJobId(
     );
 
     if (!res.ok) return null;
-    return res.json();
+
+    const response = await res.json();
+    return response.data ?? response;
   } catch (error) {
     console.error("Failed to fetch general information", error);
     return null;

@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const decoded: any = jwtDecode(storedToken);
 
         setUser({
-          userId: decoded.userId,
+          userId: Number(decoded.sub),
           email: decoded.email,
           roles: decoded.roles,
           candidateId: decoded.candidateId,
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const decoded: any = jwtDecode(newToken);
     console.log("Decoded JWT:", decoded);
     setUser({
-      userId: decoded.sub,
+      userId: Number(decoded.sub),
       email: decoded.email,
       roles: decoded.roles,
       candidateId: decoded.candidateId,

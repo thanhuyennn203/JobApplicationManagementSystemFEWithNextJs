@@ -46,5 +46,26 @@ export interface GeneralInformation {
   education: string;
   numberOfRecruitment: number;
   workingStyle: string;
+  jobCategoryId?: number;
+  categoryID?: number;
+  categoryId?: number;
+  job_category_id?: number;
+  category?: {
+    id?: number;
+  };
+  jobCategory?: {
+    id?: number;
+  };
+  jobTemplateId?: number;
+  templateID?: number;
+  templateId?: number;
+  jobTypeTemplateId?: number;
+  job_template_id?: number;
+  template?: {
+    id?: number;
+  };
+  jobTemplate?: {
+    id?: number;
+  };
 }
 

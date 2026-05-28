@@ -24,6 +24,16 @@
     transition: all .25s ease;
 }
 
+.admin-notification-bar {
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 28px 0;
+    background: #f3f5f7;
+}
+
 .job-card {
     background: #ffffff;
     border: 1px solid #e5e7eb;

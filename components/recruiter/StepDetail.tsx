@@ -42,7 +42,7 @@ export default function StepDetail({
 
     // TEMP UI DEMO MODE
     // đổi false -> true nếu muốn test không cần BE
-    const DEMO_MODE = true;
+    const DEMO_MODE = false;
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -82,7 +82,7 @@ export default function StepDetail({
             }
 
             let data;
-
+            console.log(hasDetail);
             if (hasDetail) {
 
                 data = await updateJobDetail(
@@ -160,7 +160,7 @@ export default function StepDetail({
 
                 const data =
                     await getJobDetailByJobId(jobId);
-
+                console.log("có details", data);
                 if (!data) return;
 
                 setFormData({

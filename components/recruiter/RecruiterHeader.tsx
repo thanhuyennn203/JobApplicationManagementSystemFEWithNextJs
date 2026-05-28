@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import NotificationBell from "@/components/notification/NotificationBell";
 
 export default function RecruiterHeader() {
 
@@ -100,9 +101,7 @@ export default function RecruiterHeader() {
       {/* Right */}
       <div className="header-right">
 
-        <div className="icon-btn">
-          <i className="fa-regular fa-bell"></i>
-        </div>
+        <NotificationBell variant="dark" />
 
         <div className="icon-btn cart">
           <i className="fa-solid fa-cart-shopping"></i>

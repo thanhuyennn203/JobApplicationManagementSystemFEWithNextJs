@@ -215,7 +215,7 @@ const totalPages = Math.max(
                       {/* DRAFT */}
                       {job.status === "DRAFT" && (
                         <button
-                          onClick={() => router.push(`jobs/edit/${job.id}`)}
+                          onClick={() => router.push(`/jobs/edit/${job.id}`)}
                           className="text-xs text-[#00b14f] font-medium hover:underline"
                         >
                           Continue
@@ -472,7 +472,7 @@ function DraftReminder({ draftJobs }: { draftJobs: any[] }) {
 
       {/* ACTION */}
       <button
-        onClick={() => router.push(`/jobs/edit/${latestDraft.id}`)}
+        onClick={() => router.push(`/recruiter/jobs/edit/${latestDraft.id}`)}
         className="text-xs bg-[#00b14f] text-white px-3 py-1.5 rounded-md hover:bg-[#009e46]"
       >
         Continue
