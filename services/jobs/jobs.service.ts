@@ -152,3 +152,47 @@ export const getJobGenerateContext = async (
     generalInformation: data.generalInformation ?? null,
   };
 };
+
+export const updateJobStatus = async (
+  jobId: number,
+  status: string
+) => {
+
+  let endpoint = "";
+
+  switch (status) {
+
+    case "OPEN":
+      endpoint = "open";
+      break;
+
+    case "CLOSED":
+      endpoint = "close";
+      break;
+
+    case "DRAFT":
+      endpoint = "draft";
+      break;
+
+    default:
+      throw new Error(
+        "Unsupported status"
+      );
+  }
+
+  const res = await fetch(
+    `${API_URL}/${jobId}/${endpoint}`,
+    {
+      method: "PATCH",
+      headers: getAuthHeader(),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error(
+      "Failed to update job status"
+    );
+  }
+
+  return res.json();
+};

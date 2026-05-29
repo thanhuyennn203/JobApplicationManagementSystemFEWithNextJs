@@ -1,44 +1,63 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useAuth } from "@/context/AuthContext";
-import Calendar from "react-calendar";
-// import { useRouter } from "next/navigation";
-import "react-calendar/dist/Calendar.css";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+
+import { useAuth } from "@/context/AuthContext";
+import {
+  getJobByCompanyId,
+  updateJobStatus,
+} from "@/services/jobs/jobs.service";
+
+import {
+  Briefcase,
+  CalendarDays,
+  CircleDollarSign,
+  Eye,
+  FileText,
+  MapPin,
+  Pencil,
+  PlayCircle,
+  ShieldAlert,
+  StopCircle,
+  Users,
+} from "lucide-react";
+import { useLocation } from "@/context/LocationContext";
 
 export default function DashboardPage() {
   const auth = useAuth();
-  const companyId = auth?.user?.companyId;
   const router = useRouter();
+
+  const companyId = auth?.user?.companyId;
 
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  console.log(auth?.user);
+  const [changingStatusId, setChangingStatusId] = useState<number | null>(null);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
 
-  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
-  const [appliedRange, setAppliedRange] = useState<[Date | null, Date | null]>([null, null]);
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
 
-  // ✅ pagination
+  const [appliedRange, setAppliedRange] = useState<[
+    Date | null,
+    Date | null
+  ]>([null, null]);
+
   const [currentPage, setCurrentPage] = useState(1);
-  const jobsPerPage = 20;
+  const jobsPerPage = 8;
 
-  // 📊 stats
-  const totalJobs = jobs.length;
-  const openJobs = jobs.filter((j) => j.status === "OPEN").length;
-  const closedJobs = jobs.filter((j) => j.status === "CLOSED").length;
-  const expiredJobs = jobs.filter((j) => j.status === "EXPIRED").length;
-  const draftJobs = jobs.filter((j) => j.status === "DRAFT");
-  // fetch
   const fetchJobs = async () => {
     try {
-      const res = await fetch(`http://localhost:9191/api/jobs/company/${companyId}`);
-      const data = await res.json();
+      if (!companyId) return;
+
+      const data = await getJobByCompanyId(companyId);
       setJobs(data || []);
-      console.log("jobs: ",data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -47,272 +66,550 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    if (companyId) fetchJobs();
-  },[companyId]);
+    fetchJobs();
+  }, [companyId]);
 
-  // ✅ FILTER
-  const filteredJobs = jobs.filter((job) => {
-    if (statusFilter !== "ALL" && job.status !== statusFilter) return false;
+  const filteredJobs = useMemo(() => {
+    return jobs.filter((job) => {
+      if (
+        statusFilter !== "ALL" &&
+        job.status !== statusFilter
+      ) {
+        return false;
+      }
 
-    if (search && !job.title?.toLowerCase().includes(search.toLowerCase())) return false;
+      if (
+        search &&
+        !job.title
+          ?.toLowerCase()
+          .includes(search.toLowerCase())
+      ) {
+        return false;
+      }
 
-    const [start, end] = appliedRange;
+      const [start, end] = appliedRange;
 
-    if (start && end && job.postedDate) {
-      const jobDate = new Date(job.postedDate);
+      if (start && end && job.postedDate) {
+        const jobDate = new Date(job.postedDate);
 
-      const startDate = new Date(start);
-      startDate.setHours(0, 0, 0, 0);
+        const startDate = new Date(start);
+        startDate.setHours(0, 0, 0, 0);
 
-      const endDate = new Date(end);
-      endDate.setHours(23, 59, 59, 999);
+        const endDate = new Date(end);
+        endDate.setHours(23, 59, 59, 999);
 
-      if (jobDate < startDate || jobDate > endDate) return false;
-    }
+        if (jobDate < startDate || jobDate > endDate) {
+          return false;
+        }
+      }
 
-    return true;
-  });
+      return true;
+    });
+  }, [jobs, search, statusFilter, appliedRange]);
 
-  // ✅ pagination logic
-const totalPages = Math.max(
-  1,
-  Math.ceil(filteredJobs.length / jobsPerPage)
-);
+  console.log("jobs", jobs);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredJobs.length / jobsPerPage)
+  );
+
   const paginatedJobs = filteredJobs.slice(
     (currentPage - 1) * jobsPerPage,
     currentPage * jobsPerPage
   );
-  const emptyRows = jobsPerPage - paginatedJobs.length;
+
+  const totalJobs = jobs.length;
+  const openJobs = jobs.filter((j) => j.status === "OPEN").length;
+  const closedJobs = jobs.filter((j) => j.status === "CLOSED").length;
+  const expiredJobs = jobs.filter((j) => j.status === "EXPIRED").length;
+
+  const handleChangeStatus = async (
+    jobId: number,
+    status: string
+  ) => {
+    const actionText =
+      status === "OPEN"
+        ? "publish"
+        : "close";
+
+    const confirmed = window.confirm(
+      `Are you sure you want to ${actionText} this job?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setChangingStatusId(jobId);
+
+      await updateJobStatus(jobId, status);
+
+      setJobs((prev) =>
+        prev.map((job) =>
+          job.id === jobId
+            ? {
+              ...job,
+              status,
+            }
+            : job
+        )
+      );
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update job status");
+    } finally {
+      setChangingStatusId(null);
+    }
+  };
+
   return (
-    <div className="p-6 bg-[#f6f7fb] min-h-screen space-y-6">
+    <div className="min-h-screen bg-[#f4f7fb] p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
 
-      {/* HEADER */}
-      <div>
-        <h1 className="text-2xl font-semibold">
-          Hi, {auth?.user?.email || "Recruiter"}
-        </h1>
-        <p className="text-gray-500 text-sm">
-          Here is your job posting performance
-        </p>
-      </div>
+        {/* HEADER */}
+        <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">
+                Recruiter Dashboard
+              </h1>
 
-      {/* STATS */}
-      <div className="grid grid-cols-4 gap-4">
-        <StatCard title="Total Jobs" value={totalJobs} sub="All job posts" />
-        <StatCard title="Active Jobs" value={openJobs} sub="Currently open" positive />
-        <StatCard title="Closed Jobs" value={closedJobs} sub="Closed by recruiter" />
-        <StatCard title="Expired Jobs" value={expiredJobs} sub="Reached deadline" negative />
-      </div>
+              <p className="text-gray-500 mt-1">
+                Monitor and manage your recruitment posts professionally.
+              </p>
+            </div>
 
-      {/* MAIN */}
-      <div className="grid grid-cols-3 gap-6">
-
-        {/* LEFT */}
-        <div className="col-span-2 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
-          {draftJobs.length > 0 && (
-            <DraftReminder draftJobs={draftJobs} />
-          )}
-          {/* FILTER */}
-          <div className="flex justify-between items-center mb-4 gap-3">
-            <h2 className="font-semibold">Job Listings</h2>
-
-            <div className="flex gap-3">
-              <button
-              onClick={() => router.push("./jobs/create")}
-              className="flex items-center gap-2 bg-[#00b14f] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#009e46] transition"
+            <button
+              onClick={() => router.push("/recruiter/jobs/create")}
+              className="bg-[#00b14f] hover:bg-[#009245] transition text-white px-5 py-3 rounded-2xl font-medium flex items-center gap-2"
             >
-              + New Job
+              <Briefcase size={18} />
+              Create New Job
             </button>
-              <input
-                placeholder="Search jobs..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="border border-gray-100 px-3 py-2 rounded-lg text-sm w-48 focus:ring-2 focus:ring-[#00b14f]"
-              />
-
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="border border-gray-100 px-3 py-2 rounded-lg text-sm"
-              >
-                <option value="ALL">All</option>
-                <option value="OPEN">Open</option>
-                <option value="CLOSED">Closed</option>
-                <option value="DRAFT">Draft</option>
-                <option value="EXPIRED">Expired</option>
-              </select>
-              
-            </div>
-            
           </div>
-
-          {/* TABLE AREA */}
-          {loading ? (
-            <p className="text-gray-400">Loading...</p>
-          ) : (
-            <table className="w-full text-sm">
-
-              {/* STICKY HEADER */}
-              <thead className="text-gray-400 text-left sticky top-0 bg-white z-10">
-                <tr>
-                  <th className="py-2">Job Title</th>
-                  <th>Status</th>
-                  <th>Applications</th>
-                  <th>Posted</th>
-                  <th className="text-right">Actions</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {paginatedJobs.map((job) => (
-                  <tr
-                    key={job.id}
-                    className="border-t border-gray-100 hover:bg-[#f0fdf4]"
-                  >
-                    {/* TITLE (truncate) */}
-                    <td className="py-3 max-w-[220px]">
-                      <p className="truncate text-sm font-medium">
-                        {job.title}
-                      </p>
-                    </td>
-
-                    {/* STATUS */}
-                    <td>
-                      <StatusBadge status={job.status} />
-                    </td>
-
-                    {/* APPLICATION */}
-                    <td>{job.applicationCount || 0}</td>
-
-                    {/* DATE */}
-                    <td>
-                      {job.postedDate
-                        ? new Date(job.postedDate).toLocaleDateString()
-                        : "-"}
-                    </td>
-
-                    {/* ACTIONS */}
-                    <td className="text-right space-x-2">
-                      {/* OPEN */}
-                      {job.status === "OPEN" && (
-                        <>
-                          <button
-                            onClick={() => router.push(`/jobs/${job.id}`)}
-                            className="text-xs text-gray-600 hover:underline"
-                          >
-                            View
-                          </button>
-
-                          <button
-                            onClick={() => router.push(`jobs/edit/${job.id}`)}
-                            className="text-xs text-[#00b14f] font-medium hover:underline"
-                          >
-                            Edit
-                          </button>
-                        </>
-                      )}
-
-                      {/* DRAFT */}
-                      {job.status === "DRAFT" && (
-                        <button
-                          onClick={() => router.push(`/jobs/edit/${job.id}`)}
-                          className="text-xs text-[#00b14f] font-medium hover:underline"
-                        >
-                          Continue
-                        </button>
-                      )}
-
-                      {/* CLOSED / EXPIRED */}
-                      {(job.status === "CLOSED" || job.status === "EXPIRED") && (
-                        <button
-                          onClick={() => router.push(`/jobs/${job.id}`)}
-                          className="text-xs text-gray-600 hover:underline"
-                        >
-                          View
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-
-            </table>
-          )}
-
-          {/* PAGINATION (ALWAYS STAYS BOTTOM) */}
-          <div className="flex justify-between items-center mt-4 text-sm">
-            <span className="text-gray-400">
-              Page {currentPage} of {totalPages}
-            </span>
-
-            <div className="flex gap-2">
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => p - 1)}
-                className="px-3 py-1 border border-gray-100 rounded-md disabled:opacity-40"
-              >
-                Prev
-              </button>
-
-              <button
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((p) => p + 1)}
-                className="px-3 py-1 border border-gray-100 rounded-md disabled:opacity-40"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-
-          {/* EMPTY STATE */}
-          {!loading && filteredJobs.length === 0 && (
-            <p className="text-center text-gray-400 py-4">
-              No jobs found
-            </p>
-          )}
-
         </div>
 
-        {/* RIGHT */}
-        <div className="space-y-6">
+        {/* STATS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+          <StatsCard
+            title="Total Jobs"
+            value={totalJobs}
+            color="bg-blue-50"
+            text="All created job posts"
+            icon={<FileText size={20} />}
+          />
 
-          {/* CALENDAR */}
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
-            <h2 className="font-semibold">Filter by Date</h2>
+          <StatsCard
+            title="Active Jobs"
+            value={openJobs}
+            color="bg-green-50"
+            text="Currently receiving applications"
+            icon={<PlayCircle size={20} />}
+          />
 
-            <Calendar
-            locale="en-US"
-              selectRange
-              onChange={(value: any) => setDateRange(value)}
-              value={dateRange}
-            />
+          <StatsCard
+            title="Closed Jobs"
+            value={closedJobs}
+            color="bg-red-50"
+            text="Closed manually"
+            icon={<StopCircle size={20} />}
+          />
 
-            <button
-              onClick={() => setAppliedRange(dateRange)}
-              className="w-full text-sm bg-[#00b14f] text-white py-2 rounded-lg hover:bg-[#009e46]"
-            >
-              Apply Date Filter
-            </button>
+          <StatsCard
+            title="Expired Jobs"
+            value={expiredJobs}
+            color="bg-yellow-50"
+            text="Expired automatically"
+            icon={<ShieldAlert size={20} />}
+          />
+        </div>
 
-            <button
-              onClick={() => {
-                setDateRange([null, null]);
-                setAppliedRange([null, null]);
-              }}
-              className="w-full text-sm border border-gray-100 py-2 rounded-lg"
-            >
-              Clear Date Filter
-            </button>
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
 
-            {appliedRange[0] && appliedRange[1] && (
-              <p className="text-sm text-gray-500 text-center">
-                {appliedRange[0].toLocaleDateString()} →{" "}
-                {appliedRange[1].toLocaleDateString()}
+          {/* LEFT */}
+          <div className="xl:col-span-3 space-y-5">
+
+            {/* FILTER */}
+            <div className="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm">
+              <div className="flex flex-wrap gap-4 items-center justify-between">
+
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Job Listings
+                  </h2>
+
+                  <p className="text-sm text-gray-500 mt-1">
+                    Track job performance and manage recruitment status.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search jobs..."
+                    className="w-[220px] border border-gray-200 rounded-2xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#00b14f]"
+                  />
+
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="border border-gray-200 rounded-2xl px-4 py-2.5 text-sm outline-none"
+                  >
+                    <option value="ALL">All Status</option>
+                    <option value="OPEN">Open</option>
+                    <option value="CLOSED">Closed</option>
+                    <option value="DRAFT">Draft</option>
+                    <option value="EXPIRED">Expired</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* JOB LIST */}
+            <div className="space-y-4">
+              {loading ? (
+                <div className="bg-white rounded-3xl p-10 text-center border border-gray-100 shadow-sm text-gray-400">
+                  Loading jobs...
+                </div>
+              ) : paginatedJobs.length === 0 ? (
+                <div className="bg-white rounded-3xl p-10 text-center border border-gray-100 shadow-sm text-gray-400">
+                  No jobs found.
+                </div>
+              ) : (
+                paginatedJobs.map((job) => (
+                  <JobCard
+                    key={job.id}
+                    job={job}
+                    router={router}
+                    changingStatusId={changingStatusId}
+                    onChangeStatus={handleChangeStatus}
+                  />
+                ))
+              )}
+            </div>
+
+            {/* PAGINATION */}
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 flex items-center justify-between">
+              <p className="text-sm text-gray-500">
+                Page {currentPage} of {totalPages}
               </p>
-            )}
+
+              <div className="flex gap-2">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => p - 1)}
+                  className="px-4 py-2 rounded-xl border border-gray-200 text-sm disabled:opacity-40"
+                >
+                  Previous
+                </button>
+
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => p + 1)}
+                  className="px-4 py-2 rounded-xl border border-gray-200 text-sm disabled:opacity-40"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
 
-          <SystemAds />
+          {/* RIGHT */}
+          <div className="space-y-5">
+
+            {/* DATE FILTER */}
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-4">
+              <h2 className="font-semibold text-gray-900">
+                Filter By Date
+              </h2>
+
+              <Calendar
+                locale="en-US"
+                selectRange
+                onChange={(value: any) => setDateRange(value)}
+                value={dateRange}
+              />
+
+              <button
+                onClick={() => setAppliedRange(dateRange)}
+                className="w-full bg-[#00b14f] hover:bg-[#009245] text-white py-2.5 rounded-2xl text-sm font-medium"
+              >
+                Apply Filter
+              </button>
+
+              <button
+                onClick={() => {
+                  setDateRange([null, null]);
+                  setAppliedRange([null, null]);
+                }}
+                className="w-full border border-gray-200 py-2.5 rounded-2xl text-sm"
+              >
+                Clear Filter
+              </button>
+            </div>
+
+            {/* HELP CARD */}
+            <div className="bg-gradient-to-br from-[#00b14f] to-[#009245] rounded-3xl p-5 text-white shadow-sm">
+              <h3 className="text-lg font-semibold">
+                Recruitment Tips
+              </h3>
+
+              <p className="text-sm text-green-50 mt-2 leading-6">
+                Jobs with detailed descriptions and clear salary ranges usually receive more applications.
+              </p>
+
+              <button className="mt-4 bg-white text-[#00b14f] px-4 py-2 rounded-2xl text-sm font-semibold">
+                Improve Job Posts
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ========================================================= */
+
+function JobCard({
+  job,
+  router,
+  onChangeStatus,
+  changingStatusId,
+}: any) {
+
+    const { getProvinceName } = useLocation();
+
+  return (
+    <div className="bg-white border border-gray-100 rounded-3xl shadow-sm hover:shadow-md transition overflow-hidden">
+
+      {/* TOP */}
+      <div className="p-6 border-b border-gray-100">
+        <div className="flex items-start justify-between gap-5 flex-wrap">
+
+          {/* LEFT */}
+          <div className="flex gap-4 flex-1 min-w-[300px]">
+
+            <div className="w-16 h-16 rounded-2xl bg-gray-100 overflow-hidden border border-gray-200 flex items-center justify-center">
+              {job.logo_url ? (
+                <img
+                  src={job.logo_url}
+                  alt="company"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Briefcase size={26} className="text-gray-400" />
+              )}
+            </div>
+
+            <div className="flex-1 space-y-3">
+              <div>
+                <h3 className="font-semibold text-gray-900 leading-7">
+                  {job.title}
+                </h3>
+
+                <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
+                  <span className="font-medium text-[#00b14f]">
+                    {job.company_name}
+                  </span>
+
+                  <span>•</span>
+
+                  <span>
+                    Job ID: #{job.id}
+                  </span>
+                </div>
+              </div>
+
+              {/* META */}
+              <div className="flex flex-wrap gap-3 text-sm">
+
+                <MetaTag
+                  icon={<CircleDollarSign size={15} />}
+                  text={`${formatSalary(job.salary_min)} - ${formatSalary(job.salary_max)}`}
+                />
+
+                <MetaTag
+                  icon={<Users size={15} />}
+                  text={job.experienceRequired || "No experience data"}
+                />
+
+                <MetaTag
+                  icon={<CalendarDays size={15} />}
+                  text={`Due: ${formatDate(job.dueDate)}`}
+                />
+
+                <MetaTag
+                  icon={<MapPin size={15} />}
+                  text={
+                    job.locations?.length > 0
+                      ? job.locations
+                        .map((l: any) =>
+                          getProvinceName(l.province)
+                        )
+                        .join(", ")
+                      : "Remote / Flexible"
+                  }
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT STATUS */}
+          <div className="min-w-[230px] bg-[#f8fafc] rounded-2xl p-4 border border-gray-100">
+
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-gray-700">
+                Recruitment Status
+              </p>
+
+              <StatusBadge status={job.status} />
+            </div>
+
+            {/* PROCESS */}
+            <div className="mt-4 flex items-center gap-2 text-xs font-medium">
+
+              <Step active>
+                Draft
+              </Step>
+
+              <div className="flex-1 h-[2px] bg-gray-200" />
+
+              <Step
+                active={
+                  job.status === "OPEN" ||
+                  job.status === "CLOSED" ||
+                  job.status === "EXPIRED"
+                }
+              >
+                Open
+              </Step>
+
+              <div className="flex-1 h-[2px] bg-gray-200" />
+
+              <Step
+                active={
+                  job.status === "CLOSED" ||
+                  job.status === "EXPIRED"
+                }
+              >
+                End
+              </Step>
+            </div>
+
+            {/* ACTION */}
+            <div className="mt-4">
+
+              {job.status === "DRAFT" && (
+                <button
+                  disabled={changingStatusId === job.id}
+                  onClick={() =>
+                    onChangeStatus(job.id, "OPEN")
+                  }
+                  className="w-full bg-[#00b14f] hover:bg-[#009245] disabled:opacity-50 text-white py-2.5 rounded-xl text-sm font-medium"
+                >
+                  Publish Job
+                </button>
+              )}
+
+              {job.status === "OPEN" && (
+                <button
+                  disabled={changingStatusId === job.id}
+                  onClick={() =>
+                    onChangeStatus(job.id, "CLOSED")
+                  }
+                  className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white py-2.5 rounded-xl text-sm font-medium"
+                >
+                  Close Recruitment
+                </button>
+              )}
+
+              {job.status === "CLOSED" && (
+                <div className="text-sm text-gray-500 bg-white border border-gray-200 rounded-xl p-3 text-center">
+                  This job was closed manually.
+                </div>
+              )}
+
+              {job.status === "EXPIRED" && (
+                <div className="text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-xl p-3 text-center">
+                  Recruitment expired automatically.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* BOTTOM */}
+      <div className="px-6 py-4 bg-[#fcfcfd] flex items-center justify-between flex-wrap gap-3">
+
+        <div className="flex flex-wrap gap-2">
+          {(job.tags || []).slice(0, 5).map((tag: string) => (
+            <span
+              key={tag}
+              className="px-3 py-1 rounded-full bg-[#eafaf1] text-[#00b14f] text-xs font-medium"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => router.push(`/jobs/${job.id}`)}
+            className="border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2"
+          >
+            <Eye size={16} />
+            View Detail
+          </button>
+
+          {(job.status === "OPEN" ||
+            job.status === "DRAFT") && (
+              <button
+                onClick={() =>
+                  router.push(`/recruiter/jobs/edit/${job.id}`)
+                }
+                className="bg-[#00b14f] hover:bg-[#009245] text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2"
+              >
+                <Pencil size={16} />
+                Edit Job
+              </button>
+            )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ========================================================= */
+
+function StatsCard({
+  title,
+  value,
+  text,
+  color,
+  icon,
+}: any) {
+  return (
+    <div className="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm">
+      <div className="flex items-start justify-between">
+
+        <div>
+          <p className="text-sm text-gray-500">
+            {title}
+          </p>
+
+          <h3 className="text-xl font-bold text-gray-900 mt-2">
+            {value}
+          </h3>
+
+          <p className="text-sm text-gray-400 mt-1">
+            {text}
+          </p>
+        </div>
+
+        <div className={`${color} p-3 rounded-2xl`}>
+          {icon}
         </div>
       </div>
     </div>
@@ -320,163 +617,56 @@ const totalPages = Math.max(
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const style: any = {
-    OPEN: "bg-green-100 text-green-600",
-    CLOSED: "bg-red-100 text-red-600",
-    EXPIRED: "bg-yellow-100 text-yellow-600",
-    DRAFT: "bg-gray-100 text-gray-500",
+  const styles: any = {
+    OPEN: "bg-green-100 text-green-700 border-green-200",
+    CLOSED: "bg-red-100 text-red-700 border-red-200",
+    EXPIRED: "bg-yellow-100 text-yellow-700 border-yellow-200",
+    DRAFT: "bg-gray-100 text-gray-700 border-gray-200",
   };
 
   return (
-    <span className={`px-2 py-1 rounded-md text-xs ${style[status]}`}>
+    <span
+      className={`px-3 py-1 rounded-full border text-xs font-semibold ${styles[status]}`}
+    >
       {status}
     </span>
   );
 }
 
-function StatCard({
-  title,
-  value,
-  sub,
-  positive,
-  negative,
-}: any) {
+function MetaTag({ icon, text }: any) {
   return (
-    <div className="bg-white p-4 rounded-2xl">
-      <p className="text-gray-400 text-sm">{title}</p>
-      <h3 className="text-xl font-semibold">{value}</h3>
-
-      <span
-        className={`text-xs ${positive
-          ? "text-green-500"
-          : negative
-            ? "text-red-500"
-            : "text-gray-400"
-          }`}
-      >
-        {sub}
-      </span>
+    <div className="flex items-center gap-2 bg-gray-50 border border-gray-100 px-3 py-2 rounded-xl text-gray-700">
+      {icon}
+      <span>{text}</span>
     </div>
   );
 }
 
-function JobRow({ job }: { job: any }) {
-  const statusStyle: any = {
-    OPEN: "bg-green-100 text-green-600",
-    CLOSED: "bg-red-100 text-red-600",
-    EXPIRED: "bg-yellow-100 text-yellow-600",
-    DRAFT: "bg-gray-100 text-gray-500",
-  };
-
+function Step({ active, children }: any) {
   return (
-    <tr className="border-t hover:bg-gray-50">
-      <td className="py-3">{job.title}</td>
-
-      <td>
-        <span
-          className={`px-2 py-1 rounded-md text-xs ${statusStyle[job.status]
-            }`}
-        >
-          {job.status}
-        </span>
-      </td>
-
-      <td>{job.applicationCount || 0}</td>
-
-      <td>
-        {job.createdAt
-          ? new Date(job.createdAt).toLocaleDateString()
-          : "-"}
-      </td>
-
-      <td>
-        {job.dueDate
-          ? new Date(job.dueDate).toLocaleDateString()
-          : "-"}
-      </td>
-
-      <td className="text-right">
-        <button className="text-sm text-purple-600 hover:underline">
-          View
-        </button>
-      </td>
-    </tr>
-  );
-}
-
-function SystemAds() {
-  const ads = [
-    {
-      title: "Boost your job post",
-      desc: "Reach more candidates faster.",
-      img: "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?w=400",
-      date: "2 days ago",
-      cta: "Boost Now",
-    },
-    {
-      title: "Upgrade to Premium",
-      desc: "Unlock smart hiring tools.",
-      img: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=400",
-      date: "1 week ago",
-      cta: "Upgrade",
-    },
-  ];
-
-  return (
-    <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
-      <h2 className="font-semibold text-sm">Announcements</h2>
-
-      {ads.map((ad, i) => (
-        <div
-          key={i}
-          className="rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition"
-        >
-          <img src={ad.img} className="w-full h-28 object-cover" />
-
-          <div className="p-3">
-            <div className="flex justify-between">
-              <h3 className="text-sm font-semibold">{ad.title}</h3>
-              <span className="text-xs text-gray-400">{ad.date}</span>
-            </div>
-
-            <p className="text-xs text-gray-500 mt-1">{ad.desc}</p>
-
-            <button className="mt-3 w-full text-xs text-white bg-[#00b14f] py-1.5 rounded-md hover:bg-[#009e46]">
-              {ad.cta}
-            </button>
-          </div>
-        </div>
-      ))}
+    <div
+      className={`px-2 py-1 rounded-full transition ${active
+          ? "bg-[#00b14f] text-white"
+          : "bg-gray-200 text-gray-500"
+        }`}
+    >
+      {children}
     </div>
   );
 }
 
+function formatDate(date: any) {
+  if (!date) return "N/A";
 
-function DraftReminder({ draftJobs }: { draftJobs: any[] }) {
-  const router = useRouter();
+  return new Date(date).toLocaleDateString();
+}
 
-  const latestDraft = draftJobs[0]; // you can improve later
+function formatSalary(value: number) {
+  if (!value) return "0";
 
-  return (
-    <div className="mb-4 p-4 rounded-xl border border-yellow-100 bg-yellow-50 flex items-center justify-between">
-
-      {/* LEFT TEXT */}
-      <div>
-        <p className="text-sm font-semibold text-yellow-700">
-          You have unfinished job posts
-        </p>
-        <p className="text-xs text-yellow-600">
-          Complete your draft to start receiving applications
-        </p>
-      </div>
-
-      {/* ACTION */}
-      <button
-        onClick={() => router.push(`/recruiter/jobs/edit/${latestDraft.id}`)}
-        className="text-xs bg-[#00b14f] text-white px-3 py-1.5 rounded-md hover:bg-[#009e46]"
-      >
-        Continue
-      </button>
-    </div>
-  );
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    maximumFractionDigits: 0,
+  }).format(value);
 }
