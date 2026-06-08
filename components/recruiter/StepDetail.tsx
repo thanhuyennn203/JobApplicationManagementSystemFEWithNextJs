@@ -11,6 +11,7 @@ import {
 } from "@/services/jobs/jobDetailService";
 
 import { JobDetail } from "@/types/jobs";
+import { useToast } from "@/components/notification/ToastProvider";
 
 export default function StepDetail({
     jobId,
@@ -19,6 +20,7 @@ export default function StepDetail({
 }: any) {
 
     const router = useRouter();
+    const toast = useToast();
 
     const [formData, setFormData] = useState<JobDetail>({
         description: "",
@@ -78,6 +80,7 @@ export default function StepDetail({
 
                 setSuccess(true);
                 setHasDetail(true);
+                toast.success("Job detail saved successfully.");
                 return;
             }
 
@@ -105,10 +108,12 @@ export default function StepDetail({
             );
 
             setSuccess(true);
+            toast.success("Job detail saved successfully.");
 
         } catch (err: any) {
 
             setError(err.message);
+            toast.error(err.message || "Failed to save job detail.");
 
         } finally {
 
@@ -131,12 +136,13 @@ export default function StepDetail({
             // DEMO MODE
             if (DEMO_MODE) {
 
-                alert("Job published successfully!");
+                toast.success("Job published successfully!");
                 router.push("/recruiter/jobs");
                 return;
             }
 
             await publishJob(jobId);
+            toast.success("Job published successfully!");
 
             router.push(
                 "/recruiter/jobs"
@@ -145,6 +151,7 @@ export default function StepDetail({
         } catch (err) {
 
             console.error(err);
+            toast.error("Failed to publish job.");
 
         }
 

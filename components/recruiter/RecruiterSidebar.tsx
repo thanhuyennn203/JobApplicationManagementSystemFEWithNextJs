@@ -33,11 +33,16 @@ export default function RecruiterSidebar() {
       icon: "fa-solid fa-building",
       path: "/admin/company",
     },
+    {
+      name: "Orders",
+      icon: "fa-solid fa-bag-shopping",
+      path: "admin/orders",
+    },
   ];
 
   const handleLogout = () => {
     auth?.logout(); // call your context logout
-    router.push("/recruiter/login"); // redirect after logout
+    router.push("/candidate/login"); // redirect after logout
   };
 
   return (

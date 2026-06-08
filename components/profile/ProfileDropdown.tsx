@@ -51,7 +51,7 @@ export default function ProfileDropdown() {
 
           {/* Profile */}
           <div className="profile-header">
-            <img src="/avatar.png" className="avatar-large" />
+            <img src="/images/default-avatar.jpg" className="avatar-large" />
             <div>
               <p className="name">{auth?.user?.email}</p>
               <p className="verify">Verified Account</p>

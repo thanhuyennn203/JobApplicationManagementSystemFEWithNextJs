@@ -10,6 +10,7 @@ import {
 } from "@/services/candidate/savedJob.service";
 import { useAuth } from "@/context/AuthContext";
 import ApplyJobModal from "../application/ApplyJobModal";
+import { useToast } from "@/components/notification/ToastProvider";
 
 interface Props {
   data: {
@@ -27,6 +28,7 @@ export default function JobDetailHeader({ data }: Props) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const auth = useAuth();
+  const toast = useToast();
   const [saved, setSaved] = useState(false);
   const candidateId = auth?.user?.candidateId;
   const [showModal, setShowModal] = useState(false);
@@ -57,7 +59,7 @@ export default function JobDetailHeader({ data }: Props) {
 
   const handleSaveJob = async () => {
     if (!candidateId) {
-      alert("You have to login as a candidate.");
+      toast.warning("You have to login as a candidate.");
       return;
     }
 
@@ -66,8 +68,10 @@ export default function JobDetailHeader({ data }: Props) {
 
       if (saved) {
         await removeSavedJob(candidateId, data.jobId);
+        toast.info("Job removed from saved list.");
       } else {
         await saveJob(candidateId, data.jobId);
+        toast.success("Job saved successfully.");
       }
 
       setSaved(!saved);
@@ -75,7 +79,7 @@ export default function JobDetailHeader({ data }: Props) {
 
     } catch (error) {
       console.error(error);
-      alert("Có lỗi xảy ra!");
+      toast.error("Có lỗi xảy ra!");
     } finally {
       setLoading(false);
     }

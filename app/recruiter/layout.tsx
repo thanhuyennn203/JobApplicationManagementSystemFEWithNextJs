@@ -1,5 +1,6 @@
 import RecruiterHeader from "@/components/recruiter/RecruiterHeader";
 // import "@/styles/recruiter/RecruiterHeader.css";
+import { CartProvider } from "@/context/CartContext";
 
 export default function RecruiterLayout({
   children,
@@ -7,12 +8,14 @@ export default function RecruiterLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="recruiter-layout">
-      <RecruiterHeader />
+    <CartProvider>
+      <div className="recruiter-layout">
+        <RecruiterHeader />
+        <main className="recruiter-content">
+          {children}
+        </main>
+      </div>
+    </CartProvider>
 
-      <main className="recruiter-content">
-        {children}
-      </main>
-    </div>
   );
 }

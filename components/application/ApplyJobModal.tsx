@@ -4,6 +4,7 @@ import { useState } from "react";
 import "@/styles/application/ApplicationForm.css";
 import { applyJob } from "@/services/application/application.service";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/components/notification/ToastProvider";
 
 interface Props {
     jobId: number;
@@ -14,6 +15,7 @@ interface Props {
 
 export default function ApplyJobModal({ jobId, jobTitle, companyId, onClose }: Props) {
     const auth = useAuth();
+    const toast = useToast();
     const candidateId = auth?.user?.candidateId;
     // const companyId = auth?.user?.companyId;
     console.log("companyId in modal: ", companyId);
@@ -53,11 +55,11 @@ export default function ApplyJobModal({ jobId, jobTitle, companyId, onClose }: P
         console.log(formData);
         try {
             await applyJob(formData);
-            alert("Application submitted successfully!");
+            toast.success("Application submitted successfully!");
             onClose();
         } catch (err) {
             console.error(err);
-            alert("Failed to apply!");
+            toast.error("Failed to apply!");
         }
     };
 

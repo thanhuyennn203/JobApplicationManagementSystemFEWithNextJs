@@ -4,11 +4,13 @@ import { useState, useEffect } from "react";
 import "@/styles/candidate/Register.css";
 import useAuth from "@/hooks/useAuth";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useToast } from "@/components/notification/ToastProvider";
 
 export default function LoginForm() {
   const { login, user } = useAuth();
   const router = useRouter();
   const params = useSearchParams();
+  const toast = useToast();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,12 +33,12 @@ export default function LoginForm() {
     e.preventDefault();
 
     if (!email || !password) {
-      alert("All fields are required");
+      toast.warning("All fields are required");
       return;
     }
 
     if (!validateEmail(email)) {
-      alert("Invalid email");
+      toast.warning("Invalid email");
       return;
     }
 
@@ -64,7 +66,7 @@ export default function LoginForm() {
       }
 
     } catch (err) {
-      alert("Login failed");
+      toast.error("Login failed");
     }
   };
 

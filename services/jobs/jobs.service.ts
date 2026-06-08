@@ -1,5 +1,9 @@
 import { Job, JobDetail } from "@/types/jobs";
 import { JobGenerateContext } from "@/types/tagging";
+import {
+  PageResponse,
+  TopJobRequest,
+} from "@/types/TopJob";
 
 const API_URL = "http://localhost:9191/api/jobs";
 
@@ -9,6 +13,59 @@ const getAuthHeader = () => {
     "Authorization": `Bearer ${token}`,
     "Content-Type": "application/json",
   };
+};
+
+export type FeaturedBoxFilterParams = {
+  provinceId?: string;
+  region?: string;
+  minSalary?: number;
+  maxSalary?: number;
+  jobRank?: string;
+  page?: number;
+  size?: number;
+};
+
+export const getFeaturedBoxJobsWithFilters = async (
+  params: FeaturedBoxFilterParams
+): Promise<PageResponse<Job>> => {
+  const queryParams = new URLSearchParams();
+
+  if (params.provinceId) {
+    queryParams.append("provinceId", params.provinceId);
+  }
+
+  if (params.region) {
+    queryParams.append("region", params.region);
+  }
+
+  if (params.minSalary !== undefined) {
+    queryParams.append("minSalary", params.minSalary.toString());
+  }
+
+  if (params.maxSalary !== undefined) {
+    queryParams.append("maxSalary", params.maxSalary.toString());
+  }
+
+  if (params.jobRank) {
+    queryParams.append("jobRank", params.jobRank);
+  }
+
+  queryParams.append("page", (params.page ?? 0).toString());
+  queryParams.append("size", (params.size ?? 12).toString());
+
+  const response = await fetch(
+    `${API_URL}/top-jobs/featured-box/filter?${queryParams.toString()}`,
+    {
+      method: "GET",
+      headers: getAuthHeader(),
+    }
+  );
+ console.log("GET", queryParams.toString());
+  if (!response.ok) {
+    throw new Error("Failed to fetch featured box jobs");
+  }
+
+  return response.json();
 };
 
 export async function fetchJobs(): Promise<Job[]> {
@@ -23,6 +80,80 @@ export async function fetchJobs(): Promise<Job[]> {
     console.error("Error fetching jobs:", err);
     return [];
   }
+}
+
+export async function fetchTopJobs(
+  request: TopJobRequest
+): Promise<PageResponse<Job>> {
+
+  const params =
+    new URLSearchParams();
+
+  params.append(
+    "page",
+    request.page.toString()
+  );
+
+  params.append(
+    "size",
+    request.size.toString()
+  );
+
+  if (request.filterType) {
+
+    params.append(
+      "filterType",
+      request.filterType
+    );
+  }
+
+  if (request.province) {
+
+    params.append(
+      "province",
+      request.province
+    );
+  }
+
+  if (request.minSalary) {
+
+    params.append(
+      "minSalary",
+      request.minSalary.toString()
+    );
+  }
+
+  if (request.maxSalary) {
+
+    params.append(
+      "maxSalary",
+      request.maxSalary.toString()
+    );
+  }
+
+  if (
+    request.experienceRequired
+  ) {
+
+    params.append(
+      "experienceRequired",
+      request.experienceRequired
+    );
+  }
+
+  const res =
+    await fetch(
+      `${API_URL}/top-jobs?${params}`
+    );
+
+  if (!res.ok) {
+
+    throw new Error(
+      "Failed to fetch top jobs"
+    );
+  }
+
+  return res.json();
 }
 
 export const getJobById = async (id: number) => {
@@ -143,13 +274,16 @@ export const getJobGenerateContext = async (
   }
 
   const data = await res.json();
-  console.log(data);
+  // console.log(data);
 
   return {
     categories: data.categories ?? [],
     templates: data.templates ?? [],
-    tags: data.tags ?? [],
-    generalInformation: data.generalInformation ?? null,
+    groupedTags: data.groupedTags ?? [],
+    selectedTagIds: data.selectedTagIds ?? [],
+    userCreatedTags: data.userCreatedTags ?? [],
+    selectedTemplateId: data.selectedTemplateId,
+    selectedCategoryId: data.selectedCategoryId
   };
 };
 

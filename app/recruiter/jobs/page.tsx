@@ -25,10 +25,12 @@ import {
   Users,
 } from "lucide-react";
 import { useLocation } from "@/context/LocationContext";
+import { useToast } from "@/components/notification/ToastProvider";
 
 export default function DashboardPage() {
   const auth = useAuth();
   const router = useRouter();
+  const toast = useToast();
 
   const companyId = auth?.user?.companyId;
 
@@ -153,9 +155,10 @@ export default function DashboardPage() {
             : job
         )
       );
+      toast.success(`Job status updated to ${status}.`);
     } catch (err) {
       console.error(err);
-      alert("Failed to update job status");
+      toast.error("Failed to update job status");
     } finally {
       setChangingStatusId(null);
     }

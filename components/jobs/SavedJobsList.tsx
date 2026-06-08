@@ -33,8 +33,6 @@ export default function SavedJobsList() {
             <h2>
                List <span>{jobs.length}</span> saved jobs.
             </h2>
-
-
             <div className="saved_jobs_list_grid">
                 {jobs.map(job => (
                     <SavedJobCard key={job.id} job={job} />

@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useLocation } from "@/context/LocationContext";
 import { getJobById } from "@/services/jobs/jobs.service";
 import { createJob, updateJob } from "@/services/jobs/jobs.service";
+import { useToast } from "@/components/notification/ToastProvider";
 
 interface StepJobCardProps {
     nextStep: () => void;
@@ -15,6 +16,7 @@ interface StepJobCardProps {
 
 export default function StepJobCard({ nextStep, setJobId, jobId }: StepJobCardProps) {
     const auth = useAuth();
+    const toast = useToast();
     const companyId = auth?.user?.companyId;
 
     const { provinces, wardList, wardsMap, getWards } = useLocation();
@@ -164,9 +166,7 @@ export default function StepJobCard({ nextStep, setJobId, jobId }: StepJobCardPr
                     payload
                 );
 
-                alert(
-                    "Job card updated successfully"
-                );
+                toast.success("Job card updated successfully");
 
                 return;
             }
@@ -185,6 +185,7 @@ export default function StepJobCard({ nextStep, setJobId, jobId }: StepJobCardPr
 
             }
 
+            toast.success("Job card saved successfully");
             nextStep();
 
         } catch (err) {
@@ -193,6 +194,7 @@ export default function StepJobCard({ nextStep, setJobId, jobId }: StepJobCardPr
                 "Failed to save job",
                 err
             );
+            toast.error("Failed to save job");
 
         } finally {
 
@@ -206,9 +208,7 @@ export default function StepJobCard({ nextStep, setJobId, jobId }: StepJobCardPr
 
         if (!jobId) {
 
-            alert(
-                "Please save Job Card first"
-            );
+            toast.warning("Please save Job Card first");
 
             return;
 

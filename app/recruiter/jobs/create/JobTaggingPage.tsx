@@ -1,8 +1,11 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import CategorySelector from "@/components/recruiter/CategorySelector";
 import TemplateSelector from "@/components/recruiter/TemplateSelector";
 import TagSection from "@/components/recruiter/TagSection";
 import CustomTagInput from "@/components/recruiter/CustomTagInput";
+import { useToast } from "@/components/notification/ToastProvider";
 
 import {
     JobCategory,
@@ -26,6 +29,7 @@ import {
 } from "@/services/jobs/tagService";
 
 export default function JobTaggingPage() {
+    const toast = useToast();
 
     const [categories, setCategories] =
         useState<JobCategory[]>([]);
@@ -62,7 +66,6 @@ export default function JobTaggingPage() {
     }, []);
 
     const loadCategories = async () => {
-
         try {
 
             const data = await getCategories();
@@ -109,7 +112,7 @@ export default function JobTaggingPage() {
         }
 
         if(state.length >= 6) {
-            alert("Maximum 6 tags allowed");
+            toast.warning("Maximum 6 tags allowed");
             return;
         }
 
@@ -149,10 +152,11 @@ export default function JobTaggingPage() {
                 });
             }
 
-            alert("Tags saved successfully");
+            toast.success("Tags saved successfully");
 
         } catch (error) {
             console.error(error);
+            toast.error("Failed to save tags");
         }
     };
 

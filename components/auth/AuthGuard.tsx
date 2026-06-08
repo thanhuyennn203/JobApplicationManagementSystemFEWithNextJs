@@ -28,58 +28,58 @@ const ROLE_ROUTES: Record<string, string[]> = {
 };
 
 export default function AuthGuard({ children }: any) {
-    const router = useRouter();
-    const pathname = usePathname();
-    const auth = useAuth();
+//     const router = useRouter();
+//     const pathname = usePathname();
+//     const auth = useAuth();
 
-   useEffect(() => {
-    if (!auth || auth.loading) return;
+//    useEffect(() => {
+//     if (!auth || auth.loading) return;
 
-    const user = auth.user;
+//     const user = auth.user;
 
-    // 1. PUBLIC routes: everyone can access
-    const isPublic = PUBLIC_ROUTES.some(route =>
-        pathname === route || pathname.startsWith(route + "/")
-    );
+//     // 1. PUBLIC routes: everyone can access
+//     const isPublic = PUBLIC_ROUTES.some(route =>
+//         pathname === route || pathname.startsWith(route + "/")
+//     );
 
-    if (isPublic) {
-        return; // allow guest + any logged-in role
-    }
+//     if (isPublic) {
+//         return; // allow guest + any logged-in role
+//     }
 
-    // 2. Non-public routes require login
-    if (!user) {
-        router.replace("/");
-        return;
-    }
+//     // 2. Non-public routes require login
+//     if (!user) {
+//         router.replace("/");
+//         return;
+//     }
 
-    // 3. Check role-based protected routes
-    const matchedPrefix = Object.keys(ROLE_ROUTES).find(prefix =>
-        pathname.startsWith(prefix)
-    );
+//     // 3. Check role-based protected routes
+//     const matchedPrefix = Object.keys(ROLE_ROUTES).find(prefix =>
+//         pathname.startsWith(prefix)
+//     );
 
-    if (matchedPrefix) {
+//     if (matchedPrefix) {
 
-        const requiredRoles = ROLE_ROUTES[matchedPrefix];
+//         const requiredRoles = ROLE_ROUTES[matchedPrefix];
 
-        const hasRole = requiredRoles.some(role =>
-            user.roles?.includes(role)
-        );
+//         const hasRole = requiredRoles.some(role =>
+//             user.roles?.includes(role)
+//         );
 
-        if (!hasRole) {
+//         if (!hasRole) {
 
-            if (user.roles?.includes("ADMIN")) {
-                router.replace("/admin");
-            } else if (user.roles?.includes("RECRUITER")) {
-                router.replace("/recruiter");
-            } else if (user.roles?.includes("CANDIDATE")) {
-                router.replace("/candidate");
-            } else {
-                router.replace("/");
-            }
-        }
-    }
+//             if (user.roles?.includes("ADMIN")) {
+//                 router.replace("/admin");
+//             } else if (user.roles?.includes("RECRUITER")) {
+//                 router.replace("/recruiter");
+//             } else if (user.roles?.includes("CANDIDATE")) {
+//                 router.replace("/candidate");
+//             } else {
+//                 router.replace("/");
+//             }
+//         }
+//     }
 
-}, [auth, pathname]);
+// }, [auth, pathname]);
 
     return children;
 }

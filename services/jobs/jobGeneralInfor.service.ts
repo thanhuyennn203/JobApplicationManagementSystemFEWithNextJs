@@ -13,7 +13,9 @@ export async function getGeneralInformationByJobId(
 ): Promise<GeneralInformation | null> {
   try {
     const res = await fetch(
-      `http://localhost:9191/api/jobs/${jobId}/general-information`
+      `http://localhost:9191/api/jobs/${jobId}/general-information`, {
+    headers: getAuthHeader(),
+  }
     );
 
     if (!res.ok) return null;

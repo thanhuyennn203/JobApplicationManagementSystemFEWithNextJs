@@ -4,10 +4,12 @@ import { useState } from "react";
 import "@/styles/candidate/Register.css";
 import useAuth from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/notification/ToastProvider";
 
 export default function RegisterForm() {
   const { register } = useAuth();
   const router = useRouter();
+  const toast = useToast();
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -38,27 +40,27 @@ export default function RegisterForm() {
     e.preventDefault();
 
     if (!fullName || !email || !password || !confirmPassword) {
-      alert("All fields are required");
+      toast.warning("All fields are required");
       return;
     }
 
     if (!validateEmail(email)) {
-      alert("Invalid email");
+      toast.warning("Invalid email");
       return;
     }
 
     if (!validatePassword(password)) {
-      alert("Password must be at least 6 characters and contain letters and numbers");
+      toast.warning("Password must be at least 6 characters and contain letters and numbers");
       return;
     }
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      toast.warning("Passwords do not match");
       return;
     }
 
     if (!agree) {
-      alert("You must agree to the terms");
+      toast.warning("You must agree to the terms");
       return;
     }
 
@@ -67,17 +69,18 @@ export default function RegisterForm() {
 
       // console.log("success: ", fullName);
       if (!data.success) {
-        alert(data.message);
+        toast.error(data.message || "Register failed");
         console.log("Register failed: ", data.message );
       } else {
         clearForm();
+        toast.success("Registration successful. Please log in.");
 
         router.push(`/candidate/login?email=${email}`);
 
       }
 
     } catch (err) {
-      alert("Register failed");
+      toast.error("Register failed");
     }
   };
 

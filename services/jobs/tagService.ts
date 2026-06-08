@@ -142,3 +142,29 @@ export const validateTagFormat = (tagText: string): boolean => {
     return /^[a-zA-Z0-9\s\-_.]*$/.test(tagText);
 };
 
+export const updateJobCategoryAndTemplate = async (
+    jobId: number,
+    categoryId: number,
+    templateId: number
+) => {
+    const res = await fetch(
+        `http://localhost:9191/api/jobs/${jobId}/category-template`,
+        {
+            method: "PUT",
+            headers: getAuthHeader(),
+            body: JSON.stringify({
+                categoryId,
+                templateId,
+            }),
+        }
+    );
+
+    if (!res.ok) {
+        const error = await res.json();
+        throw new Error(
+            error.message || "Failed to update category and template"
+        );
+    }
+
+    return res.json();
+};

@@ -7,6 +7,7 @@ import {
     getAllApplications,
     updateApplicationStatus,
 } from "@/services/application/application.service";
+import { useToast } from "@/components/notification/ToastProvider";
 
 interface Application {
     appliedDate?: Date;
@@ -22,6 +23,7 @@ interface Application {
 }
 
 export default function ApplicationPage() {
+    const toast = useToast();
     const [applications, setApplications] = useState<Application[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -67,8 +69,9 @@ export default function ApplicationPage() {
                     app.id === id ? { ...app, status } : app
                 )
             );
+            toast.success("Application status updated.");
         } catch (err) {
-            alert("Update failed");
+            toast.error("Update failed");
         }
     };
 

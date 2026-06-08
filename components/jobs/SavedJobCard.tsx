@@ -10,6 +10,7 @@ import {
 } from "@/services/candidate/savedJob.service";
 import { useAuth } from "@/context/AuthContext";
 import { useLocation } from "@/context/LocationContext";
+import { useToast } from "@/components/notification/ToastProvider";
 interface Props {
   job: Job;
 }
@@ -19,6 +20,7 @@ export default function SavedJobCard({ job }: Props) {
   const firstLocation = locations[0];
   const remainingCount = locations.length - 1;
   const auth = useAuth();
+  const toast = useToast();
   const [saved, setSaved] = useState(false);
   const candidateId = auth?.user?.candidateId;
   console.log("candidateId: ", job);
@@ -43,20 +45,23 @@ export default function SavedJobCard({ job }: Props) {
     e.preventDefault(); // stop link navigation
 
     if (!candidateId) {
-      alert("You must login as candidate");
+      toast.warning("You must login as candidate");
       return;
     }
 
     try {
       if (saved) {
         await removeSavedJob(candidateId, job.id);
+        toast.info("Job removed from saved list.");
       } else {
         await saveJob(candidateId, job.id);
+        toast.success("Job saved successfully.");
       }
 
       setSaved(!saved);
     } catch (error) {
       console.error(error);
+      toast.error("Failed to update saved job.");
     }
   };
   return (

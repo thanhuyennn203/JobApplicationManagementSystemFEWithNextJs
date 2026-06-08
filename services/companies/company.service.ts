@@ -1,3 +1,5 @@
+const BASE_URL = "http://localhost:9191/api/companies";
+
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
   return {
@@ -96,8 +98,6 @@ export const getAllCompanies = async () => {
   return res.json();
 };
 
-const BASE_URL = "http://localhost:9191/api/companies";
-
 export const approveCompany = async (id: number) => {
   const res = await fetch(`${BASE_URL}/admin/${id}/approve`, {
     method: "POST",
@@ -116,5 +116,16 @@ export const rejectCompany = async (id: number, reason: string) => {
     }
   );
   if (!res.ok) throw new Error("Reject failed");
+  return res.json();
+};
+
+export const getPackages = async () => {
+  const res = await fetch(
+    `${BASE_URL}/members/packages`,{
+      method: "GET",
+      headers: getAuthHeader(),
+    }
+  );
+  if (!res.ok) throw new Error("Packages reloads failed.");
   return res.json();
 };

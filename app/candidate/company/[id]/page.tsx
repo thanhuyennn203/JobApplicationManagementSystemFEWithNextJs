@@ -8,11 +8,13 @@ import { useLocation } from "@/context/LocationContext";
 import { useAuth } from "@/context/AuthContext";
 import { followCompany, unfollowCompany, checkFollowCompany } from "@/services/companies/company.service";
 import { getJobByCompanyId } from "@/services/jobs/jobs.service";
+import { useToast } from "@/components/notification/ToastProvider";
 
 export default function CompanyProfilePage() {
     const params = useParams();
     const id = params.id;
     const auth = useAuth();
+    const toast = useToast();
     const [company, setCompany] = useState<Company | null>(null);
     const { getProvinceName, getWardNameFromList } = useLocation();
     const [isFollowing, setIsFollowing] = useState(false);
@@ -64,12 +66,12 @@ export default function CompanyProfilePage() {
 
     const handleFollow = async () => {
         if (!auth?.user) {
-            alert("You have to login first to follow this company");
+            toast.warning("You have to login first to follow this company");
             return;
         }
 
         if (auth.user.roles?.[0] !== "CANDIDATE") {
-            alert("Only candidates can follow companies");
+            toast.warning("Only candidates can follow companies");
             return;
         }
 
@@ -87,6 +89,7 @@ export default function CompanyProfilePage() {
                 } : prev);
 
                 setIsFollowing(false);
+                toast.info("Company removed from following list.");
             } else {
                 await followCompany(auth?.user?.candidateId, company.id);
 
@@ -96,10 +99,12 @@ export default function CompanyProfilePage() {
                 } : prev);
 
                 setIsFollowing(true);
+                toast.success("Company followed successfully.");
             }
 
         } catch (err) {
             console.error("Follow error:", err);
+            toast.error("Failed to update follow status.");
         } finally {
             setLoadingFollow(false);
         }

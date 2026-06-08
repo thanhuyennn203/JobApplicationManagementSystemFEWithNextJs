@@ -26,14 +26,18 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen space-y-6">
+    <div className="min-h-screen bg-gray-50 p-8 space-y-6">
 
       {/* ALERT */}
-      <div className="bg-white p-4 rounded-xl border flex gap-3">
-        <Bell className="text-blue-500" />
+      <div className="flex gap-4 rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
+        <Bell className="h-6 w-6 text-blue-500 shrink-0" />
+
         <div>
-          <h3 className="font-semibold">Important Notice</h3>
-          <p className="text-sm text-gray-600">
+          <h3 className="text-lg font-semibold text-gray-900">
+            Important Notice
+          </h3>
+
+          <p className="mt-1 text-sm text-gray-500">
             Password must be updated every 6 months starting Jan 2026.
           </p>
         </div>
@@ -142,32 +146,32 @@ export default function Dashboard() {
           </div>
         </div>
 
-          <div className="space-y-3 max-h-[300px] overflow-y-auto">
-            {notifications.map((n) => (
-              <div key={n.id} className={`flex gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer ${n.status === "new" ? "border-l-4 border-green-500" : ""
-                } border`}>
+        <div className="space-y-3 max-h-[300px] overflow-y-auto">
+          {notifications.map((n) => (
+            <div key={n.id} className={`flex gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer ${n.status === "new" ? "border-l-4 border-green-500" : ""
+              } border`}>
 
-                <i className={`fa-solid ${n.icon} ${n.color}`}></i>
+              <i className={`fa-solid ${n.icon} ${n.color}`}></i>
 
-                <div className="flex-1">
-                  <p className="text-sm font-medium">{n.message}</p>
+              <div className="flex-1">
+                <p className="text-sm font-medium">{n.message}</p>
 
-                  <div className="text-xs text-gray-500 flex gap-2 mt-1">
-                    <span>{n.time}</span>
-                    <span className={`px-2 py-0.5 rounded-full ${n.status === "new"
-                      ? "bg-green-100 text-green-600"
-                      : "bg-gray-100 text-gray-500"
-                      }`}>
-                      {n.status === "new" ? "New" : "Read"}
-                    </span>
-                  </div>
+                <div className="text-xs text-gray-500 flex gap-2 mt-1">
+                  <span>{n.time}</span>
+                  <span className={`px-2 py-0.5 rounded-full ${n.status === "new"
+                    ? "bg-green-100 text-green-600"
+                    : "bg-gray-100 text-gray-500"
+                    }`}>
+                    {n.status === "new" ? "New" : "Read"}
+                  </span>
                 </div>
               </div>
-            ))}
-          </div>
-
+            </div>
+          ))}
         </div>
+
       </div>
+    </div>
   );
 }
 

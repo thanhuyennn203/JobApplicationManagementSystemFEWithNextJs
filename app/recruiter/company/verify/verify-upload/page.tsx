@@ -4,12 +4,14 @@ import { useState } from "react";
 import "@/styles/company/BusinessCertificateForm.css";
 import { useAuth } from "@/context/AuthContext";
 import { uploadCertificate } from "@/services/companies/company.service";
+import { useToast } from "@/components/notification/ToastProvider";
 
 export default function BusinessCertificateForm() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const auth = useAuth();
+  const toast = useToast();
   const companyId = auth?.user?.companyId;
 console.log(companyId);
   const handleFileChange = (e: any) => {
@@ -18,7 +20,7 @@ console.log(companyId);
 
     // Validate size (5MB)
     if (selected.size > 5 * 1024 * 1024) {
-      alert("File must be <= 5MB");
+      toast.warning("File must be <= 5MB");
       return;
     }
 
@@ -41,13 +43,13 @@ console.log(companyId);
 
     await uploadCertificate(file, companyId);
 
-    alert("Uploaded successfully!");
+    toast.success("Uploaded successfully!");
     setFile(null);
     setPreview(null);
 
   } catch (err) {
     console.error(err);
-    alert("Upload failed");
+    toast.error("Upload failed");
   } finally {
     setLoading(false);
   }

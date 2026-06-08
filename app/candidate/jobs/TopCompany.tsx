@@ -31,7 +31,7 @@ export default function TopCompanies() {
                     {/* Logo */}
                     <div className="banner-featured-company__image">
                         <img
-                            src={topCompany?.logo_url || "/images/company-logo-default.jpg"}
+                            src={topCompany?.logoUrl || "/images/company-logo-default.jpg"}
                             alt={topCompany?.name}
                         />
                     </div>
@@ -40,10 +40,10 @@ export default function TopCompanies() {
                     <div className="banner-featured-company__desc">
                         <h3
                             className="banner-featured-company__desc--name"
-                            title={topCompany?.name}
+                            title={topCompany?.companyName}
                         >
-                            <a href={`/candidate/company/${topCompany?.id}`} target="_blank">
-                                {topCompany?.name}
+                            <a href={`/candidate/company/${topCompany?.companyId}`} target="_blank">
+                                {topCompany?.companyName}
                             </a>
                         </h3>
 

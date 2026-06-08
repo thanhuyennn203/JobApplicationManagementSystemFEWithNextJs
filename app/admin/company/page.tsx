@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import "@/styles/admin/AdminPage.css";
 import { getAllCompanies, approveCompany, rejectCompany } from "@/services/companies/company.service";
 import Pagination from "@/components/jobs/Pagination"; // adjust path
+import { useToast } from "@/components/notification/ToastProvider";
 
 export default function CompanyPage() {
+    const toast = useToast();
     const [companies, setCompanies] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -28,9 +30,10 @@ export default function CompanyPage() {
 
             // remove from list
             setCompanies((prev) => prev.filter((c) => c.id !== id));
+            toast.success("Company rejected.");
 
         } catch (err) {
-            alert("Reject failed");
+            toast.error("Reject failed");
         }
     };
     const handleApprove = async (id: number) => {
@@ -39,9 +42,10 @@ export default function CompanyPage() {
 
             // remove from list (pending list UX)
             setCompanies((prev) => prev.filter((c) => c.id !== id));
+            toast.success("Company approved.");
 
         } catch (err) {
-            alert("Approve failed");
+            toast.error("Approve failed");
         }
     };
     useEffect(() => {

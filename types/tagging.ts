@@ -1,4 +1,3 @@
-import type { GeneralInformation } from "@/types/jobs";
 
 export interface JobCategory {
     id: number;
@@ -38,15 +37,7 @@ export interface JobTemplate {
 export type TagCategory =
     | "SKILLS"
     | "REQUIREMENTS"
-    | "BENEFITS"
-    | "RESPONSIBILITIES";
-
-export interface SuggestedTagsResponse {
-    skills: string[];
-    requirements: string[];
-    benefits: string[];
-    responsibilities?: string[];
-}
+    | "BENEFITS";
 
 /**
  * SelectedTag - stores a tag selected/created by user
@@ -74,8 +65,15 @@ export interface TagDTO {
 export interface JobGenerateContext {
     categories: JobCategory[];
     templates: JobTemplate[];
-    tags: TagDTO[];
-    generalInformation?: GeneralInformation | null;
+    groupedTags: {
+        SKILL: TagDTO[];
+        BENEFIT: TagDTO[];
+        REQUIREMENT: TagDTO[];
+    };
+    selectedTagIds: number[];
+    userCreatedTags: TagDTO[];
+    selectedTemplateId: number | null;
+    selectedCategoryId: number | null;
 }
 
 /**
