@@ -1,4 +1,3 @@
-import { useToast } from "@/components/notification/ToastProvider";
 import { Order, OrderItem } from "@/types/order";
 
 const API_URL = "http://localhost:9191/api/companies/orders";
@@ -93,4 +92,100 @@ export const orderService = {
 
         return handleResponse(res);
     },
+};
+
+export const adminOrderService = {
+    async getAllOrders(
+        page = 0,
+        size = 10
+    ): Promise<{
+        content: Order[];
+        totalPages: number;
+        totalElements: number;
+        number: number;
+    }> {
+
+        const res = await fetch(
+            `${API_URL}?page=${page}&size=${size}`,
+            {
+                method: "GET",
+                headers: getAuthHeader(),
+            }
+        );
+
+
+        if (!res.ok) {
+
+            const error = await res.json();
+
+            throw new Error(
+                error.message ||
+                "Cannot load orders"
+            );
+        }
+
+
+        return res.json();
+    },
+
+
+
+    async activateOrder(
+        orderId: number
+    ): Promise<Order> {
+
+
+        const res = await fetch(
+            `${API_URL}/${orderId}/activate`,
+            {
+                method: "PUT",
+               headers: getAuthHeader(),
+            }
+        );
+
+
+        if (!res.ok) {
+
+            const error = await res.json();
+
+            throw new Error(
+                error.message ||
+                "Cannot activate order"
+            );
+        }
+
+
+        return res.json();
+    },
+
+
+
+    async rejectOrder(
+        orderId: number
+    ): Promise<Order> {
+
+
+        const res = await fetch(
+            `${API_URL}/${orderId}/reject`,
+            {
+                method: "PUT",
+                headers: getAuthHeader(),
+            }
+        );
+
+
+        if (!res.ok) {
+
+            const error = await res.json();
+
+            throw new Error(
+                error.message ||
+                "Cannot reject order"
+            );
+        }
+
+
+        return res.json();
+    }
+
 };

@@ -1,9 +1,6 @@
 "use client";
 
-import RecruiterSidebar from "@/components/recruiter/RecruiterSidebar";
-import "@/styles/recruiter/layout.css";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
+import AdminSidebar from "@/components/admin/AdminSideBar";
 import NotificationBell from "@/components/notification/NotificationBell";
 
 export default function AdminLayout({
@@ -11,18 +8,21 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-
   return (
-    <div className="recruiter-layout">
-      <RecruiterSidebar />
+    <div className="flex h-screen bg-gray-100 overflow-hidden">
+      <AdminSidebar />
 
-      <div className="container" >
-        <div className="admin-notification-bar">
+      {/* Main content area */}
+      <div className="flex flex-col flex-1 overflow-hidden bg-white">
+        {/* Top notification bar */}
+        <div className="flex items-center justify-end px-5 py-3 border-b border-gray-100">
           <NotificationBell variant="light" />
         </div>
-        {/* Content */}
-        <main className="recruiter-content">{children}</main>
+
+        {/* Page content */}
+        <main className="flex-1 pl-[60px] overflow-auto">
+          {children}
+        </main>
       </div>
     </div>
   );

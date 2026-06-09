@@ -1,7 +1,7 @@
 export type OrderStatus =
     | "PENDING"        // vừa tạo, chờ chuyển khoản
     | "WAITING"        // đã bấm "Tôi đã thanh toán", chờ admin xác nhận
-    | "CONFIRMED"      // admin xác nhận
+    // | "CONFIRMED"      // admin xác nhận
     | "ACTIVE"         // package đang hoạt động
     | "REJECTED";      // admin từ chối
 

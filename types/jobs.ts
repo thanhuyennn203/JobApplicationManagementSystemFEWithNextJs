@@ -24,6 +24,7 @@ export interface Job {
   posted_date: Date;
   savedAt: Date;
   createStatus: String;
+  status: String;
 }
 
 export interface JobDetail {
