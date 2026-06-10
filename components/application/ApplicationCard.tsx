@@ -84,7 +84,7 @@ export default function ApplicationCard({
         </div>
 
         <div className="truncate text-right text-gray-400 text-xs">
-          {application.jobTitle || "Unknown job"}
+          {application.jobId || "Unknown job"}
         </div>
          <div className="flex justify-between">
           <span>Phone</span>

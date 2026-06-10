@@ -14,3 +14,17 @@ export interface Company {
   verificationStatus?: string;
   rejectionReason?: string;
 }
+
+export interface Member {
+    id?: number;
+    companyId?: number;
+    userId?: number;
+    position?: string;
+    department?: string;
+    description?: string;
+    gender?: string;
+    phone?: string;
+    email?: string;
+    fullName?: string;
+    creatAt?: Date;
+}

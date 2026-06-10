@@ -1,4 +1,5 @@
 import { Candidate, CandidateUpdatePayload } from "@/types/candidate";
+import { CandidateAdmin } from "@/types/auth";
 
 const API_URL = "http://localhost:9191/api/candidates";
 
@@ -108,3 +109,5 @@ export async function updateCandidate(
     return getCandidateProfileById(candidateId);
   }
 }
+
+

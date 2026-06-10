@@ -39,11 +39,7 @@ interface NavItem {
 // ─── Nav data ────────────────────────────────────────────────────────────────
 
 const mainNav: NavItem[] = [
-    {
-        name: "Dashboard",
-        icon: LayoutDashboard,
-        path: "/admin/dashboard",
-    },
+    
     {
         name: "Recruitment",
         icon: Briefcase,
@@ -51,7 +47,7 @@ const mainNav: NavItem[] = [
         children: [
             { name: "Jobs", path: "/admin/recruitment/jobs", description: "Manage job listings" },
             { name: "Applications", path: "/admin/recruitment/applications", description: "Review applicants" },
-            { name: "CV Documents", path: "/admin/recruitment/cv-documents", description: "Uploaded CVs" },
+            // { name: "CV Documents", path: "/admin/recruitment/cv-documents", description: "Uploaded CVs" },
         ],
     },
     {
@@ -73,15 +69,15 @@ const mainNav: NavItem[] = [
             { name: "Recruiters", path: "/admin/users/recruiters", description: "Hiring managers" },
         ],
     },
-    {
-        name: "Finance",
-        icon: CreditCard,
-        path: "/admin/finance",
-        children: [
-            { name: "Transactions", path: "/admin/finance/transactions", description: "Payment history" },
-            { name: "Reports", path: "/admin/finance/reports", description: "Financial summaries" },
-        ],
-    },
+    // {
+    //     name: "Finance",
+    //     icon: CreditCard,
+    //     path: "/admin/finance",
+    //     children: [
+    //         { name: "Transactions", path: "/admin/finance/transactions", description: "Payment history" },
+    //         { name: "Reports", path: "/admin/finance/reports", description: "Financial summaries" },
+    //     ],
+    // },
     {
         name: "Analytics",
         icon: BarChart2,

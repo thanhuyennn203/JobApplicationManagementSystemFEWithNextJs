@@ -330,3 +330,24 @@ export const updateJobStatus = async (
 
   return res.json();
 };
+
+import { TotalMonthlyAnalytics } from "@/types/analytic";
+
+export async function getTotalMonthlyAnalytics(): Promise<TotalMonthlyAnalytics> {
+
+    const res = await fetch(
+        `${API_URL}/admin/analytic`,
+        {
+            method: "GET",
+            headers: getAuthHeader(),
+            cache: "no-store",
+        }
+    );
+    if(!res.ok){
+        throw new Error(
+            "Failed to fetch dashboard analytics"
+        );
+    }
+    return await res.json();
+
+}

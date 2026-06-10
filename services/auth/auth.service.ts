@@ -1,5 +1,14 @@
+import { CandidateAdmin } from "@/types/auth";
+
 const API_URL = "http://localhost:9191/api/auth";
 
+const getAuthHeader = () => {
+  const token = localStorage.getItem("token");
+  return {
+    "Authorization": `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+};
 export async function register(data: {
   fullName: string;
   email: string;
@@ -77,4 +86,21 @@ export const recruiterRegister = async (
   }
 
   return response.json();
+};
+
+export const getAllCandidates = async (): Promise<CandidateAdmin[]> => {
+    const res = await fetch(
+        `${API_URL}/candidates/admin`,
+        {
+            method: "GET",
+            headers: getAuthHeader(),
+            cache: "no-store"
+        }
+    );
+    if(!res.ok){
+        throw new Error(
+            "Failed to fetch candidates"
+        );
+    }
+    return await res.json();
 };

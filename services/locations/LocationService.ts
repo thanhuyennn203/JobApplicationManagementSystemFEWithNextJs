@@ -48,3 +48,4 @@ export const getWardList = async (): Promise<Ward[]> => {
 
   return res.json();
 };
+

@@ -89,9 +89,10 @@ export const LocationProvider = ({
 
   };
 
-  const getWardName = (provinceCode: string, wardCode: string) => {
+  const getWardName = (provinceCode: string | undefined, wardCode: string | undefined) => {
     if (provinceCode != null && provinceCode != undefined) {
       const wards = wardsMap[provinceCode] || [];
+      console.log(wards);
       const found = wards.find((w) => w.code === wardCode);
       return found?.nameEn || wardCode;
     } else return "";
