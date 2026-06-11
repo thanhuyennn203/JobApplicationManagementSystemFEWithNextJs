@@ -191,21 +191,35 @@ export default function AnalyticsPage() {
   const [applicationStatusPie, setApplicationStatusPie] = useState<ApplicationStatus[] | null>(null);
 
   useEffect(() => {
-    fetchAnalytics().then((data) => setData(data || {}))
-      .catch(() => setError("Failed"))
-      .finally(() => setLoading(false));
+  setLoading(true);
 
-    getApplicationStatus().then((data) => setApplicationStatusPie(data))
-      .catch(() => setError("Failed to load analytics application status."))
+  Promise.allSettled([
+    fetchAnalytics(),
+    getApplicationStatus(),
+    getTopJobByApplication(),
+    getTotalMonthlyAnalytics(),
+  ]).then(([analytics, appStatus, topJob, monthly]) => {
+    if (analytics.status === "fulfilled")
+      setData(analytics.value || {});
 
-    getTopJobByApplication().then((data) => setTopJobByApplication(data)).
-      catch(() => setError("Failed to load analytics top job by application."))
+    if (appStatus.status === "fulfilled")
+      setApplicationStatusPie(appStatus.value);
 
-    getTotalMonthlyAnalytics()
-      .then((data) => setTotalMonthlyAnalytics(data || []))
-      .catch(() => setError("Failed to load analytics data per month."))
-      .finally(() => setLoading(false));
-  }, []);
+    if (topJob.status === "fulfilled")
+      setTopJobByApplication(topJob.value);
+
+    if (monthly.status === "fulfilled")
+      setTotalMonthlyAnalytics(monthly.value || []);
+
+    console.log("monthly: " , monthly);
+
+    const anyFailed = [analytics, appStatus, topJob, monthly]
+      .some((r) => r.status === "rejected");
+
+    if (anyFailed)
+      setError("Some analytics data failed to load.");
+  }).finally(() => setLoading(false));
+}, []);
 
   const conversionRate = (() => {
 
@@ -225,6 +239,8 @@ export default function AnalyticsPage() {
       : 0;
 
   })();
+
+  console.log("total",totalMonthlyAnalytics);
 
   const analyticsCards = totalMonthlyAnalytics
     ? [
@@ -274,7 +290,7 @@ export default function AnalyticsPage() {
   if (error || !data) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-2 text-red-400 text-sm">
-        <span className="text-3xl">⚠️</span>{error}
+        <span className="text-3xl">Loading...</span>{error}
       </div>
     );
   }
@@ -332,83 +348,8 @@ export default function AnalyticsPage() {
           );
         })}
       </div>
-
-      {/* Growth + Forecast chart */}
-      <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-5">
-        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-          <div>
-            <h2 className="text-sm font-semibold text-gray-800">Growth & Forecast</h2>
-            {predMonth && (
-              <p className="text-xs text-gray-400 mt-0.5">Dashed area = predicted from {predMonth}</p>
-            )}
-          </div>
-          <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
-            {(Object.keys(CHART_META) as ChartTab[]).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setChartTab(tab)}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all capitalize ${chartTab === tab
-                  ? "bg-white text-indigo-600 shadow-sm border border-indigo-200"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-                  }`}
-              >
-                {CHART_META[tab].label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <ResponsiveContainer width="100%" height={260}>
-          <ComposedChart data={data.monthly} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-            <defs>
-              <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={CHART_META[chartTab].color} stopOpacity={0.15} />
-                <stop offset="95%" stopColor={CHART_META[chartTab].color} stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="colorForecast" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.12} />
-                <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-            <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-            <Tooltip content={<CustomTooltip />} />
-            {/* Actual area */}
-            <Area
-              type="monotone"
-              dataKey={CHART_META[chartTab].key}
-              name={CHART_META[chartTab].label}
-              stroke={CHART_META[chartTab].color}
-              strokeWidth={2.5}
-              fill="url(#colorActual)"
-              dot={false}
-              activeDot={{ r: 5, strokeWidth: 0 }}
-            />
-            {/* Prediction reference line */}
-            {predMonth && (
-              <ReferenceLine
-                x={predMonth}
-                stroke="#8b5cf6"
-                strokeDasharray="4 3"
-                strokeWidth={1.5}
-                label={{ value: "Forecast →", position: "insideTopRight", fontSize: 10, fill: "#8b5cf6" }}
-              />
-            )}
-            {/* Custom dots on prediction points */}
-            <Line
-              type="monotone"
-              dataKey={(d) => d.isPrediction ? d[CHART_META[chartTab].key as keyof MonthlyPoint] : null}
-              stroke="#8b5cf6"
-              strokeWidth={2}
-              strokeDasharray="5 4"
-              dot={<CustomDot />}
-              activeDot={{ r: 5, fill: "#8b5cf6", strokeWidth: 0 }}
-              name="Forecast"
-              connectNulls
-            />
-          </ComposedChart>
-        </ResponsiveContainer>
-      </div>
+      
+      
 
       {/* Bottom row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -457,22 +398,15 @@ export default function AnalyticsPage() {
               })}
 
             </div>
-
           </div>
-
-
           <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between">
-
             <span className="text-xs text-gray-400">
               Application → Hire conversion
             </span>
-
             <span className="text-sm font-bold text-indigo-600">
               {conversionRate ?? 0}%
             </span>
-
           </div>
-
         </div>
 
         {/* Top jobs */}

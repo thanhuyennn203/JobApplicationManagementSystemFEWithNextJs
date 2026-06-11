@@ -18,7 +18,8 @@ import {
     Star,
     Package,
     CalendarCheck,
-    FileText, CheckCircle
+    FileText, CheckCircle,
+    User
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -286,7 +287,7 @@ export default function OrderDetailPage() {
                     Dashboard
                 </Link>
                 <ChevronRight size={12} />
-                <Link href="/admin/orders" className="hover:text-[#0b77da] transition-colors">
+                <Link href="/admin/services/orders" className="hover:text-[#0b77da] transition-colors">
                     Order
                 </Link>
                 <ChevronRight size={12} />
@@ -409,6 +410,53 @@ export default function OrderDetailPage() {
                                     </td>
                                 </tr>
                             </tfoot>
+                        </table>
+                    </div>
+                    {/* Customer Info */}
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-100">
+                            <User size={15} className="text-[#0b77da]" />
+                            <h2 className="text-sm font-semibold text-gray-800">Customer Information</h2>
+                        </div>
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="bg-gray-50 border-b border-gray-100">
+                                    <th className="py-2.5 px-5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        Company
+                                    </th>
+                                    <th className="py-2.5 px-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        Name
+                                    </th>
+                                    <th className="py-2.5 px-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        Email
+                                    </th>
+                                    <th className="py-2.5 px-5 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                        Phone
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                
+                                    <tr key={order.companyId} className="hover:bg-gray-50/50 transition-colors">
+                                        <td className="py-3.5 px-5">
+                                            <div className="flex items-center gap-2.5">
+                                                <div>
+                                                    <div className="font-medium text-gray-900">{order.companyName}</div>
+                                                    <div className="text-xs text-gray-400 font-mono">ID: {order.companyId}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="py-3.5 px-4 text-center text-gray-600">{order.memberName}</td>
+                                        <td className="py-3.5 px-4 text-right text-gray-600">
+                                            {order.email}
+                                        </td>
+                                        <td className="py-3.5 px-5 text-right font-semibold text-gray-900">
+                                           {order.phone}
+                                        </td>
+                                    </tr>
+                               
+                            </tbody>
+                            
                         </table>
                     </div>
 

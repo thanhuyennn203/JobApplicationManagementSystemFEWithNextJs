@@ -19,7 +19,7 @@ export interface Job {
   logo_url?: string;
   tags?: string[];
   description?: string;
-  dueDate: Date;
+  dueDate: string;
   experienceRequired: string;
   posted_date: Date;
   savedAt: Date;

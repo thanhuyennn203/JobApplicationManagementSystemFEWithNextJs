@@ -12,6 +12,11 @@ import {
 
 import { JobDetail } from "@/types/jobs";
 import { useToast } from "@/components/notification/ToastProvider";
+import {
+    ArrowLeft,
+    ChevronRight,
+    Info
+} from "lucide-react";
 
 export default function StepDetail({
     jobId,
@@ -199,56 +204,67 @@ export default function StepDetail({
         };
 
         fetchJobDetail();
-
     }, [jobId]);
 
     return (
+        <div className="min-h-screen bg-[#f4f7fb]">
+            {/* ── Top Navigation Bar ── */}
+            <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+                <div className="max-w-4xl mx-auto px-4 h-14 flex items-center gap-3">
+                    <button
+                        type="button"
+                        onClick={() => router.push("/recruiter/jobs")}
+                        className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#00b14f] transition-colors group"
+                    >
+                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                        <span>Back to Jobs</span>
+                    </button>
 
-        <div className="min-h-screen bg-[#f4f7fb] px-6 py-8">
+                    <span className="text-gray-300">|</span>
 
-            <div className="mx-auto max-w-6xl">
+                    {/* Breadcrumb */}
+                    <div className="flex items-center gap-1.5 text-sm">
+                        <span className="text-gray-400">Recruiter</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
+                        <span className="text-gray-400">Jobs</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
+                        <span className="font-medium text-gray-700">
+                            {jobId ? "Edit Job" : "Create Job"}
+                        </span>
+                    </div>
 
+                    {/* Status pill */}
+                    <div className="ml-auto flex items-center gap-1.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+                        <Info className="w-3.5 h-3.5" />
+                        DRAFT
+                    </div>
+                </div>
+            </div>
+
+            <div className="mx-auto max-w-4xl mt-3">
                 {/* HEADER */}
                 <div className="mb-8 flex items-center justify-between">
-
                     <div>
-                        <h1 className="text-3xl font-bold text-[#1f2937]">
+                        <h1 className="text-xl font-bold text-[#1f2937]">
                             Job Details
                         </h1>
-
                         <p className="mt-2 text-sm text-gray-500">
                             Complete detailed information to attract better candidates.
                         </p>
-                    </div>
-
-                    <div className="rounded-2xl bg-white px-5 py-4 shadow-sm border border-gray-100">
-                        <p className="text-xs font-medium text-gray-400">
-                            STATUS
-                        </p>
-
-                        <div className="mt-2 flex items-center gap-2">
-
-                            <div className="h-2.5 w-2.5 rounded-full bg-[#00b14f]"></div>
-
-                            <span className="font-semibold text-[#00b14f]">
-                                Draft
-                            </span>
-
-                        </div>
                     </div>
 
                 </div>
 
                 <form
                     onSubmit={handleSubmit}
-                    className="space-y-6"
+                    className="space-y-3"
                 >
 
                     {/* JOB DESCRIPTION */}
                     <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
 
                         <div className="mb-5">
-                            <h2 className="text-xl font-semibold text-gray-800">
+                            <h2 className="text-lg font-semibold text-gray-800">
                                 Job Description
                             </h2>
 
@@ -272,7 +288,7 @@ export default function StepDetail({
                     <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
 
                         <div className="mb-5">
-                            <h2 className="text-xl font-semibold text-gray-800">
+                            <h2 className="text-lg font-semibold text-gray-800">
                                 Job Requirements
                             </h2>
 
@@ -301,7 +317,7 @@ export default function StepDetail({
                             {/* INCOME */}
                             <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
 
-                                <h2 className="mb-4 text-xl font-semibold text-gray-800">
+                                <h2 className="mb-4 text-lg font-semibold text-gray-800">
                                     Income
                                 </h2>
 
@@ -319,7 +335,7 @@ export default function StepDetail({
                             {/* BENEFITS */}
                             <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
 
-                                <h2 className="mb-4 text-xl font-semibold text-gray-800">
+                                <h2 className="mb-4 text-lg font-semibold text-gray-800">
                                     Benefits
                                 </h2>
 
@@ -342,7 +358,7 @@ export default function StepDetail({
                             {/* ALLOWANCE */}
                             <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
 
-                                <h2 className="mb-4 text-xl font-semibold text-gray-800">
+                                <h2 className="mb-4 text-lg font-semibold text-gray-800">
                                     Allowance
                                 </h2>
 
@@ -360,7 +376,7 @@ export default function StepDetail({
                             {/* EQUIPMENT */}
                             <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
 
-                                <h2 className="mb-4 text-xl font-semibold text-gray-800">
+                                <h2 className="mb-4 text-lg font-semibold text-gray-800">
                                     Working Equipment
                                 </h2>
 
@@ -383,7 +399,7 @@ export default function StepDetail({
                     <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
 
                         <div className="mb-6">
-                            <h2 className="text-xl font-semibold text-gray-800">
+                            <h2 className="text-lg font-semibold text-gray-800">
                                 Additional Information
                             </h2>
 

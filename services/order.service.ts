@@ -17,6 +17,7 @@ async function handleResponse(res: Response) {
 
         try {
             const error = await res.json();
+            // console.log("error",error);
             message = error.message || message;
         } catch {}
 
@@ -27,29 +28,64 @@ async function handleResponse(res: Response) {
 }
 
 export const orderService = {
-
     createOrder: async (
         items: OrderItem[]
     ): Promise<Order> => {
+
+
+        // Check every package quantity must be 1
+        const invalidQuantity = items.some(
+            item => item.quantity !== 1
+        );
+
+
+        if (invalidQuantity) {
+            throw new Error(
+                "Each package quantity must be 1"
+            );
+        }
+
+
+        // Check duplicate packageCode
+        const packageCodes = items.map(
+            item => item.packageCode
+        );
+
+
+        const hasDuplicate =
+            new Set(packageCodes).size !== packageCodes.length;
+
+
+        if (hasDuplicate) {
+            throw new Error(
+                "Duplicate packages are not allowed"
+            );
+        }
+
 
         const packageIds = items.map(
             item => item.packageId
         );
 
+
         const res = await fetch(
             `${API_URL}`,
             {
                 method: "POST",
-                headers: getAuthHeader(),
+                headers: {
+                    ...getAuthHeader(),
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify({
-                    packageIds,
+                    packageIds
                 }),
             }
         );
 
-        return handleResponse(res);
-    },
 
+        return handleResponse(res);
+    }
+,
     getMyOrders: async (): Promise<Order[]> => {
 
         const res = await fetch(
@@ -188,4 +224,32 @@ export const adminOrderService = {
         return res.json();
     }
 
+};
+
+export interface QRResponse {
+    qrUrl: string;
+}
+
+
+export const generateQR = async (
+    orderId: string
+): Promise<QRResponse> => {
+
+    const res = await fetch(
+        `/api/orders/${orderId}/qr`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+    );
+
+
+    if (!res.ok) {
+        throw new Error("Generate QR failed");
+    }
+
+
+    return res.json();
 };

@@ -13,23 +13,36 @@ export interface OrderItem {
     quantity: number;
     vip: boolean;
 }
-
 export interface BankInfo {
+    bincode: string; // mã ngân hàng (MB: 970422)
     bankName: string;
     accountNumber: string;
     accountHolder: string;
     branch: string;
-    transferContent: string;  // nội dung chuyển khoản
+    transferContent: string; // nội dung chuyển khoản
 }
 
 export interface Order {
     id: string;
+    companyId: number;
+
+    companyName?: string;
+    memberName?: string;
+    email?: string;
+    phone?: string;
+
     orderCode: string;
+
     items: OrderItem[];
+
     totalAmount: number;
+
     status: OrderStatus;
+
     bankInfo: BankInfo;
+
     createdAt: string;
+
     paidAt?: string;
     confirmedAt?: string;
     note?: string;

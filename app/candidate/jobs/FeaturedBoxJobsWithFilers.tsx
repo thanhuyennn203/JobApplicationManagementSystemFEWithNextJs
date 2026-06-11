@@ -31,6 +31,104 @@ export default function FeaturedBoxJobsWithFilters() {
     jobRank: undefined,
   };
 
+  const loadFakeJobs = () => {
+    const topJobs: Job[] = [
+      {
+        id: 1,
+        title: "Senior Frontend Developer",
+        company_id: 101,
+        company_name: "TechNova Solutions",
+        salary_min: 2500,
+        salary_max: 4500,
+        locations: [
+          {
+            id: 1,
+            name: "Ho Chi Minh City"
+          }
+        ],
+        logo_url: "/images/company1.png",
+        tags: ["React", "Next.js", "TypeScript"],
+        description: "Build modern web applications using React and Next.js.",
+        dueDate: "2026-07-15",
+        experienceRequired: "3+ years",
+        posted_date: new Date("2026-06-10"),
+        savedAt: new Date("2026-06-11"),
+        createStatus: "APPROVED",
+        status: "OPEN"
+      },
+      {
+        id: 2,
+        title: "Backend Java Developer",
+        company_id: 102,
+        company_name: "Global Fintech",
+        salary_min: 3000,
+        salary_max: 5500,
+        locations: [
+          {
+            id: 2,
+            name: "Hanoi"
+          }
+        ],
+        logo_url: "/images/company2.png",
+        tags: ["Java", "Spring Boot", "Microservices"],
+        description: "Develop scalable backend systems and APIs.",
+        dueDate: "2026-07-20",
+        experienceRequired: "2+ years",
+        posted_date: new Date("2026-06-09"),
+        savedAt: new Date("2026-06-10"),
+        createStatus: "APPROVED",
+        status: "OPEN"
+      },
+      {
+        id: 3,
+        title: "UI/UX Designer",
+        company_id: 103,
+        company_name: "Creative Studio",
+        salary_min: 1200,
+        salary_max: 2500,
+        locations: [
+          {
+            id: 3,
+            name: "Da Nang"
+          }
+        ],
+        logo_url: "/images/company3.png",
+        tags: ["Figma", "UX Research", "Design System"],
+        description: "Design user-friendly digital products.",
+        dueDate: "2026-07-05",
+        experienceRequired: "1+ years",
+        posted_date: new Date("2026-06-08"),
+        savedAt: new Date("2026-06-09"),
+        createStatus: "APPROVED",
+        status: "OPEN"
+      },
+      {
+        id: 4,
+        title: "DevOps Engineer",
+        company_id: 104,
+        company_name: "CloudX Technology",
+        salary_min: 3500,
+        salary_max: 6500,
+        locations: [
+          {
+            id: 4,
+            name: "Ho Chi Minh City"
+          }
+        ],
+        logo_url: "/images/company4.png",
+        tags: ["Docker", "Kubernetes", "AWS"],
+        description: "Manage cloud infrastructure and deployment pipelines.",
+        dueDate: "2026-07-25",
+        experienceRequired: "4+ years",
+        posted_date: new Date("2026-06-07"),
+        savedAt: new Date("2026-06-08"),
+        createStatus: "APPROVED",
+        status: "OPEN"
+      }
+    ];
+    setJobs(topJobs);
+  }
+
   useEffect(() => {
     const loadJobs = async () => {
       const response =
@@ -43,7 +141,9 @@ export default function FeaturedBoxJobsWithFilters() {
       setJobsPage(response);
     };
 
-    loadJobs();
+    // loadJobs();
+    loadFakeJobs();
+
   }, [filters, page]);
 
   const getSalaryRange = (code: string) => {

@@ -23,11 +23,11 @@ export default function PackagesPage() {
         <main className="min-h-screen bg-[#f5f7fa] py-12">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="mb-10">
-                    <h1 className="text-4xl font-bold text-gray-900">
+                    <h1 className="text-lg font-bold text-gray-900">
                         Recruitment Packages
                     </h1>
 
-                    <p className="mt-3 text-lg text-gray-600">
+                    <p className="mt-3 text-base text-gray-600">
                         Choose the package that best suits your hiring needs.
                     </p>
                 </div>

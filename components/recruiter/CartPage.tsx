@@ -18,7 +18,7 @@ const STATUS_META: Record<OrderStatus, { label: string; color: string; bg: strin
     PENDING: { label: "Awaiting payment", color: "#b45309", bg: "#fef3c7", icon: <Clock size={13} /> },
     WAITING: { label: "Confirming payment", color: "#1d4ed8", bg: "#dbeafe", icon: <Clock size={13} /> },
     // WAITING: { label: "Confirming payment", color: "#1d4ed8", bg: "#dbeafe", icon: <Loader2 size={13} className="animate-spin" /> },
-    CONFIRMED: { label: "Confirmed", color: "#15803d", bg: "#dcfce7", icon: <CircleCheck size={13} /> },
+    // CONFIRMED: { label: "Confirmed", color: "#15803d", bg: "#dcfce7", icon: <CircleCheck size={13} /> },
     ACTIVE: { label: "Active", color: "#15803d", bg: "#dcfce7", icon: <CircleCheck size={13} /> },
     REJECTED: { label: "Rejected", color: "#b91c1c", bg: "#fee2e2", icon: <AlertCircle size={13} /> },
 };
@@ -44,8 +44,12 @@ function BankTransferModal({
     onPaid: (o: Order) => void;
     onClose: () => void;
 }) {
+    const toast = useToast();
+    // console.log("order", order);
     const [loading, setLoading] = useState(false);
-    const [copied, setCopied] = useState<string | null>(null);
+    const [qrLoading, setQrLoading] = useState(false);
+    const [qrUrl, setQrUrl] = useState<string | null>(null);
+    const [copied, setCopied] = useState<string | null>(false);
 
     const copy = (key: string, val: string) => {
         navigator.clipboard.writeText(val).catch(() => { });
@@ -53,12 +57,39 @@ function BankTransferModal({
         setTimeout(() => setCopied(null), 2000);
     };
 
+    const addInfo = order.bankInfo.transferContent + "CID" + order.companyId;
+
+    const handleGenerateQR = async () => {
+        try {
+
+            setQrLoading(true);
+            const url =
+                `https://img.vietqr.io/image/${order.bankInfo.bincode}-${order.bankInfo.accountNumber}-compact2.png?amount=${order.totalAmount}&addInfo=${encodeURIComponent(addInfo)}&accountName=${encodeURIComponent(order.bankInfo.accountHolder)}`;
+
+            setQrUrl(url);
+
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setQrLoading(false);
+        }
+    };
+
+
     const handlePaid = async () => {
         setLoading(true);
-        const updated = await orderService.confirmPayment(order.id);
-        setLoading(false);
-        onPaid(updated);
+        try {
+            const updated = await orderService.confirmPayment(order.id);
+            onPaid(updated);
+            toast.success("Confirmed transfer successfully. Please wait to admin to check your payment");
+        } catch (error : any) {
+            // console.error(error);
+            toast.error(error.message || "Confirm payment failed. Please try again later.");
+        } finally {
+            setLoading(false);
+        }
     };
+
 
     const fields = [
         { key: "bank", label: "Bank", value: order.bankInfo.bankName },
@@ -73,13 +104,14 @@ function BankTransferModal({
         {
             key: "content",
             label: "Transfer content",
-            value: order.bankInfo.transferContent,
+            value: addInfo,
         },
     ];
 
+
     return (
         <div className="w-full rounded-xl border border-gray-200 bg-white p-6 shadow-lg">
-            {/* Header */}
+
             <div className="mb-5 flex items-center justify-between">
                 <div>
                     <p className="text-base font-medium text-gray-900">
@@ -91,77 +123,80 @@ function BankTransferModal({
                     </p>
                 </div>
 
-                <button
-                    onClick={onClose}
-                    className="px-2 py-1 text-2xl leading-none text-gray-400 transition hover:text-gray-600"
-                >
+                <button onClick={onClose} className="px-2 py-1 text-2xl leading-none text-gray-400 transition hover:text-gray-600">
                     ×
                 </button>
             </div>
 
-            {/* Bank Info */}
+
             <div className="mb-4 flex flex-col gap-2">
                 {fields.map((f) => (
-                    <div
-                        key={f.key}
-                        className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2.5"
-                    >
+                    <div key={f.key} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2.5">
+
                         <div className="min-w-0 flex-1">
+
                             <p className="text-[11px] text-gray-400">
                                 {f.label}
                             </p>
 
-                            <p
-                                className={`mt-0.5 text-sm font-medium break-all ${f.key === "amount"
-                                    ? "text-green-600"
-                                    : "text-gray-900"
-                                    }`}
-                            >
+                            <p className={`mt-0.5 text-sm font-medium break-all ${f.key === "amount" ? "text-green-600" : "text-gray-900"}`}>
                                 {f.value}
                             </p>
+
                         </div>
 
-                        <button
-                            onClick={() => copy(f.key, f.value)}
-                            className={`ml-3 flex-shrink-0 p-1 transition ${copied === f.key
-                                ? "text-green-600"
-                                : "text-gray-400 hover:text-gray-600"
-                                }`}
-                        >
-                            {copied === f.key ? (
-                                <CheckCircle2 size={14} />
-                            ) : (
-                                <Copy size={14} />
-                            )}
+
+                        <button onClick={() => copy(f.key, f.value)} className={`ml-3 flex-shrink-0 p-1 transition ${copied === f.key ? "text-green-600" : "text-gray-400 hover:text-gray-600"}`}>
+                            {copied === f.key ? <CheckCircle2 size={14} /> : <Copy size={14} />}
                         </button>
+
                     </div>
                 ))}
             </div>
 
-            {/* Warning */}
+
+            {/* QR Button */}
+            <button
+                onClick={handleGenerateQR}
+                disabled={qrLoading}
+                className="mb-3 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+                {qrLoading && <Loader2 size={15} className="animate-spin" />}
+                {qrLoading ? "Generating QR..." : "Generate QR Code"}
+            </button>
+
+
+            {qrUrl && (
+                <div className="mb-4 flex justify-center rounded-lg border border-gray-200 p-3">
+
+                    <img
+                        src={qrUrl}
+                        alt="Payment QR"
+                        className="h-64 w-64"
+                    />
+
+                </div>
+            )}
+
+
             <div className="mb-4 rounded-lg bg-amber-100 px-3 py-2.5 text-xs leading-relaxed text-amber-700">
-                ⚠ Please enter the exact transfer content so your payment can
-                be confirmed quickly.
+                ⚠ Please enter the exact transfer content so your payment can be confirmed quickly.
             </div>
 
-            {/* Confirm Button */}
-            <button
-                onClick={handlePaid}
-                disabled={loading}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 py-3 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-70"
-            >
+
+            <button onClick={handlePaid} disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 py-3 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-70">
+
                 {loading && <Loader2 size={15} className="animate-spin" />}
 
                 {loading ? "Processing..." : "I have transferred"}
+
             </button>
 
-            {/* Cancel Button */}
-            <button
-                onClick={onClose}
-                className="mt-2 w-full rounded-lg border border-gray-300 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
-            >
+
+            <button onClick={onClose} className="mt-2 w-full rounded-lg border border-gray-300 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50">
                 Cancel
             </button>
+
         </div>
     );
 }
@@ -257,16 +292,15 @@ function OrderCard({
 
                     {order.status === "WAITING" && (
                         <p className="mt-2 rounded-lg bg-blue-100 px-3 py-2 text-xs text-blue-700">
-                            Payment received — waiting for admin to confirm.
+                            You have paied. Please wait about 3 days for payment confirmed from admin.
                         </p>
                     )}
 
-                    {(order.status === "CONFIRMED" ||
-                        order.status === "ACTIVE") && (
-                            <p className="mt-2 rounded-lg bg-green-100 px-3 py-2 text-xs text-green-700">
-                                ✓ Payment confirmed. Your package is now active.
-                            </p>
-                        )}
+                    {order.status === "ACTIVE" && (
+                        <p className="mt-2 rounded-lg bg-green-100 px-3 py-2 text-xs text-green-700">
+                            ✓ Payment confirmed. Your package is now active.
+                        </p>
+                    )}
                 </div>
             )}
         </div>
@@ -313,7 +347,6 @@ export default function CartPage() {
                 const order =
                     await orderService.createOrder(orderItems);
 
-                toast.success("Order created successfully");
                 clearCart();
                 setOrders((prev) => [order, ...prev]);
                 setActiveOrder(order);
@@ -607,8 +640,8 @@ export default function CartPage() {
 
             {/* Bank Transfer Modal overlay */}
             {activeOrder && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-5">
-                    <div className="w-full max-w-[500px]">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-5 overflow-y-auto no-scrollbar">
+                    <div className="w-full max-w-[500px] max-h-[90vh]">
                         <BankTransferModal
                             order={activeOrder}
                             onPaid={handlePaid}

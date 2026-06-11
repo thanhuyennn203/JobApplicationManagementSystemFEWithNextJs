@@ -199,13 +199,17 @@ export default function CompanyDetailPage() {
 
             {/* Hero */}
             <div className="relative h-36 bg-[#e1f5ee] overflow-hidden">
-                {company.backgroundUrl ? (
+                {/* {company.backgroundUrl ? (
                     <img src={company.backgroundUrl} alt="" className="w-full h-full object-cover" />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center">
                         <Building2 size={48} className="text-[#9fe1cb]" />
                     </div>
-                )}
+                )} */}
+
+                 <div className="w-full h-full flex items-center justify-center">
+                        <Building2 size={48} className="text-[#9fe1cb]" />
+                    </div>
                 <div className="absolute -bottom-6 left-6 w-14 h-14 rounded-xl border-[3px] border-white bg-white flex items-center justify-center text-base font-medium text-gray-500 overflow-hidden shadow-sm">
                     {company.logo_url ? (
                         <img src={company.logo_url} alt="" className="w-full h-full object-contain" />

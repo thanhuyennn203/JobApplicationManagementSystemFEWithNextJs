@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import "@/styles/recruiter/GeneralInformation.css";
 import { saveJobPostingTags, updateJobCategoryAndTemplate } from "@/services/jobs/tagService";
-import { getJobGenerateContext, saveGeneralInformation } from "@/services/jobs/jobs.service";
+import { getGeneralInformationByJobId, getJobGenerateContext, saveGeneralInformation } from "@/services/jobs/jobs.service";
 import { createCategory } from "@/services/jobs/categoryService";
 import { getTemplatesByCategory, createTemplate } from "@/services/jobs/templateService";
 import {
@@ -16,7 +16,11 @@ import {
 } from "@/types/tagging";
 import SearchableSelect from "@/components/jobs/SearchableSelect";
 import SearchableTagInput from "@/components/jobs/SearchableTagInput";
-
+import {
+    ArrowLeft,
+    ChevronRight,
+    Info,
+} from "lucide-react";
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const TAG_CATEGORIES: TagCategory[] = ["SKILLS", "REQUIREMENTS", "BENEFITS"];
@@ -95,6 +99,28 @@ export default function StepBasic({
         numberOfRecruitment: 1,
         workingStyle: "",
     });
+
+    useEffect(() => {
+        if (!jobId) return;
+        const fetchJobGeneralInfor = async () => {
+            try {
+                const data = await getGeneralInformationByJobId(jobId);
+                setFormData({
+                    rank: data?.rank,
+                    education: data?.education,
+                    numberOfRecruitment: data?.numberOfRecruitment,
+                    workingStyle: data?.workingStyle
+                });
+
+            } catch (err) {
+                console.error("Failed to fetch job", err);
+            }
+
+        };
+
+        fetchJobGeneralInfor();
+
+    }, [jobId]);
 
     // ── Category ──────────────────────────────────────────────────────────────
     const [categories, setCategories] = useState<JobCategory[]>([]);
@@ -584,7 +610,7 @@ export default function StepBasic({
 
     if (initializing) {
         return (
-            <div className="step-container">
+            <div className="generalInfo-container">
                 <div className="general-info-container">
                     <div className="space-y-4 animate-pulse p-8">
                         <div className="h-6 bg-gray-100 rounded w-48" />
@@ -605,11 +631,51 @@ export default function StepBasic({
     // ─────────────────────────────────────────────────────────────────────────
 
     return (
-        <div className="step-container">
+        <div className="min-h-screen bg-gray-50">
+            {/* ── Top Navigation Bar ── */}
+            <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+                <div className="max-w-4xl mx-auto px-4 h-14 flex items-center gap-3">
+                    <button
+                        type="button"
+                        onClick={() => router.push("/recruiter/jobs")}
+                        className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#00b14f] transition-colors group"
+                    >
+                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                        <span>Back to Jobs</span>
+                    </button>
+
+                    <span className="text-gray-300">|</span>
+
+                    {/* Breadcrumb */}
+                    <div className="flex items-center gap-1.5 text-sm">
+                        <span className="text-gray-400">Recruiter</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
+                        <span className="text-gray-400">Jobs</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
+                        <span className="font-medium text-gray-700">
+                            {jobId ? "Edit Job" : "Create Job"}
+                        </span>
+                    </div>
+
+                    {/* Status pill */}
+                    <div className="ml-auto flex items-center gap-1.5 text-xs font-medium text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+                        <Info className="w-3.5 h-3.5" />
+                        DRAFT
+                    </div>
+                </div>
+            </div>
+
             <div className="general-info-container">
                 <form className="general-info-form" onSubmit={handleSubmit}>
-                    <h2 className="page-title">General Information</h2>
-
+                    {/* Page header */}
+                    <div className="mb-6">
+                        <h1 className="text-lg font-bold text-gray-900">
+                           General Infomation
+                        </h1>
+                        <p className="text-sm text-gray-500 mt-1">
+                            Fill in the details below. Fields marked with <span className="text-red-500">*</span> are required.
+                        </p>
+                    </div>
                     {/* ── Basic Fields ── */}
                     <div className="grid-2">
                         <div className="form-group">
@@ -621,7 +687,7 @@ export default function StepBasic({
                                 className={inputCls("rank")}
                             >
                                 <option value="">Select Rank</option>
-                                {["Intern", "Staff" ,"Junior", "Middle", "Senior", "Lead"].map((r) => (
+                                {["Intern", "Staff", "Junior", "Middle", "Senior", "Lead"].map((r) => (
                                     <option key={r} value={r}>{r}</option>
                                 ))}
                             </select>
@@ -677,10 +743,10 @@ export default function StepBasic({
                     </div>
 
                     {/* ── Category ── */}
-                    <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
+                    <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100 mb-2.5">
                         <div className="mb-6 flex items-start justify-between">
                             <div>
-                                <h2 className="text-xl font-semibold text-gray-800">Job Category</h2>
+                                <h2 className="text-lg font-semibold text-gray-800">Job Category</h2>
                                 <p className="mt-1 text-sm text-gray-500">
                                     Select the category that best fits this role.
                                 </p>
@@ -755,10 +821,10 @@ export default function StepBasic({
 
                     {/* ── Template ── */}
                     {selectedCategory && (
-                        <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100">
+                        <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100 mb-2.5">
                             <div className="mb-6 flex items-start justify-between">
                                 <div>
-                                    <h2 className="text-xl font-semibold text-gray-800">Job Template</h2>
+                                    <h2 className="text-lg font-semibold text-gray-800">Job Template</h2>
                                     <p className="mt-1 text-sm text-gray-500">
                                         Select a hiring template for this category.
                                     </p>
@@ -785,7 +851,7 @@ export default function StepBasic({
                                         type="text"
                                         placeholder={`Template name (max ${MAX_CUSTOM_INPUT_LENGTH} chars)`}
                                         maxLength={MAX_CUSTOM_INPUT_LENGTH}
-                                    maxTags={MAX_TAGS_PER_CATEGORY}
+                                        maxTags={MAX_TAGS_PER_CATEGORY}
                                         value={newTemplateName}
                                         onChange={(e) => setNewTemplateName(e.target.value)}
                                         className="flex-1 rounded-xl border border-gray-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00b14f]/30"
@@ -835,7 +901,7 @@ export default function StepBasic({
                     {selectedTemplate && (
                         <div className="rounded-3xl bg-white p-7 shadow-sm border border-gray-100 space-y-8">
                             <div>
-                                <h2 className="text-xl font-semibold text-gray-800">Smart Tags</h2>
+                                <h2 className="text-lg font-semibold text-gray-800">Smart Tags</h2>
                                 <p className="mt-1 text-sm text-gray-500">
                                     Add searchable tags to improve candidate matching.
                                     Max {MAX_TAGS_PER_CATEGORY} per section · Custom tags max {MAX_CUSTOM_INPUT_LENGTH} chars.

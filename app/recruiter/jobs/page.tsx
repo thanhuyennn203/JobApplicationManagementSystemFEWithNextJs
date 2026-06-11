@@ -381,7 +381,7 @@ function JobCard({
   changingStatusId,
 }: any) {
 
-    const { getProvinceName } = useLocation();
+  const { getProvinceName } = useLocation();
 
   return (
     <div className="bg-white border border-gray-100 rounded-3xl shadow-sm hover:shadow-md transition overflow-hidden">
@@ -407,7 +407,7 @@ function JobCard({
 
             <div className="flex-1 space-y-3">
               <div>
-                <h3 className="font-semibold text-gray-900 leading-7">
+                <h3 className="font-semibold text-sm text-gray-900 leading-7">
                   {job.title}
                 </h3>
 
@@ -415,10 +415,8 @@ function JobCard({
                   <span className="font-medium text-[#00b14f]">
                     {job.company_name}
                   </span>
-
                   <span>•</span>
-
-                  <span>
+                  <span className="text-xs">
                     Job ID: #{job.id}
                   </span>
                 </div>
@@ -426,7 +424,6 @@ function JobCard({
 
               {/* META */}
               <div className="flex flex-wrap gap-3 text-sm">
-
                 <MetaTag
                   icon={<CircleDollarSign size={15} />}
                   text={`${formatSalary(job.salary_min)} - ${formatSalary(job.salary_max)}`}
@@ -455,14 +452,19 @@ function JobCard({
                   }
                 />
               </div>
+              <div>
+                <p className="text-xs text-gray-700">{job.description}</p>
+              </div>
+
             </div>
+
           </div>
 
           {/* RIGHT STATUS */}
           <div className="min-w-[230px] bg-[#f8fafc] rounded-2xl p-4 border border-gray-100">
 
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-gray-700">
+              <p className="text-xs font-medium text-gray-700">
                 Recruitment Status
               </p>
 
@@ -509,7 +511,7 @@ function JobCard({
                   onClick={() =>
                     onChangeStatus(job.id, "OPEN")
                   }
-                  className="w-full bg-[#00b14f] hover:bg-[#009245] disabled:opacity-50 text-white py-2.5 rounded-xl text-sm font-medium"
+                  className="w-full bg-[#00b14f] hover:bg-[#009245] disabled:opacity-50 text-white py-2.5 rounded-xl text-xs font-medium"
                 >
                   Publish Job
                 </button>
@@ -521,20 +523,20 @@ function JobCard({
                   onClick={() =>
                     onChangeStatus(job.id, "CLOSED")
                   }
-                  className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white py-2.5 rounded-xl text-sm font-medium"
+                  className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white py-2.5 rounded-xl text-xs font-medium"
                 >
                   Close Recruitment
                 </button>
               )}
 
               {job.status === "CLOSED" && (
-                <div className="text-sm text-gray-500 bg-white border border-gray-200 rounded-xl p-3 text-center">
+                <div className="text-xs text-gray-500 bg-white border border-gray-200 rounded-xl p-3 text-center">
                   This job was closed manually.
                 </div>
               )}
 
               {job.status === "EXPIRED" && (
-                <div className="text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-xl p-3 text-center">
+                <div className="text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-xl p-3 text-center">
                   Recruitment expired automatically.
                 </div>
               )}
@@ -638,7 +640,7 @@ function StatusBadge({ status }: { status: string }) {
 
 function MetaTag({ icon, text }: any) {
   return (
-    <div className="flex items-center gap-2 bg-gray-50 border border-gray-100 px-3 py-2 rounded-xl text-gray-700">
+    <div className="flex text-xs items-center gap-1 bg-gray-50 border border-gray-100 px-3 py-2 rounded-xl text-gray-700">
       {icon}
       <span>{text}</span>
     </div>
@@ -648,9 +650,9 @@ function MetaTag({ icon, text }: any) {
 function Step({ active, children }: any) {
   return (
     <div
-      className={`px-2 py-1 rounded-full transition ${active
-          ? "bg-[#00b14f] text-white"
-          : "bg-gray-200 text-gray-500"
+      className={`px-2 text-xs py-1 rounded-full transition ${active
+        ? "bg-[#00b14f] text-white"
+        : "bg-gray-200 text-gray-500"
         }`}
     >
       {children}

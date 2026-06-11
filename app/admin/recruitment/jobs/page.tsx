@@ -173,6 +173,13 @@ export default function JobPage() {
     toast.success("Job deleted.");
   };
 
+  function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
   // ── Render ──
   return (
     <div className="flex flex-col min-h-full bg-white">
@@ -311,7 +318,7 @@ export default function JobPage() {
                       <div className="font-medium text-gray-900 text-sm">
                         ${(job.salary_min)} – ${(job.salary_max)}
                       </div>
-                      <div className="text-xs text-gray-400"> month</div>
+                      <div className="text-xs text-gray-400">per month</div>
                     </td>
 
                     {/* Experience */}
@@ -323,8 +330,8 @@ export default function JobPage() {
 
                     {/* Due date */}
                     <td className="py-3 pr-4">
-                      <span className={`text-xs ${due.cls}`}>{due.text}</span>
-                    </td>
+                        {formatDate(job.dueDate)}
+                        </td>
 
                     {/* Status */}
                     <td className="py-3 pr-4"><StatusBadge status={job.status} /></td>

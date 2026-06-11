@@ -27,6 +27,14 @@ body {
   background-color: #f3f5f7;
 }
 
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
 /* .main_container {
   padding: 20px 40px;
 } */

@@ -237,6 +237,28 @@ export const updateJob = async (id: number, payload: any) => {
   return res.json();
 };
 
+import { GeneralInformation } from "@/types/jobs";
+
+export async function getGeneralInformationByJobId(
+  jobId: number
+): Promise<GeneralInformation | null> {
+  try {
+    const res = await fetch(
+      `${API_URL}/${jobId}/general-information`, {
+    headers: getAuthHeader(),
+  }
+    );
+
+    if (!res.ok) return null;
+
+    const response = await res.json();
+    return response.data ?? response;
+  } catch (error) {
+    console.error("Failed to fetch general information", error);
+    return null;
+  }
+}
+
 export const saveGeneralInformation = async (
   jobId: number,
   payload: any

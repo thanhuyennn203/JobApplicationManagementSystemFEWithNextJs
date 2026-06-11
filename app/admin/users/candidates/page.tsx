@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getAllCandidates } from "@/services/auth/auth.service";
 
 export interface CandidateAdmin {
     userId: number;
@@ -15,17 +16,17 @@ export interface CandidateAdmin {
 }
 
 // Replace with your real import: import { getAllCandidates } from "@/services/candidate";
-const getAllCandidates = async (): Promise<CandidateAdmin[]> => {
-    return Array.from({ length: 47 }, (_, i) => ({
-        userId: i + 1,
-        email: `candidate${i + 1}@email.com`,
-        fullName: `Candidate ${i + 1}`,
-        candidateId: i % 3 !== 0 ? 100 + i : undefined,
-        phone: i % 2 === 0 ? `090${String(i).padStart(7, "0")}` : undefined,
-        headline: ["Frontend Developer", "Product Manager", "Backend Engineer", "UX Designer", "Data Analyst"][i % 5],
-        profileUrl: i % 3 !== 0 ? `/profile/${i + 1}` : undefined,
-    }));
-};
+// const getAllCandidates = async (): Promise<CandidateAdmin[]> => {
+//     return Array.from({ length: 47 }, (_, i) => ({
+//         userId: i + 1,
+//         email: `candidate${i + 1}@email.com`,
+//         fullName: `Candidate ${i + 1}`,
+//         candidateId: i % 3 !== 0 ? 100 + i : undefined,
+//         phone: i % 2 === 0 ? `090${String(i).padStart(7, "0")}` : undefined,
+//         headline: ["Frontend Developer", "Product Manager", "Backend Engineer", "UX Designer", "Data Analyst"][i % 5],
+//         profileUrl: i % 3 !== 0 ? `/profile/${i + 1}` : undefined,
+//     }));
+// };
 
 const PAGE_SIZE = 10;
 
@@ -72,7 +73,7 @@ function Pagination({
 
     const btn = (label: React.ReactNode, target: number, disabled = false, active = false) => (
         <button
-            key={String(label)}
+           key={target}
             onClick={() => !disabled && onChange(target)}
             disabled={disabled}
             className={`min-w-[32px] h-8 px-2 rounded-md text-xs font-medium transition-all ${
@@ -140,7 +141,7 @@ export default function CandidatesPage() {
     const to = Math.min(page * PAGE_SIZE, filtered.length);
 
     return (
-        <div className="p-6 h-full flex flex-col gap-5">
+        <div className="p-6 flex flex-col gap-5">
 
             {/* Header */}
             <div>
@@ -200,7 +201,7 @@ export default function CandidatesPage() {
             <div className="flex flex-1 bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm min-h-0">
 
                 {/* Table */}
-                <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex-1 flex flex-col">
                     {loading ? (
                         <div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-2">
                             <div className="w-6 h-6 border-2 border-indigo-300 border-t-indigo-600 rounded-full animate-spin" />
@@ -213,7 +214,7 @@ export default function CandidatesPage() {
                     ) : (
                         <>
                             <div className="overflow-auto flex-1">
-                                <table className="w-full text-sm">
+                                <table className="w-full text-sm overflow-y-auto">
                                     <thead className="sticky top-0 z-10">
                                         <tr className="bg-gray-50 border-b border-gray-100">
                                             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Candidate</th>
