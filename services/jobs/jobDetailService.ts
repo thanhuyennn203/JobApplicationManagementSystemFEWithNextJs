@@ -120,3 +120,18 @@ export async function publishJob(
 
     return await res.json();
 }
+
+export async function generateJobDetailByAI(job: any, generalInfo: any) {
+    const res = await fetch("/api/ai/job-detail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ job, generalInfo }),
+    });
+
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to generate AI suggestions.");
+    }
+
+    return res.json();
+}

@@ -62,39 +62,6 @@ export default function CreateJobPage() {
         <div className="onboarding-container">
 
             {/* ================================= */}
-            {/* PROFESSIONAL STEPPER */}
-            {/* ================================= */}
-
-            <div className="stepper-container">
-
-                <div className={`step-item ${step >= 1 ? "active" : ""}`}>
-                    <div className="step-circle">
-                        1
-                    </div>
-                    <p>Job Card</p>
-                </div>
-
-                <div className="step-line" />
-
-                <div className={`step-item ${step >= 2 ? "active" : "locked"}`}>
-                    <div className="step-circle">
-                        2
-                    </div>
-                    <p>General Info</p>
-                </div>
-
-                <div className="step-line" />
-
-                <div className={`step-item ${step >= 3 ? "active" : "locked"}`}>
-                    <div className="step-circle">
-                        3
-                    </div>
-                    <p>Job Detail</p>
-                </div>
-
-            </div>
-
-            {/* ================================= */}
             {/* STEP 1 */}
             {/* ================================= */}
 

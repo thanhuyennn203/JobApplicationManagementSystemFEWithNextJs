@@ -21,6 +21,7 @@ import {
     ChevronRight,
     Info,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const TAG_CATEGORIES: TagCategory[] = ["SKILLS", "REQUIREMENTS", "BENEFITS"];
@@ -92,6 +93,7 @@ export default function StepBasic({
     jobId,
     currentUserId,
 }: StepBasicProps) {
+    const router = useRouter();
     // ── Form ──────────────────────────────────────────────────────────────────
     const [formData, setFormData] = useState<FormData>({
         rank: "",
@@ -113,7 +115,7 @@ export default function StepBasic({
                 });
 
             } catch (err) {
-                console.error("Failed to fetch job", err);
+                // console.error("Failed to fetch job", err);
             }
 
         };
@@ -228,6 +230,7 @@ export default function StepBasic({
     // ─────────────────────────────────────────────────────────────────────────
 
     useEffect(() => {
+        if (!jobId) return;
         const init = async () => {
             setInitializing(true);
             try {
@@ -282,6 +285,7 @@ export default function StepBasic({
     // ─────────────────────────────────────────────────────────────────────────
 
     useEffect(() => {
+        if (!jobId) return;
         if (!selectedCategory) {
             setFilteredTemplates([]);
             setSelectedTemplate(null);
@@ -324,6 +328,7 @@ export default function StepBasic({
     // ─────────────────────────────────────────────────────────────────────────
 
     useEffect(() => {
+        if (!jobId) return;
         // Skip if no template selected or no context yet
         if (!selectedTemplate || !contextRef.current) return;
 

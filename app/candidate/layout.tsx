@@ -7,11 +7,11 @@ export default function CandidateLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="no-crollbar">
       {/* <Header /> */}
       <CandidateHeader />
       {children}
       <Footer />
-    </>
+    </div>
   );
 }

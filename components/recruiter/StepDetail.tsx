@@ -2,31 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
 import {
-    createJobDetail,
-    updateJobDetail,
-    getJobDetailByJobId,
+    createJobDetail, updateJobDetail, getJobDetailByJobId,
     publishJob
 } from "@/services/jobs/jobDetailService";
-
 import { JobDetail } from "@/types/jobs";
 import { useToast } from "@/components/notification/ToastProvider";
-import {
-    ArrowLeft,
-    ChevronRight,
-    Info
-} from "lucide-react";
+import { ArrowLeft, ChevronRight, Info } from "lucide-react";
+import { generateJobDetailByAI } from "@/services/jobs/jobDetailService";
+import { getJobById, getGeneralInformationByJobId } from "@/services/jobs/jobs.service"; // adjust to your real function
+import { Sparkles } from "lucide-react";
 
-export default function StepDetail({
-    jobId,
-    prevStep,
-    onPublished
-}: any) {
-
+export default function StepDetail({ jobId, prevStep, onPublished }: any) {
     const router = useRouter();
     const toast = useToast();
-
     const [formData, setFormData] = useState<JobDetail>({
         description: "",
         requirement: "",
@@ -46,7 +35,7 @@ export default function StepDetail({
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState("");
     const [hasDetail, setHasDetail] = useState(false);
-
+    const [generating, setGenerating] = useState(false);
     // TEMP UI DEMO MODE
     // đổi false -> true nếu muốn test không cần BE
     const DEMO_MODE = false;
@@ -62,6 +51,78 @@ export default function StepDetail({
             [name]: value
         }));
 
+    };
+    const handleGenerateAI = async () => {
+        if (!jobId) {
+            toast.error("Job ID not found.");
+            return;
+        }
+
+        setGenerating(true);
+
+        try {
+            // 1. Fetch job + general information
+            const [job, generalInfo] = await Promise.all([
+                getJobById(jobId),
+                getGeneralInformationByJobId(jobId),
+            ]);
+
+            // 2. Call Groq to get suggestions
+            const suggestion = await generateJobDetailByAI(job, generalInfo);
+
+            // 3. Check if any field already has content
+            const fields: (keyof JobDetail)[] = [
+                "description",
+                "requirement",
+                "income",
+                "interest",
+                "allowance",
+                "working_equipment",
+                "working_location",
+                "working_time",
+                "apply_by",
+            ];
+
+            const hasExistingContent = fields.some(
+                (field) => formData[field] && String(formData[field]).trim() !== ""
+            );
+
+            let overwrite = true;
+
+            if (hasExistingContent) {
+                overwrite = window.confirm(
+                    "Some fields already have content. Do you want to overwrite them with the AI-generated suggestions?\n\nClick OK to overwrite, or Cancel to only fill in the empty fields."
+                );
+            }
+
+            // 4. Merge into formData
+            setFormData((prev) => {
+                const updated = { ...prev };
+
+                fields.forEach((field) => {
+                    const current = prev[field];
+                    const suggested = (suggestion as any)[field];
+
+                    if (!suggested) return;
+
+                    const isEmpty = !current || String(current).trim() === "";
+
+                    if (isEmpty || overwrite) {
+                        (updated as any)[field] = suggested;
+                    }
+                });
+
+                return updated;
+            });
+
+            toast.success("AI suggestions generated successfully!");
+
+        } catch (err: any) {
+            console.error(err);
+            toast.error(err.message || "Failed to generate AI suggestions.");
+        } finally {
+            setGenerating(false);
+        }
     };
 
     const handleSubmit = async (
@@ -90,7 +151,7 @@ export default function StepDetail({
             }
 
             let data;
-            console.log(hasDetail);
+            // console.log(hasDetail);
             if (hasDetail) {
 
                 data = await updateJobDetail(
@@ -106,12 +167,6 @@ export default function StepDetail({
                 );
 
             }
-
-            console.log(
-                "Saved job detail:",
-                data
-            );
-
             setSuccess(true);
             toast.success("Job detail saved successfully.");
 
@@ -153,10 +208,10 @@ export default function StepDetail({
                 "/recruiter/jobs"
             );
 
-        } catch (err) {
+        } catch (err : any) {
 
             console.error(err);
-            toast.error("Failed to publish job.");
+            toast.error(err.message || "Failed to publish job.");
 
         }
 
@@ -252,7 +307,26 @@ export default function StepDetail({
                             Complete detailed information to attract better candidates.
                         </p>
                     </div>
+                    <div className="mb-8 flex items-center justify-between">
+                        <div>
+                            <h1 className="text-xl font-bold text-[#1f2937]">
+                                Job Details
+                            </h1>
+                            <p className="mt-2 text-sm text-gray-500">
+                                Complete detailed information to attract better candidates.
+                            </p>
+                        </div>
 
+                        <button
+                            type="button"
+                            onClick={handleGenerateAI}
+                            disabled={generating}
+                            className="flex items-center gap-2 rounded-2xl bg-[#00b14f]/10 border border-[#00b14f]/30 px-5 py-2.5 text-sm font-semibold text-[#00b14f] transition-all hover:bg-[#00b14f]/20 disabled:opacity-50"
+                        >
+                            <Sparkles className={`w-4 h-4 ${generating ? "animate-spin" : ""}`} />
+                            {generating ? "Generating..." : "Generate by AI"}
+                        </button>
+                    </div>
                 </div>
 
                 <form
@@ -461,10 +535,9 @@ export default function StepDetail({
                                 </label>
 
                                 <input
-                                    type="date"
+                                    readOnly
+                                    value={"Applcation Deadline will be 30 days after posted day."}
                                     name="due_date"
-                                    value={formData.due_date}
-                                    onChange={handleChange}
                                     className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition-all focus:border-[#00b14f] focus:bg-white"
                                 />
                             </div>
@@ -513,7 +586,7 @@ export default function StepDetail({
                                     {
                                         loading
                                             ? "Saving..."
-                                            : "Save Draft"
+                                            : "Save Detail"
                                     }
                                 </button>
 
