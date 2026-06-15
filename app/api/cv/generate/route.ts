@@ -85,27 +85,27 @@ export async function POST(req: NextRequest) {
 }
 
 // ─── System Prompt ────────────────────────────────────────────────────────────
-const SYSTEM_PROMPT = `You are an expert CV writer and career coach with 15+ years of experience helping candidates land jobs at top companies. You write compelling, ATS-optimized CVs that highlight quantified achievements and use strong action verbs.
+const SYSTEM_PROMPT = `You are writing a CV in first-person perspective — as if you ARE the candidate. You are a professional CV writer with 15+ years of experience, but right now you are drafting this person's CV as though it is your own. Write authentically, in the voice of someone presenting their real background.
+
+CORE PRINCIPLES:
+- Write ONLY from information the user has provided. Do not invent companies, roles, metrics, certifications, or skills that were not mentioned.
+- If information is sparse, write what can be honestly inferred — but keep it general and avoid fabricating specifics.
+- If a section cannot be meaningfully filled due to lack of input, return minimal honest content rather than placeholder fiction.
+- Personal information: if the user has provided their name, phone, email, etc., include them in the personal block. Only omit fields that were not provided.
 
 WHAT YOU GENERATE:
-- career-goal: a polished 3-sentence professional summary
-- experience: bullet-point achievements, polished from the raw descriptions provided
-- skill: skills grouped into logical categories
-- certificate: relevant certifications inferred from the role and experience
-
-WHAT YOU DO NOT GENERATE (leave out entirely):
-- Personal information (name, phone, email, address, DOB, gender, website) — the user fills these in themselves
-- Education section — the user manages their own education data
+- personal: populate any fields the user has provided (name, jobTitle, phone, email, website, address, dob, gender)
+- career-goal: a polished 2–3 sentence professional summary written in first person ("I am...", "I bring...", "I seek...")
+- experience: bullet-point achievements rewritten from the user's raw descriptions — do not add metrics or accomplishments that were not implied by the input
+- skill: skills grouped into logical categories, based only on what the user listed
+- certificate: only include if the user mentioned certifications; omit the section entirely if none were provided
 
 OUTPUT RULES (CRITICAL):
 - Return ONLY valid JSON matching the exact schema provided. No markdown, no explanation, no extra text.
-- Every string field must be non-empty and polished — no placeholder text.
-- Use strong action verbs: Led, Architected, Delivered, Increased, Reduced, Launched, Optimized, Built.
-- Quantify achievements whenever possible: "Reduced load time by 40%" > "Improved performance".
-- Each experience description must be 2–4 concise bullet points (use "\\n• " as separator).
-- Career summary: 3 tight sentences — who the candidate is, what they bring, their goal.
-- Skills: organize into 2–4 logical groups, not a flat list.
-- ATS-optimize: mirror keywords from the job description when provided.`;
+- Do not fabricate: no fake company names, no invented percentages, no made-up certifications.
+- Use strong action verbs when rewriting experience: Led, Built, Delivered, Improved, Managed, Designed — but only when supported by the user's description.
+- ATS-optimize: mirror keywords from the job description when provided.
+- Career summary: first-person, specific to the role, honest to the background provided.`;
 
 // ─── Dynamic Prompt Builder ───────────────────────────────────────────────────
 function buildPrompt(data: GenerateRequest): string {
@@ -123,64 +123,67 @@ function buildPrompt(data: GenerateRequest): string {
 
   const hasExperience = experiences.some((e) => e.company || e.position);
   const hasJD = jobDescription?.trim().length > 100;
+  const hasSkills = skills?.trim().length > 0;
 
   const toneMap: Record<string, string> = {
-    professional: "formal, achievement-focused, third-person implied tone",
-    creative:
-      "engaging, personality-driven, slightly conversational while remaining professional",
-    concise:
-      "punchy, minimal words, maximum impact — no fluff, every word earns its place",
+    professional: "formal, achievement-focused, confident first-person",
+    creative: "engaging, personality-driven, slightly conversational while remaining professional — still first-person",
+    concise: "punchy, minimal words, maximum impact — no filler, every word earns its place",
   };
 
   const seniorityContext: Record<string, string> = {
-    intern:
-      "student or recent graduate with limited work experience — emphasize projects and eagerness to learn",
-    junior:
-      "early-career professional with 0–2 years — highlight learning speed, technical skills, and early wins",
-    mid: "mid-level professional with 2–5 years — balance technical skills with ownership and impact",
-    senior:
-      "senior individual contributor with 5+ years — focus on leadership, system design, and measurable business impact",
-    lead: "team lead or manager — emphasize team results, mentoring, cross-functional collaboration, and strategic thinking",
+    intern: "student or recent graduate with limited work experience — emphasize academic background, projects, and eagerness to learn",
+    junior: "early-career professional with 0–2 years — highlight learning agility, technical foundation, and early contributions",
+    mid: "mid-level professional with 2–5 years — balance technical skills with ownership and demonstrated impact",
+    senior: "senior individual contributor with 5+ years — focus on technical depth, leadership, and measurable outcomes",
+    lead: "team lead or manager — emphasize team results, mentoring, cross-functional collaboration, and strategic decisions",
   };
 
   const experienceBlock = hasExperience
     ? experiences
-        .filter((e) => e.company || e.position)
-        .map(
-          (e) =>
-            `- Company: ${e.company || "Unknown"}
+      .filter((e) => e.company || e.position)
+      .map(
+        (e) =>
+          `- Company: ${e.company || "Unknown"}
   Position: ${e.position || "Unknown"}
   Duration: ${e.duration || "Unknown"}
-  Raw description: ${e.description || "No description provided"}`
-        )
-        .join("\n\n")
-    : "No work experience provided — generate content appropriate for a fresher/entry-level candidate.";
+  What I did (raw): ${e.description || "No description provided — rewrite only what can be inferred from the position title, do not invent specifics"}`
+      )
+      .join("\n\n")
+    : `No work experience provided. I am a ${seniorityLevel}-level candidate targeting ${targetPosition}. Write a career summary that honestly reflects an entry-level profile. Do not generate fake experience items — omit the experience section or return an empty items array.`;
+
+  const skillBlock = hasSkills
+    ? `My skills (raw input): ${skills}`
+    : `No skills provided — infer only broad, safe categories from the target role and seniority level. Keep it general (e.g. "Communication", "Problem Solving"). Do not list specific tools or technologies I didn't mention.`;
 
   const jdBlock = hasJD
-    ? `IMPORTANT — Job Description to optimize for:
+    ? `Job Description to optimize for (mirror its keywords and requirements):
 <job_description>
 ${jobDescription.slice(0, 3000)}
-</job_description>
-Mirror the keywords, required skills, and terminology from this JD throughout the CV. Ensure the career summary directly addresses what this employer is looking for.`
-    : "No specific job description provided — write for the general market in this field.";
+</job_description>`
+    : "No job description provided — write for the general market in this field.";
 
-  // educationLevel is provided as context only — so the AI can write
-  // a relevant career summary, but must NOT produce an education section.
-  return `Generate content for the following candidate's CV.
+  const personalNote = `Personal info fields: populate ONLY what the user has filled in. Leave all other fields as empty string "".`;
 
-IMPORTANT: Do NOT include an education section in your output. The user manages education data separately. Only generate: career-goal, experience, skill, and certificate sections.
+  return `You are writing MY CV. I am the candidate. Write everything in my voice, as if I am presenting myself.
 
-═══ CANDIDATE PROFILE ═══
+Do NOT invent information. Only use what I have provided below. If something is missing, write honestly around the absence rather than fabricating details.
+
+═══ MY PROFILE ═══
 Target Position: ${targetPosition}
-Industry/Domain: ${industry || "General technology / business"}
-Level: ${seniorityLevel} — ${seniorityContext[seniorityLevel] ?? "experienced professional"}
-Education level (context only, do NOT output): ${educationLevel || "Not specified"}
-Key Skills (raw input): ${skills || "Not specified — infer from experience and role"}
+Industry/Domain: ${industry || "Not specified"}
+Seniority Level: ${seniorityLevel} — ${seniorityContext[seniorityLevel] ?? "experienced professional"}
+Education (context only, do NOT output an education section): ${educationLevel || "Not specified"}
 Writing tone: ${toneMap[tone] ?? "professional"}
-Output language: ${language === "vietnamese" ? "Vietnamese (use formal Vietnamese throughout)" : "English"}
+Output language: ${language === "vietnamese" ? "Vietnamese (use formal Vietnamese throughout, first-person)" : "English (first-person)"}
 
-═══ WORK EXPERIENCE ═══
+${personalNote}
+
+═══ MY WORK EXPERIENCE ═══
 ${experienceBlock}
+
+═══ MY SKILLS ═══
+${skillBlock}
 
 ═══ JOB DESCRIPTION ═══
 ${jdBlock}
@@ -190,7 +193,15 @@ Return a JSON object with EXACTLY this structure:
 
 {
   "personal": {
-    "jobTitle": "${targetPosition}"
+    "fullName": "(user's name if provided, else empty string)",
+    "jobTitle": "${targetPosition}",
+    "dob": "(if provided, else empty string)",
+    "gender": "(if provided, else empty string)",
+    "phone": "(if provided, else empty string)",
+    "email": "(if provided, else empty string)",
+    "website": "(if provided, else empty string)",
+    "address": "(if provided, else empty string)",
+    "avatar": null
   },
   "sections": [
     {
@@ -198,7 +209,7 @@ Return a JSON object with EXACTLY this structure:
       "type": "career-goal",
       "title": "${language === "vietnamese" ? "MỤC TIÊU NGHỀ NGHIỆP" : "CAREER SUMMARY"}",
       "visible": true,
-      "content": "3-sentence professional summary targeting ${targetPosition}"
+      "content": "2–3 sentence first-person summary. Start with who I am, what I bring, and what I am seeking. Be honest to my background — do not overclaim."
     },
     {
       "id": "experience",
@@ -212,7 +223,7 @@ Return a JSON object with EXACTLY this structure:
           "endDate": "Mon YYYY or Present",
           "company": "Company Name",
           "position": "Job Title",
-          "description": "• Achievement 1 with metric\\n• Achievement 2 with metric\\n• Achievement 3"
+          "description": "• Rewrote from my raw description\\n• Only real things I did\\n• No invented metrics"
         }
       ]
     },
@@ -222,8 +233,7 @@ Return a JSON object with EXACTLY this structure:
       "title": "${language === "vietnamese" ? "KỸ NĂNG" : "SKILLS"}",
       "visible": true,
       "items": [
-        { "id": "skill-1", "name": "Category", "description": "Skill 1, Skill 2, Skill 3" },
-        { "id": "skill-2", "name": "Category", "description": "Skill A, Skill B" }
+        { "id": "skill-1", "name": "Category", "description": "Skill 1, Skill 2, Skill 3" }
       ]
     },
     {
@@ -231,19 +241,19 @@ Return a JSON object with EXACTLY this structure:
       "type": "certificate",
       "title": "${language === "vietnamese" ? "CHỨNG CHỈ" : "CERTIFICATIONS"}",
       "visible": true,
-      "items": [
-        { "id": "cert-1", "date": "YYYY", "name": "Certification Name" }
-      ]
+      "items": []
     }
   ]
 }
 
 CRITICAL REQUIREMENTS:
-1. career-goal: compelling, specific to ${targetPosition}${hasJD ? ", directly referencing what the employer in the JD is seeking" : ""}.
-2. experience items: polish raw descriptions into bullet-point achievements with metrics. If no experience given, create realistic placeholder content for a ${seniorityLevel}-level ${targetPosition} — label with "[Sample]" prefix.
-3. skills: 2–4 categories (e.g. "Technical", "Frameworks", "Soft Skills").${hasJD ? " Prioritize skills mentioned in the job description." : ""}
-4. personal block: output ONLY the jobTitle field. No other personal fields.
-5. Do NOT include an education section under any circumstances.
-6. All IDs must be unique strings.
-7. Return ONLY the JSON object. No markdown fence, no explanation.`;
+1. First-person throughout — "I managed", "I built", "I am seeking".
+2. Do NOT fabricate: no invented metrics, no fake certifications, no tools I didn't mention.
+3. Experience: rewrite my raw descriptions into clean bullet points. If a description is empty, write only what the job title implies — keep it vague and honest.
+4. Skills: only list what I provided. Group into 2–4 categories. If nothing provided, use only safe general categories.
+5. Certificate items: leave as empty array [] if I mentioned no certifications. Do not generate fake ones.
+6. personal block: populate every field I provided. Empty string for anything I did not provide.
+7. Do NOT include an education section.
+8. All IDs must be unique strings.
+9. Return ONLY the JSON object. No markdown fence, no explanation.`;
 }

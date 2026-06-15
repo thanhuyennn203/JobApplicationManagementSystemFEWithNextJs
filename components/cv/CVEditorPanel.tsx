@@ -353,7 +353,13 @@ function SkillForm({ item, onChange }: { item: SkillItem; onChange: (u: Partial<
   return (
     <>
       <FormField label="Skill Category" value={item.name} onChange={(v) => onChange({ name: v })} />
-      <FormField label="Details" value={item.description} onChange={(v) => onChange({ description: v })} />
+      <FormField
+        label="Details"
+        value={item.description}
+        onChange={(v) => onChange({ description: v })}
+        textarea
+        rows={4}
+      />
     </>
   );
 }

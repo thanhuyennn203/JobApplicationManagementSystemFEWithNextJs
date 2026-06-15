@@ -3,10 +3,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Sparkles, Upload, RotateCcw, PlusCircle,
-  ChevronLeft, ChevronRight, Check,
+  ChevronLeft, ChevronRight, Check, ArrowLeft, Info
 } from "lucide-react";
 import { CV_TEMPLATES } from "@/types/cv.templates";
 import type { TemplateId } from "@/types/cv.templates";
+import Image from "next/image";
 
 // ─── Start Options ─────────────────────────────────────────────────────────────
 // route: where to go when this option is selected
@@ -73,6 +74,7 @@ export default function CVTemplatePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-8 py-4">
         <h1 className="text-xl font-semibold text-gray-800">Create a professional CV</h1>
@@ -100,9 +102,8 @@ export default function CVTemplatePage() {
                   setSelectedTemplate(t.id as TemplateId);
                 }}
                 title={t.name}
-                className={`w-5 h-5 rounded-full border-2 transition-all ${
-                  i === previewIdx ? "scale-125 border-gray-700" : "border-transparent opacity-70 hover:opacity-100"
-                }`}
+                className={`w-5 h-5 rounded-full border-2 transition-all ${i === previewIdx ? "scale-125 border-gray-700" : "border-transparent opacity-70 hover:opacity-100"
+                  }`}
                 style={{ background: t.colors.accent }}
               />
             ))}
@@ -138,10 +139,20 @@ export default function CVTemplatePage() {
               </button>
 
               {/* A4 ratio preview */}
-              <div className="aspect-[210/297] w-full">
+              {/* <div className="aspect-[210/297] w-full">
                 <MiniA4Preview template={currentTemplate} />
+              </div> */}
+              <div className="aspect-[210/297] w-full">
+                {currentTemplate.previewPdf ? (
+                  <iframe
+                    src={currentTemplate.previewPdf}
+                    className="w-full h-full"
+                    title={currentTemplate.name}
+                  />
+                ) : (
+                  <MiniA4Preview template={currentTemplate} />
+                )}
               </div>
-
               {/* Selected indicator */}
               {selectedTemplate === currentTemplate.id && (
                 <div className="absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center shadow"
@@ -157,11 +168,10 @@ export default function CVTemplatePage() {
                 </span>
                 <button
                   onClick={() => setSelectedTemplate(currentTemplate.id as TemplateId)}
-                  className={`text-xs font-medium px-3 py-1 rounded-full transition-colors ${
-                    selectedTemplate === currentTemplate.id
-                      ? "text-white"
-                      : "text-gray-600 bg-gray-100 hover:bg-gray-200"
-                  }`}
+                  className={`text-xs font-medium px-3 py-1 rounded-full transition-colors ${selectedTemplate === currentTemplate.id
+                    ? "text-white"
+                    : "text-gray-600 bg-gray-100 hover:bg-gray-200"
+                    }`}
                   style={selectedTemplate === currentTemplate.id
                     ? { background: currentTemplate.colors.accent }
                     : {}}
@@ -180,11 +190,10 @@ export default function CVTemplatePage() {
                     setPreviewIdx(i);
                     setSelectedTemplate(t.id as TemplateId);
                   }}
-                  className={`flex-1 border-2 rounded-lg overflow-hidden transition-all ${
-                    selectedTemplate === t.id
-                      ? "border-gray-700 shadow-md"
-                      : "border-transparent opacity-60 hover:opacity-100"
-                  }`}
+                  className={`flex-1 border-2 rounded-lg overflow-hidden transition-all ${selectedTemplate === t.id
+                    ? "border-gray-700 shadow-md"
+                    : "border-transparent opacity-60 hover:opacity-100"
+                    }`}
                 >
                   <ThumbnailPreview template={t} />
                   <div className="py-1 text-center text-xs text-gray-600 bg-white">{t.name}</div>
@@ -204,18 +213,16 @@ export default function CVTemplatePage() {
                 <button
                   key={option.id}
                   onClick={() => setSelectedOption(option.id)}
-                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                    isSelected
-                      ? "border-[#1e5538] bg-green-50"
-                      : "border-gray-200 bg-white hover:border-gray-300"
-                  }`}
+                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${isSelected
+                    ? "border-[#1e5538] bg-green-50"
+                    : "border-gray-200 bg-white hover:border-gray-300"
+                    }`}
                 >
                   <div className="flex items-start gap-3">
                     {/* Radio */}
                     <div
-                      className={`mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                        isSelected ? "border-[#1e5538]" : "border-gray-300"
-                      }`}
+                      className={`mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${isSelected ? "border-[#1e5538]" : "border-gray-300"
+                        }`}
                     >
                       {isSelected && (
                         <div className="w-2 h-2 rounded-full bg-[#1e5538]" />
@@ -229,9 +236,8 @@ export default function CVTemplatePage() {
                           className={isSelected ? "text-[#1e5538]" : "text-gray-400"}
                         />
                         <span
-                          className={`text-sm font-medium ${
-                            isSelected ? "text-[#1e5538]" : "text-gray-700"
-                          }`}
+                          className={`text-sm font-medium ${isSelected ? "text-[#1e5538]" : "text-gray-700"
+                            }`}
                         >
                           {option.title}
                         </span>

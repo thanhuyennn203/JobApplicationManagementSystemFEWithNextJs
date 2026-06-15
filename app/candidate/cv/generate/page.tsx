@@ -145,6 +145,15 @@ export default function CVGeneratePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Left: breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-gray-500 py-5 px-5">
+        <span className="text-gray-400  cursor-pointer" onClick={() => { router.push("/candidate/cv") }}>CV Builder</span>
+        <span className="text-gray-300">/</span>
+        <span className="font-medium text-gray-700 truncate max-w-[200px]">
+          AI Generate
+        </span>
+      </div>
+
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center gap-3">
@@ -155,15 +164,14 @@ export default function CVGeneratePage() {
             <h1 className="text-base font-semibold text-gray-800">Generate CV with AI</h1>
             <p className="text-xs text-gray-500">Powered by Groq · LLaMA 3.3 70B</p>
           </div>
+          <StepIndicator current={step} steps={STEPS} />
+
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 py-8">
-        {/* Step indicator */}
-        <StepIndicator current={step} steps={STEPS} />
-
+      <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-center gap-3">
         {/* Form card */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mt-8 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mt- overflow-hidden">
           {/* Step 1: Target Role */}
           {step === 1 && (
             <StepCard
@@ -218,8 +226,8 @@ export default function CVGeneratePage() {
                         key={lang}
                         onClick={() => updateForm("language", lang)}
                         className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition-all ${form.language === lang
-                            ? "border-[#1e5538] bg-green-50 text-[#1e5538]"
-                            : "border-gray-200 text-gray-500 hover:border-gray-300"
+                          ? "border-[#1e5538] bg-green-50 text-[#1e5538]"
+                          : "border-gray-200 text-gray-500 hover:border-gray-300"
                           }`}
                       >
                         {lang === "english" ? "🇺🇸 English" : "🇻🇳 Tiếng Việt"}
@@ -373,8 +381,8 @@ export default function CVGeneratePage() {
                     onChange={(e) => updateForm("jobDescription", e.target.value)}
                     placeholder="Paste the full job description here...
 
-Example:
-We are looking for a Senior Frontend Developer with 5+ years of experience in React and TypeScript. You will be responsible for building scalable web applications, collaborating with the design team, and mentoring junior developers..."
+                    Example:
+                    We are looking for a Senior Frontend Developer with 5+ years of experience in React and TypeScript. You will be responsible for building scalable web applications, collaborating with the design team, and mentoring junior developers..."
                     rows={10}
                     className={`${inputCls} resize-none`}
                   />
@@ -387,8 +395,8 @@ We are looking for a Senior Frontend Developer with 5+ years of experience in Re
                         key={t.value}
                         onClick={() => updateForm("tone", t.value as any)}
                         className={`p-3 rounded-xl border text-left transition-all ${form.tone === t.value
-                            ? "border-[#1e5538] bg-green-50"
-                            : "border-gray-200 hover:border-gray-300"
+                          ? "border-[#1e5538] bg-green-50"
+                          : "border-gray-200 hover:border-gray-300"
                           }`}
                       >
                         <div className={`text-sm font-medium mb-0.5 ${form.tone === t.value ? "text-[#1e5538]" : "text-gray-700"}`}>
@@ -496,44 +504,58 @@ We are looking for a Senior Frontend Developer with 5+ years of experience in Re
 // ─── Sub-components ───────────────────────────────────────────────────────────
 function StepIndicator({ current, steps }: { current: number; steps: typeof STEPS }) {
   return (
-    <div className="flex items-center gap-0">
-      {steps.map((step, idx) => {
-        const Icon = step.icon;
-        const done = current > step.id;
-        const active = current === step.id;
-        return (
-          <div key={step.id} className="flex items-center">
-            <div className="flex items-center gap-2">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${done
-                    ? "bg-[#1e5538]"
-                    : active
-                      ? "bg-[#1e5538] ring-4 ring-[#1e5538]/20"
-                      : "bg-gray-200"
-                  }`}
-              >
-                {done ? (
-                  <CheckCircle size={16} className="text-white" />
-                ) : (
-                  <Icon size={14} className={active ? "text-white" : "text-gray-400"} />
-                )}
+    <div className="flex-1 flex justify-center">
+      <div className="flex items-center gap-2">
+        {steps.map((step, idx) => {
+          const Icon = step.icon;
+          const done = current > step.id;
+          const active = current === step.id;
+
+          return (
+            <div key={step.id} className="flex items-center">
+              <div className="flex items-center gap-1.5">
+                <div
+                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${done
+                      ? "bg-[#1e5538]"
+                      : active
+                        ? "bg-[#1e5538] ring-4 ring-[#1e5538]/20"
+                        : "bg-gray-200"
+                    }`}
+                >
+                  {done ? (
+                    <CheckCircle size={14} className="text-white" />
+                  ) : (
+                    <Icon
+                      size={13}
+                      className={active ? "text-white" : "text-gray-400"}
+                    />
+                  )}
+                </div>
+
+                <span
+                  className={`text-xs hidden sm:block ${active
+                      ? "font-semibold text-gray-800"
+                      : done
+                        ? "text-[#1e5538]"
+                        : "text-gray-400"
+                    }`}
+                >
+                  {step.label}
+                </span>
               </div>
-              <span
-                className={`text-sm hidden sm:block ${active ? "font-semibold text-gray-800" : done ? "text-[#1e5538]" : "text-gray-400"
-                  }`}
-              >
-                {step.label}
-              </span>
+
+              {idx < steps.length - 1 && (
+                <div
+                  className={`w-8 h-[1px] mx-2 ${current > step.id
+                      ? "bg-[#1e5538]"
+                      : "bg-gray-200"
+                    }`}
+                />
+              )}
             </div>
-            {idx < steps.length - 1 && (
-              <div
-                className={`w-12 sm:w-16 h-0.5 mx-3 transition-all ${current > step.id ? "bg-[#1e5538]" : "bg-gray-200"
-                  }`}
-              />
-            )}
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }

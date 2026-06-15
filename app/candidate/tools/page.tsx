@@ -1,122 +1,92 @@
-import Link from "next/link";
+'use client';
 
-interface Tool {
-  href: string;
-  icon: string;
-  name: string;
+import { useState } from "react";
+import { Coins, ArrowLeftRight, Landmark, ShieldCheck } from "lucide-react";
+import GrossNetCalculator from "./Grossnetcalculator";
+import PITCalculator from "./Pitcalculator";
+import UnemploymentCalculator from "./UnemploymentCalculator ";
+
+type TabId = "gross_net" | "pit" | "bhtn";
+
+interface Tab {
+  id: TabId;
+  label: string;
+  icon: React.ReactNode;
   description: string;
-  badge?: { label: string; color: string };
 }
 
-const TOOL_GROUPS: { label: string; tools: Tool[] }[] = [
+const TABS: Tab[] = [
   {
-    label: "Tests & Interview Prep",
-    tools: [
-      {
-        href: "/candidate/tools/interview-questions",
-        icon: "💬",
-        name: "Interview Questions",
-        description: "Practice with curated questions by role and industry",
-        badge: { label: "New", color: "bg-orange-50 text-orange-600" },
-      },
-      {
-        href: "/candidate/tools/mbti",
-        icon: "🧠",
-        name: "MBTI Personality Test",
-        description: "Discover your personality type and ideal career paths",
-        badge: { label: "Hot", color: "bg-red-50 text-red-500" },
-      },
-    ],
+    id: "gross_net",
+    label: "Gross / Net",
+    icon: <ArrowLeftRight size={15} />,
+    description: "Convert between gross and net salary",
   },
   {
-    label: "Salary & Finance",
-    tools: [
-      {
-        href: "/candidate/tools/salary-calculator",
-        icon: "🧮",
-        name: "Gross / Net Salary",
-        description: "Convert between gross and net salary instantly",
-        badge: { label: "Free", color: "bg-green-50 text-green-600" },
-      },
-      {
-        href: "/candidate/tools/salary-lookup",
-        icon: "📊",
-        name: "Salary Lookup",
-        description: "Benchmark your salary against market rates by role",
-        badge: { label: "New", color: "bg-orange-50 text-orange-600" },
-      },
-      {
-        href: "/candidate/tools/insurance-calculator",
-        icon: "🛡️",
-        name: "Insurance Calculator",
-        description: "Estimate social insurance and unemployment contributions",
-        badge: { label: "Free", color: "bg-green-50 text-green-600" },
-      },
-      {
-        href: "/candidate/tools/savings-planner",
-        icon: "🐷",
-        name: "Savings Planner",
-        description: "Plan your savings goals with compound interest",
-        badge: { label: "Free", color: "bg-green-50 text-green-600" },
-      },
-    ],
+    id: "pit",
+    label: "Income Tax (PIT)",
+    icon: <Landmark size={15} />,
+    description: "Calculate personal income tax by bracket",
+  },
+  {
+    id: "bhtn",
+    label: "Unemployment Ins.",
+    icon: <ShieldCheck size={15} />,
+    description: "Calculate BHTN contributions",
   },
 ];
 
 export default function ToolsPage() {
+  const [activeTab, setActiveTab] = useState<TabId>("gross_net");
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-5xl px-6 py-12">
-        {/* Header */}
-        <div className="mb-10 border-b border-gray-200 pb-8">
-          <h1 className="text-3xl font-semibold text-gray-900">Toolkit</h1>
-          <p className="mt-2 text-base text-gray-500">
-            Free tools to help you prepare, negotiate, and grow your career.
-          </p>
-        </div>
-
-        {/* Groups */}
-        {TOOL_GROUPS.map((group) => (
-          <div key={group.label} className="mb-10">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-gray-400">
-              {group.label}
-            </p>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {group.tools.map((tool) => (
-                <Link
-                  key={tool.href}
-                  href={tool.href}
-                  className="group flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition hover:border-green-200 hover:shadow-md"
-                >
-                  <div className="flex items-start justify-between">
-                    <span className="text-3xl">{tool.icon}</span>
-                    {tool.badge && (
-                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${tool.badge.color}`}>
-                        {tool.badge.label}
-                      </span>
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 group-hover:text-green-600 transition-colors">
-                      {tool.name}
-                    </p>
-                    <p className="mt-1 text-sm leading-relaxed text-gray-500">
-                      {tool.description}
-                    </p>
-                  </div>
-                  <div className="mt-auto flex items-center text-xs font-medium text-green-600 opacity-0 transition group-hover:opacity-100">
-                    Open tool
-                    <svg className="ml-1 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </Link>
-              ))}
+      {/* Page header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-indigo-600 rounded-lg flex items-center justify-center">
+              <Coins size={18} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-semibold text-gray-900">
+                Vietnam Salary Tools
+              </h1>
+              <p className="text-sm text-gray-500">
+                Calculate gross/net salary, personal income tax, and
+                unemployment insurance
+              </p>
             </div>
           </div>
-        ))}
+        </div>
+
+        {/* Tab nav */}
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="flex overflow-x-auto">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-3 text-sm whitespace-nowrap border-b-2 transition ${
+                  activeTab === tab.id
+                    ? "border-indigo-600 text-indigo-600 font-medium"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Tab content */}
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
+        {activeTab === "gross_net" && <GrossNetCalculator />}
+        {activeTab === "pit" && <PITCalculator />}
+        {activeTab === "bhtn" && <UnemploymentCalculator />}
       </div>
     </div>
   );
 }
-

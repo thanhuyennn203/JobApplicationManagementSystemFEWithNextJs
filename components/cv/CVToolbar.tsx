@@ -1,20 +1,30 @@
 "use client";
 import { useState } from "react";
-import { Download, Eye, X, Loader2 } from "lucide-react";
+import { Download, Eye, X, Loader2, AlertTriangle } from "lucide-react";
 import type { CVData } from "@/types/Cv.types";
 import type { TemplateId } from "../../types/cv.templates";
 import CVPreview from "./CVPreview";
 import CVTemplateSwitcher from "./CVTemplateSwitcher";
+import { useRouter } from "next/navigation";
 
 interface CVToolbarProps {
   cv: CVData;
   templateId: TemplateId;
   onTemplateChange: (id: TemplateId) => void;
+  isOverflowing?: boolean;
+  overflowMm?: number;
 }
 
-export default function CVToolbar({ cv, templateId, onTemplateChange }: CVToolbarProps) {
+export default function CVToolbar({
+  cv,
+  templateId,
+  onTemplateChange,
+  isOverflowing = false,
+  overflowMm = 0,
+}: CVToolbarProps) {
   const [previewing, setPreviewing] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const router = useRouter();
 
   const handleExportPDF = async () => {
     setExporting(true);
@@ -31,25 +41,14 @@ export default function CVToolbar({ cv, templateId, onTemplateChange }: CVToolba
         allowTaint: true,
         backgroundColor: "#ffffff",
         logging: false,
+        width: element.offsetWidth,
+        height: element.offsetHeight,
       });
 
       const imgData = canvas.toDataURL("image/jpeg", 0.95);
       const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
-      const pdfWidth = 210;
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      const pageHeight = 297;
-      let heightLeft = pdfHeight;
-      let position = 0;
-      let page = 0;
-
-      while (heightLeft > 0) {
-        if (page > 0) pdf.addPage();
-        pdf.addImage(imgData, "JPEG", 0, position === 0 ? 0 : -position, pdfWidth, pdfHeight);
-        heightLeft -= pageHeight;
-        position += pageHeight;
-        page++;
-      }
+      pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
 
       const fileName = cv.personal.fullName
         ? `CV_${cv.personal.fullName.replace(/\s+/g, "_")}.pdf`
@@ -69,15 +68,25 @@ export default function CVToolbar({ cv, templateId, onTemplateChange }: CVToolba
       <div className="h-12 bg-white border-b border-gray-200 flex items-center justify-between px-4 flex-shrink-0 z-10">
         {/* Left: breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-500">
-          <span className="text-gray-400">CV Builder</span>
+          <span className="text-gray-400 cursor-pointer" onClick={() => { router.push("/candidate/cv") }}>CV Builder</span>
           <span className="text-gray-300">/</span>
-          <span className="font-medium text-gray-700 truncate max-w-[200px]">
-            {cv.personal.fullName || "Untitled CV"}
-          </span>
+          <span className="font-medium text-gray-700 truncate max-w-[200px]">Create</span>
         </div>
 
-        {/* Right: template switcher + actions */}
+        {/* Right: warning + template switcher + actions */}
         <div className="flex items-center gap-2">
+          {/* Overflow warning badge */}
+          {isOverflowing && (
+            <div
+              className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 border border-amber-300 rounded-lg text-xs text-amber-800"
+              title={`Content exceeds 1 A4 page by ~${overflowMm.toFixed(0)}mm. The overflowing part will be cut off when exporting to PDF.`}
+            >
+              <AlertTriangle size={13} className="flex-shrink-0" />
+              <span className="hidden sm:inline">Content exceeds 1 page — it will be cut off</span>
+              <span className="sm:hidden">Overflow</span>
+            </div>
+          )}
+
           {/* Template switcher */}
           <CVTemplateSwitcher current={templateId} onChange={onTemplateChange} />
 
@@ -117,7 +126,6 @@ export default function CVToolbar({ cv, templateId, onTemplateChange }: CVToolba
                 Export PDF
               </button>
 
-              {/* Template switcher inside modal */}
               <CVTemplateSwitcher current={templateId} onChange={onTemplateChange} />
 
               <button
@@ -127,6 +135,18 @@ export default function CVToolbar({ cv, templateId, onTemplateChange }: CVToolba
                 <X size={16} /> Close
               </button>
             </div>
+
+            {/* Overflow warning in modal */}
+            {isOverflowing && (
+              <div className="mb-3 px-4 py-2.5 bg-amber-50 border border-amber-300 rounded-lg text-sm text-amber-800 flex items-center gap-2">
+                <AlertTriangle size={16} className="flex-shrink-0" />
+                <span>
+                  Your content exceeds 1 A4 page by ~{overflowMm.toFixed(0)}mm.
+                  The overflowing part will be <strong>cut off</strong> when exporting to PDF.
+                  Please shorten your content.
+                </span>
+              </div>
+            )}
 
             {/* A4 sheet */}
             <div className="bg-gray-50 shadow-2xl rounded-sm overflow-hidden flex items-center justify-center py-2">

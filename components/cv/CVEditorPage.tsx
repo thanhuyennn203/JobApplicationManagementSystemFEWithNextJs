@@ -3,13 +3,18 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import type { CVData, CVSection, PersonalInfo, SectionType } from "@/types/Cv.types";
 import { DEFAULT_CV, ITEM_TEMPLATES } from "@/types/Cv.types";
 import type { TemplateId } from "../../types/cv.templates";
+import { getTemplate } from "../../types/cv.templates";
 import CVSidebar from "./CVSidebar";
 import CVEditorPanel from "./CVEditorPanel";
 import CVPreview from "./CVPreview";
 import CVToolbar from "./CVToolbar";
+import SingleColumnLayout from "./SingleColumnLayout";
+import TwoColumnLayout from "./TwoColumnLayout";
+import { useOverflowCheck } from "@/hooks/useOverflowCheck";
+import { AlertTriangle } from "lucide-react";
 
 interface CVEditorPageProps {
-  initialMode?: string;   // "ai" | "blank" | "import" | "restore"
+  initialMode?: string;
   initialTemplate?: TemplateId;
 }
 
@@ -25,20 +30,23 @@ export default function CVEditorPage({
   const [loadStatus, setLoadStatus] = useState<"idle" | "loading" | "done">("idle");
   const previewRef = useRef<HTMLDivElement>(null);
 
+  const template = getTemplate(templateId);
+  const { measureRef, isOverflowing, overflowMm } = useOverflowCheck(
+    JSON.stringify(cv) + templateId
+  );
+
   // ── Load generated CV from sessionStorage (AI mode) ───────────────────────
   useEffect(() => {
     if (initialMode !== "ai") return;
 
     setLoadStatus("loading");
 
-    // Load template preference saved from template selector
     const savedTemplate = sessionStorage.getItem("selected-template") as TemplateId | null;
     if (savedTemplate) {
       setTemplateId(savedTemplate);
       sessionStorage.removeItem("selected-template");
     }
 
-    // Load generated CV data
     const stored = sessionStorage.getItem("generated-cv");
     if (stored) {
       try {
@@ -50,7 +58,6 @@ export default function CVEditorPage({
       }
     }
 
-    // Load restored CV (restore mode)
     if (initialMode === "restore") {
       const restored = localStorage.getItem("cv-autosave");
       if (restored) {
@@ -155,7 +162,7 @@ export default function CVEditorPage({
     }));
   }, []);
 
-  // ─── AI Enhance (polish existing CV content) ───────────────────────────────
+  // ─── AI Enhance ─────────────────────────────────────────────────────────────
   const handleGenerateAI = useCallback(async () => {
     setGenerating(true);
     try {
@@ -181,7 +188,6 @@ export default function CVEditorPage({
     }
   }, [cv]);
 
-  // Loading state when coming from AI generate
   if (loadStatus === "loading") {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
@@ -197,8 +203,34 @@ export default function CVEditorPage({
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
+      {/* Hidden measure container - off-screen, unrestricted height, used to detect overflow */}
+      <div
+        ref={measureRef}
+        aria-hidden
+        style={{
+          position: "absolute",
+          left: "-9999px",
+          top: 0,
+          width: "210mm",
+          fontFamily: "Arial, Helvetica, sans-serif",
+          fontSize: "11pt",
+          color: "#333",
+          boxSizing: "border-box",
+        }}
+      >
+        {template.layout === "two-column"
+          ? <TwoColumnLayout cv={cv} template={template} />
+          : <SingleColumnLayout cv={cv} template={template} />}
+      </div>
+
       {/* Top toolbar */}
-      <CVToolbar cv={cv} templateId={templateId} onTemplateChange={setTemplateId} />
+      <CVToolbar
+        cv={cv}
+        templateId={templateId}
+        onTemplateChange={setTemplateId}
+        isOverflowing={isOverflowing}
+        overflowMm={overflowMm}
+      />
 
       {/* Main layout */}
       <div className="flex flex-1 overflow-hidden">
@@ -228,7 +260,6 @@ export default function CVEditorPage({
             onGenerateAI={handleGenerateAI}
           />
 
-          {/* Collapse tab */}
           <button
             onClick={() => setEditorCollapsed((v) => !v)}
             className="absolute -right-3 top-1/2 -translate-y-1/2 z-20 w-6 h-10 bg-white border border-gray-200 rounded-r-lg flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm"
@@ -242,7 +273,19 @@ export default function CVEditorPage({
         </div>
 
         {/* Right: Live A4 preview */}
-        <div className="flex-1 overflow-auto bg-gray-300 flex justify-center py-8 px-4">
+        <div className="flex-1 overflow-auto bg-gray-300 flex flex-col items-center py-8 px-4">
+          {/* Overflow warning banner */}
+          {isOverflowing && (
+            <div className="w-[210mm] mb-3 px-4 py-2.5 bg-amber-50 border border-amber-300 rounded-lg text-sm text-amber-800 flex items-center gap-2 flex-shrink-0">
+              <AlertTriangle size={16} className="flex-shrink-0" />
+              <span>
+                Your content exceeds 1 A4 page by ~{overflowMm.toFixed(0)}mm.
+                The overflowing part will be <strong>cut off</strong> when exporting to PDF.
+                Please shorten your content (fewer bullet points, shorter descriptions, etc.).
+              </span>
+            </div>
+          )}
+
           <div className="shadow-2xl">
             <CVPreview cv={cv} templateId={templateId} ref={previewRef} />
           </div>

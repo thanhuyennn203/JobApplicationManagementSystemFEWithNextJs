@@ -2,6 +2,8 @@ import JobSearch from "@/components/jobs/JobSearch";
 import TopCompanies from "./TopCompany";
 import CenterBanner from "@/components/Banner";
 import FeaturedBoxJobsWithFilters from "./FeaturedBoxJobsWithFilers";
+import TopJobCategories from "./TopCategorySection";
+import SuggestJobs from "./SuggestJobs";
 
 export default async function JobsPage() {
 
@@ -12,6 +14,9 @@ export default async function JobsPage() {
         <FeaturedBoxJobsWithFilters /> 
         <CenterBanner />
         <TopCompanies />
+        <SuggestJobs />
+        <TopJobCategories />
+
        <div>
         <img src="/images/tuvan.png" alt="" />
        </div>

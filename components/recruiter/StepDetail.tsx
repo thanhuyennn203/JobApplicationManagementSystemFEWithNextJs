@@ -8,10 +8,9 @@ import {
 } from "@/services/jobs/jobDetailService";
 import { JobDetail } from "@/types/jobs";
 import { useToast } from "@/components/notification/ToastProvider";
-import { ArrowLeft, ChevronRight, Info } from "lucide-react";
+import { ArrowLeft, ChevronRight, Info,Sparkles } from "lucide-react";
 import { generateJobDetailByAI } from "@/services/jobs/jobDetailService";
 import { getJobById, getGeneralInformationByJobId } from "@/services/jobs/jobs.service"; // adjust to your real function
-import { Sparkles } from "lucide-react";
 
 export default function StepDetail({ jobId, prevStep, onPublished }: any) {
     const router = useRouter();
@@ -299,14 +298,6 @@ export default function StepDetail({ jobId, prevStep, onPublished }: any) {
             <div className="mx-auto max-w-4xl mt-3">
                 {/* HEADER */}
                 <div className="mb-8 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-xl font-bold text-[#1f2937]">
-                            Job Details
-                        </h1>
-                        <p className="mt-2 text-sm text-gray-500">
-                            Complete detailed information to attract better candidates.
-                        </p>
-                    </div>
                     <div className="mb-8 flex items-center justify-between">
                         <div>
                             <h1 className="text-xl font-bold text-[#1f2937]">

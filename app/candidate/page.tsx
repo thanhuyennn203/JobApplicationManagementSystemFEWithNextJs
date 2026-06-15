@@ -7,7 +7,7 @@ export default async function CandidatePage() {
 
   return (
     // <RoleGuard allow={["CANDIDATE"]}>
-      <div>
+      <div className="bg-gray-50">
         <JobsPage />
       </div>
     // </RoleGuard>

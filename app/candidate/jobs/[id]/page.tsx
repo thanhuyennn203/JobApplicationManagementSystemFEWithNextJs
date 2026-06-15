@@ -5,7 +5,7 @@ import JobDetailHeaderClient from "@/components/jobs/JobDetailHeaderClient";
 import "@/styles/candidate/JobDetail.css";
 import JobCompanyCard from "@/components/jobs/JobCompanyCard";
 import { getCompanyById } from "@/services/companies/company.service";
-import { getGeneralInformationByJobId } from "@/services/jobs/jobGeneralInfor.service";
+import { getGeneralInformationByJobId } from "@/services/jobs/jobs.service";
 import JobGeneralInformation from "@/components/jobs/JobGeneralInformation";
 import { useEffect, useState } from "react";
 import { Company } from "@/types/company";

@@ -12,12 +12,13 @@ import {
   ChevronDown,
   Briefcase,
 } from "lucide-react";
+import { useToast } from "../notification/ToastProvider";
 
 const STATUS_CONFIG: Record<string, { label: string; dot: string; text: string; bg: string; border: string }> = {
-  APPLIED:  { label: "Applied",  dot: "bg-blue-400",   text: "text-blue-600",  bg: "bg-blue-50",   border: "border-blue-200" },
+  APPLIED: { label: "Applied", dot: "bg-blue-400", text: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200" },
   ACCEPTED: { label: "Accepted", dot: "bg-emerald-400", text: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200" },
-  REJECTED: { label: "Rejected", dot: "bg-red-400",    text: "text-red-600",   bg: "bg-red-50",    border: "border-red-200" },
-  PENDING:  { label: "Pending",  dot: "bg-amber-400",  text: "text-amber-600", bg: "bg-amber-50",  border: "border-amber-200" },
+  REJECTED: { label: "Rejected", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50", border: "border-red-200" },
+  PENDING: { label: "Pending", dot: "bg-amber-400", text: "text-amber-600", bg: "bg-amber-50", border: "border-amber-200" },
 };
 
 export default function ApplicationCard({
@@ -32,9 +33,10 @@ export default function ApplicationCard({
   const [status, setStatus] = useState(application.status);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const toast = useToast();
 
   const percent = application.matchPercent ?? Math.floor(Math.random() * 30 + 65);
-  
+
   const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG["APPLIED"];
 
   // SVG ring params
@@ -48,6 +50,12 @@ export default function ApplicationCard({
       const updated = await updateApplicationStatus(application.id!, status);
       setEditing(false);
       onUpdate?.(updated);
+    } catch (error: any) {
+      const message =
+        error.message
+        || "Something went wrong";
+
+      toast.error(message);
     } finally {
       setSaving(false);
     }

@@ -145,6 +145,7 @@ export default function FeaturedBoxJobsWithFilters() {
     loadFakeJobs();
 
   }, [filters, page]);
+  console.log(jobs);
 
   const getSalaryRange = (code: string) => {
     switch (code) {

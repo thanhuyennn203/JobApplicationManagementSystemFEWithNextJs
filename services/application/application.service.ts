@@ -77,12 +77,11 @@ export const updateApplicationStatus = async (applicationId: number, status: str
     }
   );
 
+   const data = await res.json();
   if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(errorText || "Failed to update application status");
+    throw new Error(data.message || "Something went wrong");
   }
 
-  const data: Application = await res.json();
   return data;
 };
 

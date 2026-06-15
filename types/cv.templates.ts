@@ -16,6 +16,7 @@ export interface CVTemplate {
     headerBg: string;
   };
   layout: "single" | "two-column"; // single = full width, two-column = sidebar left
+  previewPdf?: string,
 }
 
 export const CV_TEMPLATES: CVTemplate[] = [
@@ -33,6 +34,7 @@ export const CV_TEMPLATES: CVTemplate[] = [
       headerBg: "#ffffff",
     },
     layout: "single",
+    previewPdf: "/cv-builder/classic.pdf",
   },
   {
     id: "modern",
@@ -47,7 +49,9 @@ export const CV_TEMPLATES: CVTemplate[] = [
       border: "#e0e0e0",
       headerBg: "#1e5538",
     },
-    layout: "two-column",
+    layout: "two-column",   
+     previewPdf: "/cv-builder/modern.pdf",
+
   },
   {
     id: "minimal",
@@ -63,6 +67,7 @@ export const CV_TEMPLATES: CVTemplate[] = [
       headerBg: "#ffffff",
     },
     layout: "single",
+        previewPdf: "/cv-builder/minimal.pdf",
   },
 ];
 
