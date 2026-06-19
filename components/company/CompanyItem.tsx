@@ -7,8 +7,7 @@ import { useFollowCompany } from "@/hooks/useFollowCompany";
 
 export default function CompanyItem({ company }: { company: Company }) {
     const router = useRouter();
-    const { isFollowing, loading, toggleFollow } = useFollowCompany(company?.id);
-
+    const { isFollowing, loading, toggleFollow } = useFollowCompany(company?.companyId);
 
     return (
         <div className="list-company__item" >
@@ -18,8 +17,8 @@ export default function CompanyItem({ company }: { company: Company }) {
                     {/* Logo */}
                     <div className="company-header__image">
                         <img
-                            src={company.logo_url || "/images/company-logo-default.jpg"}
-                            alt={company?.name}
+                            src={company.logoUrl || "/images/company-logo-default.jpg"}
+                            alt={company?.companyName}
                         />
                     </div>
 
@@ -27,16 +26,17 @@ export default function CompanyItem({ company }: { company: Company }) {
                     <div className="company-header__desc">
                         <h3
                             className="company-header__desc--name"
-                            title={company?.name}
+                            title={company?.companyName}
                         >
-                            {/* <a href={`/candidate/company/${company?.id}`} target="_blank"> */}
-                            {company?.name}
-                            {/* </a> */}
+                            <a href={`/candidate/company/${company?.companyId}`} target="_blank">
+                                {company?.companyName}
+                            </a>
                         </h3>
 
                         <div className="company-header__desc--field">
                             {company?.industry || "Unknown"}
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -47,9 +47,13 @@ export default function CompanyItem({ company }: { company: Company }) {
                 <div className="number-job">
                     <i className="fa-solid fa-briefcase"></i>
 
-                    <span>{company.size} jobs</span>
+                    <span className="followers">{company.size} 0 jobs</span>
                 </div>
+                <div className="number-job">
+                    <i className="fa-solid fa-briefcase"></i>
 
+                    <span className="followers">{company.followers} followers</span>
+                </div>
                 <button
                     className={`btn btn-follow ${isFollowing ? "following" : ""}`}
                     onClick={toggleFollow}

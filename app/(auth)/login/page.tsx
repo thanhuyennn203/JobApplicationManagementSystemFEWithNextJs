@@ -54,6 +54,8 @@ export default function LoginForm() {
         router.push("/recruiter");
       } else if (roles.includes("ADMIN")) {
         router.push("/admin");
+      } else if (roles.includes("CANDIDATE")) {
+        router.push("/candidate")
       }
     } catch (err: any) {
       setError(err?.response?.data?.message || "Login failed");
@@ -131,9 +133,8 @@ export default function LoginForm() {
                 />
 
                 <i
-                  className={`fa-solid ${
-                    showPassword ? "fa-eye-slash" : "fa-eye"
-                  } absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500`}
+                  className={`fa-solid ${showPassword ? "fa-eye-slash" : "fa-eye"
+                    } absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500`}
                   onClick={() => setShowPassword(!showPassword)}
                 />
               </div>

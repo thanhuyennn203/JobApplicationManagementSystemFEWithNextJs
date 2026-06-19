@@ -138,8 +138,8 @@ function ConfirmDialog({
                 </h3>
                 <p className="text-sm text-gray-500 mb-5">
                     {isActivate
-                        ? "Hành động này sẽ kích hoạt gói dịch vụ cho khách hàng. Bạn có chắc chắn không?"
-                        : "Đơn hàng sẽ bị từ chối và không thể hoàn tác. Bạn có chắc chắn không?"}
+                        ? "This action will activate the service package for the customer. Are you sure?"
+                        : "The order will be rejected and cannot be undone. Are you sure?"}
                 </p>
                 <div className="flex gap-2">
                     <button
@@ -192,10 +192,10 @@ export default function OrderDetailPage() {
             // Hiện tại fallback: lấy tất cả rồi tìm theo id.
             const data = await adminOrderService.getAllOrders(0, 100);
             const found = data.content.find((o) => String(o.id) === String(orderId));
-            if (!found) throw new Error("Không tìm thấy đơn hàng");
+            if (!found) throw new Error("Order not found");
             setOrder(found);
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : "Không thể tải đơn hàng");
+            setError(err instanceof Error ? err.message : "Failed to load order");
         } finally {
             setLoading(false);
         }
@@ -217,8 +217,8 @@ export default function OrderDetailPage() {
             showToast(
                 "success",
                 confirmAction === "activate"
-                    ? "Đơn hàng đã được kích hoạt thành công"
-                    : "Đã từ chối đơn hàng"
+                    ? "Order has been activated successfully"
+                    : "Order has been rejected"
             );
         } catch (err: unknown) {
             showToast("error", err instanceof Error ? err.message : "Có lỗi xảy ra");
@@ -241,7 +241,7 @@ export default function OrderDetailPage() {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 gap-3">
                 <AlertCircle size={36} className="text-red-400" />
-                <p className="text-sm text-gray-500">{error || "Không tìm thấy đơn hàng"}</p>
+                <p className="text-sm text-gray-500">{error || "Order not found."}</p>
                 <button
                     onClick={() => router.back()}
                     className="text-sm text-[#0b77da] hover:underline flex items-center gap-1"
@@ -640,7 +640,7 @@ function TimelineStep({
                     {label}
                 </p>
                 {date && <p className="text-xs text-gray-400 mt-0.5">{date}</p>}
-                {!done && !date && <p className="text-xs text-gray-300 mt-0.5">Chưa thực hiện</p>}
+                {!done && !date && <p className="text-xs text-gray-300 mt-0.5">Not yet completed</p>}
             </div>
         </div>
     );

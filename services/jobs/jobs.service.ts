@@ -60,7 +60,7 @@ export const getFeaturedBoxJobsWithFilters = async (
       headers: getAuthHeader(),
     }
   );
- console.log("GET", queryParams.toString());
+  console.log("GET", queryParams.toString());
   if (!response.ok) {
     throw new Error("Failed to fetch featured box jobs");
   }
@@ -223,7 +223,7 @@ export const createJob = async (payload: any) => {
 
 export const updateJob = async (id: number, payload: any) => {
 
-  console.log("data sent: ",payload);
+  console.log("data sent: ", payload);
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: getAuthHeader(),
@@ -245,8 +245,8 @@ export async function getGeneralInformationByJobId(
   try {
     const res = await fetch(
       `${API_URL}/${jobId}/general-information`, {
-    headers: getAuthHeader(),
-  }
+      headers: getAuthHeader(),
+    }
     );
 
     if (!res.ok) return null;
@@ -357,19 +357,62 @@ import { TotalMonthlyAnalytics } from "@/types/analytic";
 
 export async function getTotalMonthlyAnalytics(): Promise<TotalMonthlyAnalytics> {
 
-    const res = await fetch(
-        `${API_URL}/admin/analytic`,
-        {
-            method: "GET",
-            headers: getAuthHeader(),
-            cache: "no-store",
-        }
-    );
-    if(!res.ok){
-        throw new Error(
-            "Failed to fetch dashboard analytics"
-        );
+  const res = await fetch(
+    `${API_URL}/admin/analytic`,
+    {
+      method: "GET",
+      headers: getAuthHeader(),
+      cache: "no-store",
     }
-    return await res.json();
+  );
+  if (!res.ok) {
+    throw new Error(
+      "Failed to fetch dashboard analytics"
+    );
+  }
+  return await res.json();
 
+}
+export const deleteJob = async (
+  companyId: number,
+  jobId: number
+): Promise<void> => {
+  const response = await fetch(
+    `${API_URL}/${jobId}`,
+    {
+      method: "DELETE",
+      headers: getAuthHeader(),
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to delete job");
+};
+
+/**
+ * Promote a job using a company's package.
+ *
+ * Maps to:
+ * POST /promote/{jobId}?companyId={companyId}&companyPackageId={companyPackageId}
+ */
+export async function promoteJob(
+  companyId: number,
+  jobId: number,
+  companyPackageId: number
+): Promise<void> {
+  const params = new URLSearchParams({
+    companyId: String(companyId),
+    companyPackageId: String(companyPackageId),
+  });
+
+  const res = await fetch(
+    `${API_URL}/top-jobs/promote/${jobId}?${params.toString()}`,
+    {
+      method: "POST",
+      headers: getAuthHeader(),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error(`Failed to promote job: ${res.status} ${res.statusText}`);
+  }
 }

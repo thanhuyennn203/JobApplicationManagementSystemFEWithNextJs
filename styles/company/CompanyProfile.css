@@ -5,6 +5,12 @@
     width: 100%;
 }
 
+.job-list{
+    max-height: 600px;
+    overflow-y: scroll;
+    
+}
+
 /* COVER */
 .company-cover {
     position: relative;

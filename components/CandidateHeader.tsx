@@ -10,7 +10,6 @@ const navLinks = [
   { href: "/candidate/jobs", label: "Jobs" },
   { href: "/candidate/cv", label: "Create CV" },
   { href: "/candidate/tools", label: "Tools" },
-  { href: "/candidate/career-guide", label: "Career Resources" },
 ];
 
 export default function CandidateHeader() {
@@ -69,12 +68,6 @@ export default function CandidateHeader() {
               }`}
           >
             TopCV
-            <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-500">
-              Pro
-            </span>
-            {isActive("/pro") && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600 rounded-t-full" />
-            )}
           </Link>
         </nav>
 

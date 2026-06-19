@@ -21,16 +21,13 @@ export default function JobCard({ job }: Props) {
   const router = useRouter();
   const toast = useToast();
   const locations = job.locations ?? [];
-  const firstLocation = locations[0];
-  const remainingCount = locations.length - 1;
 
   const auth = useAuth();
   const candidateId = auth?.user?.candidateId;
 
   const [saved, setSaved] = useState(false);
 
-  const { provinces, getProvinceName } = useLocation();
-  // console.log("locations: ", candidateId);
+  const { getProvinceName } = useLocation();
 
   useEffect(() => {
     const detectSaved = async () => {
@@ -71,45 +68,56 @@ export default function JobCard({ job }: Props) {
     }
   };
   // console.log(job);
+  const provinces = locations.map(
+    (loc) => getProvinceName(loc.province)
+  );
+
+  const visibleProvinces = provinces.slice(0, 3);
+  const remainingCount = provinces.length - visibleProvinces.length;
 
   return (
-    // <Link href={`/candidate/jobs/${job.id}`} className="job-card-link">
     <div className="job-card" onClick={() => router.push(`/candidate/jobs/${job.id}`)}>
       <div className="job-card__header">
-        <div className="box-comapny-logo">
-          <div className="avatar">
-            <img
-              src={job.logo_url || "/images/company-logo-default.jpg"}
-              className="job-card__logo"
-              alt={job.company_name}
-            />
-          </div>
+        <div className="job-card__logo-box">
+          <img
+            src={job.logo_url || "/images/company-logo-default.jpg"}
+            className="job-card__logo"
+            alt={job.company_name}
+          />
         </div>
 
         <div className="job-card__info">
-          <h3 className="job-card__title">{job.title}</h3>
+          <h3 className="job-card__title">
+            {job.title}
+            {job.tags?.includes("Pro") && (
+              <span className="job-card__tag">Pro</span>
+            )}
+          </h3>
 
-          <div className="company_name">
-            <p className="job-card__company">{job.company_name}</p>
-          </div>
+          <p className="job-card__company">{job?.company_name}</p>
+          {visibleProvinces.length > 0 && (
+            <span className="text-xs text-gray-500">
+              {locations.map((loc, index) => (
+                <span key={loc.id}>
+                  {getProvinceName(loc.province)}
+                  {index < visibleProvinces.length - 1 && ", "}
+                </span>
+              ))}
 
-          {job.tags?.includes("Pro") && (
-            <span className="job-card__tag">Pro</span>
+              {remainingCount > 0 && ` & +${remainingCount}`}
+            </span>
           )}
         </div>
       </div>
 
       <div className="job-card__footer">
         <span className="job-card__badge">
-          {job.salary_min} - {job.salary_max} dollar
+          $ {job.salary_min} - {job.salary_max}
         </span>
 
-        {firstLocation && (
-          <span className="job-card__badge">
-            {getProvinceName(firstLocation.province)}
-            {remainingCount > 0 && ` +${remainingCount}`}
-          </span>
-        )}
+        <span className="job-card__badge">
+          {job.experienceRequired}
+        </span>
 
         <div
           className="job-card__heart"
@@ -125,6 +133,5 @@ export default function JobCard({ job }: Props) {
         </div>
       </div>
     </div>
-    // </Link>
   );
 }

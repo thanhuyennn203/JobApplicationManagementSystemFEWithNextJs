@@ -3,22 +3,41 @@
 import { useState } from "react";
 import { Application } from "@/types/application";
 import { updateApplicationStatus } from "@/services/application/application.service";
-import {
-  Phone,
-  Mail,
-  CalendarDays,
-  FileText,
-  Check,
-  ChevronDown,
-  Briefcase,
-} from "lucide-react";
+import { Mail, Phone, MoreVertical } from "lucide-react";
 import { useToast } from "../notification/ToastProvider";
 
-const STATUS_CONFIG: Record<string, { label: string; dot: string; text: string; bg: string; border: string }> = {
-  APPLIED: { label: "Applied", dot: "bg-blue-400", text: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200" },
-  ACCEPTED: { label: "Accepted", dot: "bg-emerald-400", text: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200" },
-  REJECTED: { label: "Rejected", dot: "bg-red-400", text: "text-red-600", bg: "bg-red-50", border: "border-red-200" },
-  PENDING: { label: "Pending", dot: "bg-amber-400", text: "text-amber-600", bg: "bg-amber-50", border: "border-amber-200" },
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; text: string; bg: string; glow: string; ring: string }
+> = {
+  APPLIED: {
+    label: "Applied",
+    text: "text-blue-600",
+    bg: "bg-blue-50",
+    glow: "from-blue-100/80 via-blue-50/40",
+    ring: "ring-blue-100",
+  },
+  ACCEPTED: {
+    label: "Active",
+    text: "text-emerald-600",
+    bg: "bg-emerald-50",
+    glow: "from-emerald-100/80 via-emerald-50/40",
+    ring: "ring-emerald-100",
+  },
+  REJECTED: {
+    label: "Rejected",
+    text: "text-red-600",
+    bg: "bg-red-50",
+    glow: "from-red-100/80 via-red-50/40",
+    ring: "ring-red-100",
+  },
+  PENDING: {
+    label: "Pending",
+    text: "text-amber-600",
+    bg: "bg-amber-50",
+    glow: "from-amber-100/80 via-amber-50/40",
+    ring: "ring-amber-100",
+  },
 };
 
 export default function ApplicationCard({
@@ -31,168 +50,151 @@ export default function ApplicationCard({
   onJobClick?: () => void;
 }) {
   const [status, setStatus] = useState(application.status);
-  const [editing, setEditing] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const toast = useToast();
 
-  const percent = application.matchPercent ?? Math.floor(Math.random() * 30 + 65);
-
   const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG["APPLIED"];
 
-  // SVG ring params
-  const R = 30;
-  const C = 2 * Math.PI * R; // ~188.5
-  const offset = C - (C * percent) / 100;
-
-  const handleSave = async () => {
+  const handleStatusChange = async (next: string) => {
+    setMenuOpen(false);
+    if (next === status) return;
     setSaving(true);
     try {
-      const updated = await updateApplicationStatus(application.id!, status);
-      setEditing(false);
+      const updated = await updateApplicationStatus(application.id!, next);
+      setStatus(next as any);
       onUpdate?.(updated);
     } catch (error: any) {
-      const message =
-        error.message
-        || "Something went wrong";
-
-      toast.error(message);
+      toast.error(error.message || "Something went wrong");
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <div className="group bg-[#f6f7fb] rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col">
+    <div
+      className={`relative w-full max-w-[280px] bg-white rounded-2xl border border-gray-100 shadow-sm ring-1 ${cfg.ring} hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 p-4 overflow-hidden`}
+    >
+      {/* ── Soft gradient glow accent (top-right corner) ── */}
+      <div
+        className={`pointer-events-none absolute -top-10 -right-10 w-36 h-36 rounded-full bg-gradient-to-br ${cfg.glow} to-transparent blur-2xl`}
+      />
+      <div className="relative">
 
-      {/* ── Colored top accent based on status ── */}
-      <div className={`h-1 w-full ${cfg.dot}`} />
+      {/* ── Top row: checkbox / status badge / menu ── */}
+      <div className="flex items-center justify-between mb-3">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => setChecked(e.target.checked)}
+          className="w-4 h-4 rounded border-gray-300 text-[#00b14f] focus:ring-[#00b14f]/30 cursor-pointer"
+        />
 
-      {/* ── Status badge row ── */}
-      <div className="flex items-center justify-between px-4 pt-3 pb-0">
-        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${cfg.text} ${cfg.bg} ${cfg.border}`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
-          {cfg.label}
-        </span>
-        <span className="text-xs text-gray-400 font-mono">#{application.id}</span>
-      </div>
-
-      {/* ── Avatar + match ring ── */}
-      <div className="flex flex-col items-center px-4 pt-4 pb-3">
-        <div className="relative w-[72px] h-[72px]">
-          {/* Ring SVG */}
-          <svg width="72" height="72" className="absolute inset-0 -rotate-90">
-            <circle cx="36" cy="36" r={R} stroke="#e5e7eb" strokeWidth="5" fill="none" />
-            <circle
-              cx="36"
-              cy="36"
-              r={R}
-              stroke="#00b14f"
-              strokeWidth="5"
-              fill="none"
-              strokeDasharray={C}
-              strokeDashoffset={offset}
-              strokeLinecap="round"
-            />
-          </svg>
-          {/* Avatar */}
-          <img
-            src={application.candidate?.avatar || "/images/default-avatar.jpg"}
-            alt={application.fullName}
-            className="w-[56px] h-[56px] rounded-full absolute top-[8px] left-[8px] object-cover"
-          />
-          {/* Match % label */}
-          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-[#00b14f] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full whitespace-nowrap shadow">
-            {percent}%
+        <div className="flex items-center gap-1">
+          <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${cfg.text} ${cfg.bg}`}>
+            {cfg.label}
           </span>
-        </div>
 
-        <h3 className="mt-4 text-sm font-semibold text-gray-900 text-center leading-tight">
-          {application.fullName}
-        </h3>
-        <p className="text-xs text-gray-400 mt-0.5 text-center truncate w-full">
-          {application.email}
-        </p>
+          <div className="relative">
+            <button
+              onClick={() => setMenuOpen((v) => !v)}
+              className="p-1 rounded-full hover:bg-gray-100 text-gray-400"
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+
+            {menuOpen && (
+              <div className="absolute right-0 top-7 z-10 bg-white border border-gray-100 rounded-xl shadow-lg py-1 w-32">
+                {Object.entries(STATUS_CONFIG).map(([key, val]) => (
+                  <button
+                    key={key}
+                    onClick={() => handleStatusChange(key)}
+                    disabled={saving}
+                    className={`w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 ${val.text}`}
+                  >
+                    {val.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* ── Divider ── */}
-      <div className="mx-4 border-t border-gray-100" />
+      {/* ── Avatar + name + role ── */}
+      <div className="flex items-center gap-3 mb-4">
+        <img
+          src={application.candidate?.avatar || "/images/default-avatar.jpg"}
+          alt={application.fullName}
+          className="w-11 h-11 rounded-full object-cover shrink-0"
+        />
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold text-gray-900 truncate">
+            {application.fullName}
+          </h3>
+          <p className="text-xs text-gray-400 truncate">
+            {application.jobTitle || `Job #${application.jobId}`}
+          </p>
+        </div>
+      </div>
 
-      {/* ── Info rows ── */}
-      <div className="px-4 py-3 space-y-2 flex-1">
-        <InfoRow icon={<Phone className="w-3.5 h-3.5" />} value={application.phone || "—"} />
-        <InfoRow
-          icon={<Briefcase className="w-3.5 h-3.5" />}
-          value={
-            <button onClick={onJobClick} className="text-[#00b14f] hover:underline font-medium truncate max-w-[130px]">
-              Job #{application.jobId}
-            </button>
-          }
-        />
-        <InfoRow
-          icon={<CalendarDays className="w-3.5 h-3.5" />}
-          value={
-            application.appliedDate
-              ? new Date(application.appliedDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
-              : "—"
-          }
-        />
+      {/* ── Department / Date of joining ── */}
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        <div>
+          <p className="text-[10px] uppercase tracking-wide text-gray-400 mb-0.5">
+            Department
+          </p>
+          <p className="text-xs font-medium text-gray-700 truncate">
+            {application.department || "—"}
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-wide text-gray-400 mb-0.5">
+            Date of Joining
+          </p>
+          <p className="text-xs font-medium text-gray-700 truncate">
+            {application.appliedDate
+              ? new Date(application.appliedDate).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "2-digit",
+                  year: "numeric",
+                })
+              : "—"}
+          </p>
+        </div>
+      </div>
+
+      {/* ── Contact box ── */}
+      <div className="bg-gray-50 rounded-xl px-3 py-2.5 space-y-2 mb-4">
+        <div className="flex items-center gap-2 text-xs text-gray-600">
+          <Mail className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+          <span className="truncate">{application.email}</span>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-gray-600">
+          <Phone className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+          <span className="truncate">{application.phone || "—"}</span>
+        </div>
       </div>
 
       {/* ── Actions ── */}
-      <div className="px-4 pb-4 space-y-2 mt-1">
-        {/* View CV */}
+      <div className="flex gap-2">
+        <button
+          onClick={onJobClick}
+          className="flex-1 text-xs font-medium border border-gray-200 text-gray-600 py-2 rounded-xl hover:bg-gray-50 transition"
+        >
+          Edit
+        </button>
         <button
           onClick={() =>
             window.open(`http://localhost:9191/uploads/${application.cvFileUrl}`, "_blank")
           }
-          className="w-full flex items-center justify-center gap-2 text-xs font-medium border border-gray-200 py-2 rounded-xl hover:bg-gray-50 transition text-gray-600"
+          className="flex-1 text-xs font-medium border border-[#00b14f] hover:bg-[#009944] hover:text-white py-2 rounded-xl transition"
         >
-          <FileText className="w-3.5 h-3.5" />
-          View CV
+          View
         </button>
-
-        {/* Status selector + save */}
-        <div className="flex gap-2 items-center">
-          <div className="relative flex-1">
-            <select
-              value={status}
-              onChange={(e) => { setStatus(e.target.value); setEditing(true); }}
-              className="w-full appearance-none text-xs border border-gray-200 rounded-xl pl-3 pr-7 py-2 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#00b14f]/30 focus:border-[#00b14f] cursor-pointer"
-            >
-              <option value="APPLIED">Applied</option>
-              <option value="ACCEPTED">Accepted</option>
-              <option value="REJECTED">Rejected</option>
-              <option value="PENDING">Pending</option>
-            </select>
-            <ChevronDown className="w-3 h-3 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          </div>
-
-          {editing && (
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="flex items-center justify-center gap-1 text-xs bg-[#00b14f] hover:bg-[#009944] text-white px-3 py-2 rounded-xl transition disabled:opacity-60 whitespace-nowrap"
-            >
-              {saving ? (
-                <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <Check className="w-3.5 h-3.5" />
-              )}
-              Save
-            </button>
-          )}
-        </div>
       </div>
-    </div>
-  );
-}
-
-/* ── Helper ── */
-function InfoRow({ icon, value }: { icon: React.ReactNode; value: React.ReactNode }) {
-  return (
-    <div className="flex items-center gap-2 text-xs text-gray-500">
-      <span className="text-gray-400 shrink-0">{icon}</span>
-      <span className="truncate">{value}</span>
+      </div>
     </div>
   );
 }

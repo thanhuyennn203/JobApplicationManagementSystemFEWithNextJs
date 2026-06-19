@@ -1,13 +1,13 @@
 export interface Company {
-  id?: number;
-  name?: string;
+  companyId?: number;
+  companyName?: string;
   industry?: string;
   size?: number;
   province?: string;
   ward?: string;
   description?: string;
-  logo_url?: string;
-  followerNumber?: number;
+  logoUrl?: string;
+  followers?: number;
   backgroundUrl?: string;
   website?: string;
   certificateUrl?: string;

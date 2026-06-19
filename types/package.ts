@@ -18,3 +18,15 @@ export interface PackageData {
     descriptions: string;
     benefits: PackageBenefit[];
 }
+
+export interface CompanyPackageData {
+    companyId: number;
+    packageId: number;
+    packageCode: string;
+    packageName: string;
+    categoryCode: string;
+    startDate: string;
+    endDate: string;
+    status: "ACTIVE" | "PENDING" | "EXPIRED";
+    id: number;
+}

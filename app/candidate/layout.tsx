@@ -11,7 +11,7 @@ export default function CandidateLayout({
       {/* <Header /> */}
       <CandidateHeader />
       {children}
-      {/* <Footer /> */}
+      <Footer />
     </div>
   );
 }

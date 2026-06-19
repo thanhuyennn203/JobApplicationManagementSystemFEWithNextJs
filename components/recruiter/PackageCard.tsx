@@ -12,12 +12,6 @@ interface Props {
 export default function PackageCard({
     packageData,
 }: Props) {
-    // const {
-    //     name,
-    //     price,
-    //     descriptions,
-    //     badge,
-    // } = packageData;
     const router = useRouter();
         const { addItem } = useCart();
 
@@ -49,7 +43,7 @@ export default function PackageCard({
 
                 </div>
 
-                <p className="text-gray-600 text-sm leading-8 min-h-[150px]">
+                <p className="text-gray-600 text-sm leading-8 min-h-[150px]"  onClick={() => router.push(`/recruiter/packages/${packageData.id}`)}>
                     {packageData.descriptions}
                 </p>
 

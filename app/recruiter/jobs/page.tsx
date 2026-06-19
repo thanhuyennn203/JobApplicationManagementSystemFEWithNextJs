@@ -8,24 +8,20 @@ import "react-calendar/dist/Calendar.css";
 import { useAuth } from "@/context/AuthContext";
 import {
   getJobByCompanyId,
-  updateJobStatus,
+  updateJobStatus
 } from "@/services/jobs/jobs.service";
 
 import {
   Briefcase,
-  CalendarDays,
-  CircleDollarSign,
-  Eye,
+  Edit,
   FileText,
-  MapPin,
-  Pencil,
   PlayCircle,
   ShieldAlert,
   StopCircle,
-  Users,
 } from "lucide-react";
-import { useLocation } from "@/context/LocationContext";
 import { useToast } from "@/components/notification/ToastProvider";
+import JobCard from "@/components/jobs/JobCardRecruiter";
+import { Job } from "@/types/jobs";
 
 export default function DashboardPage() {
   const auth = useAuth();
@@ -34,7 +30,7 @@ export default function DashboardPage() {
 
   const companyId = auth?.user?.companyId;
 
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [changingStatusId, setChangingStatusId] = useState<number | null>(null);
 
@@ -109,7 +105,7 @@ export default function DashboardPage() {
     });
   }, [jobs, search, statusFilter, appliedRange]);
 
-  console.log("jobs", jobs);
+  // console.log("jobs", jobs);
   const totalPages = Math.max(
     1,
     Math.ceil(filteredJobs.length / jobsPerPage)
@@ -124,6 +120,7 @@ export default function DashboardPage() {
   const openJobs = jobs.filter((j) => j.status === "OPEN").length;
   const closedJobs = jobs.filter((j) => j.status === "CLOSED").length;
   const expiredJobs = jobs.filter((j) => j.status === "EXPIRED").length;
+  const draftJobs = jobs.filter((j) => j.status === "DRAFT").length;
 
   const handleChangeStatus = async (
     jobId: number,
@@ -164,8 +161,10 @@ export default function DashboardPage() {
     }
   };
 
+
+
   return (
-    <div className="min-h-screen bg-[#f4f7fb] p-6">
+    <div className="min-h-screen bg-[#f4f7fb] px-12 py-6">
       <div className="max-w-7xl mx-auto space-y-6">
 
         {/* HEADER */}
@@ -192,13 +191,21 @@ export default function DashboardPage() {
         </div>
 
         {/* STATS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-5">
           <StatsCard
             title="Total Jobs"
             value={totalJobs}
             color="bg-blue-50"
             text="All created job posts"
             icon={<FileText size={20} />}
+          />
+
+          <StatsCard
+            title="Draft Jobs"
+            value={draftJobs}
+            color="bg-orange-50"
+            text="Currently receiving applications"
+            icon={<Edit size={20} />}
           />
 
           <StatsCard
@@ -226,10 +233,10 @@ export default function DashboardPage() {
           />
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-6 gap-6">
 
           {/* LEFT */}
-          <div className="xl:col-span-3 space-y-5">
+          <div className="xl:col-span-4 space-y-5">
 
             {/* FILTER */}
             <div className="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm">
@@ -318,7 +325,7 @@ export default function DashboardPage() {
           </div>
 
           {/* RIGHT */}
-          <div className="space-y-5">
+          <div className="xl:col-span-2 space-y-5">
 
             {/* DATE FILTER */}
             <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-4">
@@ -331,6 +338,7 @@ export default function DashboardPage() {
                 selectRange
                 onChange={(value: any) => setDateRange(value)}
                 value={dateRange}
+                className="!w-full"
               />
 
               <button
@@ -374,217 +382,7 @@ export default function DashboardPage() {
 
 /* ========================================================= */
 
-function JobCard({
-  job,
-  router,
-  onChangeStatus,
-  changingStatusId,
-}: any) {
 
-  const { getProvinceName } = useLocation();
-
-  return (
-    <div className="bg-white border border-gray-100 rounded-3xl shadow-sm hover:shadow-md transition overflow-hidden">
-
-      {/* TOP */}
-      <div className="p-6 border-b border-gray-100">
-        <div className="flex items-start justify-between gap-5 flex-wrap">
-
-          {/* LEFT */}
-          <div className="flex gap-4 flex-1 min-w-[300px]">
-
-            <div className="w-16 h-16 rounded-2xl bg-gray-100 overflow-hidden border border-gray-200 flex items-center justify-center">
-              {job.logo_url ? (
-                <img
-                  src={job.logo_url}
-                  alt="company"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <Briefcase size={26} className="text-gray-400" />
-              )}
-            </div>
-
-            <div className="flex-1 space-y-3">
-              <div>
-                <h3 className="font-semibold text-sm text-gray-900 leading-7">
-                  {job.title}
-                </h3>
-
-                <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
-                  <span className="font-medium text-[#00b14f]">
-                    {job.company_name}
-                  </span>
-                  <span>•</span>
-                  <span className="text-xs">
-                    Job ID: #{job.id}
-                  </span>
-                </div>
-              </div>
-
-              {/* META */}
-              <div className="flex flex-wrap gap-3 text-sm">
-                <MetaTag
-                  icon={<CircleDollarSign size={15} />}
-                  text={`${formatSalary(job.salary_min)} - ${formatSalary(job.salary_max)}`}
-                />
-
-                <MetaTag
-                  icon={<Users size={15} />}
-                  text={job.experienceRequired || "No experience data"}
-                />
-
-                <MetaTag
-                  icon={<CalendarDays size={15} />}
-                  text={`Due: ${formatDate(job.dueDate)}`}
-                />
-
-                <MetaTag
-                  icon={<MapPin size={15} />}
-                  text={
-                    job.locations?.length > 0
-                      ? job.locations
-                        .map((l: any) =>
-                          getProvinceName(l.province)
-                        )
-                        .join(", ")
-                      : "Remote / Flexible"
-                  }
-                />
-              </div>
-              <div>
-                <p className="text-xs text-gray-700">{job.description}</p>
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* RIGHT STATUS */}
-          <div className="min-w-[230px] bg-[#f8fafc] rounded-2xl p-4 border border-gray-100">
-
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-medium text-gray-700">
-                Recruitment Status
-              </p>
-
-              <StatusBadge status={job.status} />
-            </div>
-
-            {/* PROCESS */}
-            <div className="mt-4 flex items-center gap-2 text-xs font-medium">
-
-              <Step active>
-                Draft
-              </Step>
-
-              <div className="flex-1 h-[2px] bg-gray-200" />
-
-              <Step
-                active={
-                  job.status === "OPEN" ||
-                  job.status === "CLOSED" ||
-                  job.status === "EXPIRED"
-                }
-              >
-                Open
-              </Step>
-
-              <div className="flex-1 h-[2px] bg-gray-200" />
-
-              <Step
-                active={
-                  job.status === "CLOSED" ||
-                  job.status === "EXPIRED"
-                }
-              >
-                End
-              </Step>
-            </div>
-
-            {/* ACTION */}
-            <div className="mt-4">
-
-              {job.status === "DRAFT" && (
-                <button
-                  disabled={changingStatusId === job.id}
-                  onClick={() =>
-                    onChangeStatus(job.id, "OPEN")
-                  }
-                  className="w-full bg-[#00b14f] hover:bg-[#009245] disabled:opacity-50 text-white py-2.5 rounded-xl text-xs font-medium"
-                >
-                  Publish Job
-                </button>
-              )}
-
-              {job.status === "OPEN" && (
-                <button
-                  disabled={changingStatusId === job.id}
-                  onClick={() =>
-                    onChangeStatus(job.id, "CLOSED")
-                  }
-                  className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white py-2.5 rounded-xl text-xs font-medium"
-                >
-                  Close Recruitment
-                </button>
-              )}
-
-              {job.status === "CLOSED" && (
-                <div className="text-xs text-gray-500 bg-white border border-gray-200 rounded-xl p-3 text-center">
-                  This job was closed manually.
-                </div>
-              )}
-
-              {job.status === "EXPIRED" && (
-                <div className="text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-xl p-3 text-center">
-                  Recruitment expired automatically.
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* BOTTOM */}
-      <div className="px-6 py-4 bg-[#fcfcfd] flex items-center justify-between flex-wrap gap-3">
-
-        <div className="flex flex-wrap gap-2">
-          {(job.tags || []).slice(0, 5).map((tag: string) => (
-            <span
-              key={tag}
-              className="px-3 py-1 rounded-full bg-[#eafaf1] text-[#00b14f] text-xs font-medium"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.push(`/jobs/${job.id}`)}
-            className="border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2"
-          >
-            <Eye size={16} />
-            View Detail
-          </button>
-
-          {(job.status === "OPEN" ||
-            job.status === "DRAFT") && (
-              <button
-                onClick={() =>
-                  router.push(`/recruiter/jobs/edit/${job.id}`)
-                }
-                className="bg-[#00b14f] hover:bg-[#009245] text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2"
-              >
-                <Pencil size={16} />
-                Edit Job
-              </button>
-            )}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /* ========================================================= */
 
@@ -600,7 +398,7 @@ function StatsCard({
       <div className="flex items-start justify-between">
 
         <div>
-          <p className="text-sm text-gray-500">
+          <p className="text-xs text-gray-500">
             {title}
           </p>
 
@@ -608,7 +406,7 @@ function StatsCard({
             {value}
           </h3>
 
-          <p className="text-sm text-gray-400 mt-1">
+          <p className="text-xs text-gray-400 mt-1">
             {text}
           </p>
         </div>
@@ -619,59 +417,4 @@ function StatsCard({
       </div>
     </div>
   );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const styles: any = {
-    OPEN: "bg-green-100 text-green-700 border-green-200",
-    CLOSED: "bg-red-100 text-red-700 border-red-200",
-    EXPIRED: "bg-yellow-100 text-yellow-700 border-yellow-200",
-    DRAFT: "bg-gray-100 text-gray-700 border-gray-200",
-  };
-
-  return (
-    <span
-      className={`px-3 py-1 rounded-full border text-xs font-semibold ${styles[status]}`}
-    >
-      {status}
-    </span>
-  );
-}
-
-function MetaTag({ icon, text }: any) {
-  return (
-    <div className="flex text-xs items-center gap-1 bg-gray-50 border border-gray-100 px-3 py-2 rounded-xl text-gray-700">
-      {icon}
-      <span>{text}</span>
-    </div>
-  );
-}
-
-function Step({ active, children }: any) {
-  return (
-    <div
-      className={`px-2 text-xs py-1 rounded-full transition ${active
-        ? "bg-[#00b14f] text-white"
-        : "bg-gray-200 text-gray-500"
-        }`}
-    >
-      {children}
-    </div>
-  );
-}
-
-function formatDate(date: any) {
-  if (!date) return "N/A";
-
-  return new Date(date).toLocaleDateString();
-}
-
-function formatSalary(value: number) {
-  if (!value) return "0";
-
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-    maximumFractionDigits: 0,
-  }).format(value);
 }

@@ -17,9 +17,9 @@ export default async function JobsPage() {
         <SuggestJobs />
         <TopJobCategories />
 
-       <div>
+       {/* <div>
         <img src="/images/tuvan.png" alt="" />
-       </div>
+       </div> */}
       </div>
     </div>
   );

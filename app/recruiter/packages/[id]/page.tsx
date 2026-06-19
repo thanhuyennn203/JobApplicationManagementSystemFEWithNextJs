@@ -9,7 +9,7 @@ export default async function PackageDetailRoute({
     const { id } = await params;
 
     const packageData = await fetchPackageById(Number(id));
-
+    
     return (
         <PackageDetailPage
             packageData={packageData}

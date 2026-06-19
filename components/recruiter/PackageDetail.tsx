@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { PackageBenefit, PackageData } from "@/types/package";
+import { useRouter } from "next/navigation";
 
 
 interface CartItem {
@@ -64,12 +65,12 @@ interface PackageDetailPageProps {
 
 export default function PackageDetailPage({
     packageData,
-    onBack,
     onAddToCart,
 }: PackageDetailPageProps) {
     const [quantity, setQuantity] = useState(1);
     const [added, setAdded] = useState(false);
     const { addItem } = useCart();
+    const router = useRouter();
 
     const handleAddToCart = () => {
         onAddToCart?.({ packageData, quantity });
@@ -84,6 +85,9 @@ export default function PackageDetailPage({
         ? "linear-gradient(135deg, #14532d 0%, #166534 60%, #15803d 100%)"
         : "linear-gradient(135deg, #166534 0%, #15803d 60%, #16a34a 100%)";
 
+    const onBack = (()=>{
+        router.back();
+    });
     return (
         <div className="min-h-screen bg-[#f4f6f9] font-sans">
             {/* Top nav */}
