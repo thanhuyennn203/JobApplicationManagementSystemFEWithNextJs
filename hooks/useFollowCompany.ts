@@ -12,7 +12,7 @@ export function useFollowCompany(companyId?: number) {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (!auth?.user || !companyId) return;
+        if (!auth?.user?.candidateId || !companyId) return;
 
         const fetch = async () => {
             try {

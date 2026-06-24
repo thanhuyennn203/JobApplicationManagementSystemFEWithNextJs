@@ -5,9 +5,12 @@ import CompanyItem from "@/components/company/CompanyItem";
 import { getTopCompanies } from "@/services/companies/company.service";
 import FieldSlider from "@/components/company/FieldSlider";
 import { useFollowCompany } from "@/hooks/useFollowCompany";
+import { useAuth } from "@/context/AuthContext";
 
 export default function TopCompanies() {
     const [companies, setCompanies] = useState<any[]>([]);
+    const auth = useAuth();
+    const candidateId = auth?.user?.candidateId;
 
     useEffect(() => {
         const fetch = async () => {
@@ -20,8 +23,26 @@ export default function TopCompanies() {
 
     console.log(companies);
     const topCompany = companies[0];
+
     const { isFollowing, loading, toggleFollow } = useFollowCompany(topCompany?.id);
 
+    const formatFollowers = (count) => {
+        if (count >= 1000000) {
+            return `${(count / 1000000)
+                .toFixed(1)
+                .replace(".0", "")
+                .replace(".", ",")}M`;
+        }
+
+        if (count >= 1000) {
+            return `${(count / 1000)
+                .toFixed(1)
+                .replace(".0", "")
+                .replace(".", ",")}k`;
+        }
+
+        return count;
+    };
     return (
         <div className="top-company-page-wrapper">
             <FieldSlider />
@@ -55,9 +76,16 @@ export default function TopCompanies() {
 
                     {/* Bottom */}
                     <div className="banner-featured-company__info">
-                        <div className="number-job">
+                        {/* <div className="number-job">
                             <i className="fa-solid fa-briefcase"></i>
                             <span>{topCompany?.jobCount ?? 0} jobs</span>
+                        </div> */}
+                        <div className="number-job">
+                            <i className="fa-solid fa-user"></i>
+
+                            <span className="followers">
+                                {formatFollowers(topCompany?.followers)} followers
+                            </span>
                         </div>
                         {topCompany?.isPro && (
                             <span className="job-pro-icon">
@@ -79,7 +107,7 @@ export default function TopCompanies() {
                 </div>
                 {/* <div className="list-company"> */}
                 {companies.slice(1, 10).map((company) => (
-                    <CompanyItem key={company.id} company={company} />
+                    <CompanyItem key={company.companyId} company={company} />
                 ))}
                 {/* </div> */}
             </div>

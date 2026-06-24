@@ -7,12 +7,26 @@ import {
 
 const API_URL = "http://localhost:9191/api/jobs";
 
+// const getAuthHeader = () => {
+//   const token = localStorage.getItem("token");
+//   return {
+//     "Authorization": `Bearer ${token}`,
+//     "Content-Type": "application/json",
+//   };
+// };
+
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
-  return {
-    "Authorization": `Bearer ${token}`,
+
+  const headers = {
     "Content-Type": "application/json",
   };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  return headers;
 };
 
 export type FeaturedBoxFilterParams = {
@@ -416,3 +430,83 @@ export async function promoteJob(
     throw new Error(`Failed to promote job: ${res.status} ${res.statusText}`);
   }
 }
+
+export const searchJobs = async (
+  params: {
+    companyName?: string;
+    jobTitle?: string;
+    province?: string;
+    page?: number;
+    size?: number;
+  }
+) => {
+
+  const query =
+    new URLSearchParams();
+
+
+  if(params.companyName)
+    query.append(
+      "companyName",
+      params.companyName
+    );
+
+
+  if(params.jobTitle)
+    query.append(
+      "jobTitle",
+      params.jobTitle
+    );
+
+
+  if(params.province)
+    query.append(
+      "province",
+      params.province
+    );
+
+
+  query.append(
+    "page",
+    String(params.page ?? 0)
+  );
+
+
+  query.append(
+    "size",
+    String(params.size ?? 12)
+  );
+
+
+  const res = await fetch(
+    `http://localhost:9191/api/jobs/top-jobs/search?${query}`
+  );
+
+
+  return res.json();
+};
+
+export const getMatchedJobsForCandidate = async (
+  candidateId: number,
+  page = 0,
+  size = 6
+): Promise<PageResponse<Job>> => {
+
+  const res = await fetch(
+    `http://localhost:9191/api/jobs/top-jobs/candidate/${candidateId}/matched?page=${page}&size=${size}`,
+    {
+      method: "GET",
+      headers: getAuthHeader(),
+    }
+  );
+
+
+  if (!res.ok) {
+    throw new Error(
+      "Failed to fetch matched jobs"
+    );
+  }
+
+
+  return res.json();
+};

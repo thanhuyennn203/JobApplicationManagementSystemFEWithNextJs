@@ -48,6 +48,40 @@ export default function FeaturedBoxJobsWithFilters() {
   }, [filters, page]);
 // console.log(jobsPage?.content);
 
+const getSalaryRange = (code : any) => {
+  switch (code) {
+    case "UNDER_500":
+      return {
+        minSalary: 0,
+        maxSalary: 500,
+      };
+
+    case "500_1000":
+      return {
+        minSalary: 500,
+        maxSalary: 1000,
+      };
+
+    case "1000_2000":
+      return {
+        minSalary: 1000,
+        maxSalary: 2000,
+      };
+
+    case "OVER_2000":
+      return {
+        minSalary: 2000,
+        maxSalary: 9999999999,
+      };
+
+    default:
+      return {
+        minSalary: null,
+        maxSalary: null,
+      };
+  }
+};
+
   return (
     <div className="jobs-by-locations">
       <div className="left">

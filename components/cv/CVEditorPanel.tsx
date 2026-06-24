@@ -42,21 +42,21 @@ export default function CVEditorPanel({
       }`}
     >
       {/* Collapse toggle tab */}
-      <button
+      {/* <button
         onClick={onToggleCollapse}
         className="absolute left-56 top-1/2 -translate-y-1/2 z-20 w-5 h-10 bg-white border border-gray-200 rounded-r-lg flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm"
         title={collapsed ? "Open editor" : "Close editor"}
         style={{ marginLeft: collapsed ? 0 : "320px" }}
       >
         {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
-      </button>
+      </button> */}
 
       {!collapsed && (
         <>
           {/* Panel header */}
           <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
             <p className="text-sm font-semibold text-gray-800 truncate">{panelTitle}</p>
-            <button
+            {/* <button
               onClick={onGenerateAI}
               disabled={generating}
               className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#1e5538] text-white text-xs rounded-lg hover:bg-[#1a4731] disabled:opacity-50 transition-colors flex-shrink-0"
@@ -67,7 +67,7 @@ export default function CVEditorPanel({
                 <Sparkles size={11} />
               )}
               AI Enhance
-            </button>
+            </button> */}
           </div>
 
           {/* Scrollable form content */}

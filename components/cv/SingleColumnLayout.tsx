@@ -126,7 +126,7 @@ function SkillRow({ name, description }: { name: string; description: string }) 
   return (
     <div style={{ display: "flex", gap: "13px", marginBottom: "3px" }}>
       <div style={{ width: "84px", flexShrink: 0, color: "#222", fontSize: "10.5pt", fontWeight: "600" }}>{name}</div>
-      <div style={{ color: "#555", fontSize: "10pt" }}>{description}</div>
+      <div style={{ color: "#555", fontSize: "10pt", paddingLeft:"15px" }}>{description}</div>
     </div>
   );
 }

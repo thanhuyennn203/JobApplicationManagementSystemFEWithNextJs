@@ -17,7 +17,7 @@ export default function AppliedJobsList() {
     const [applications, setApplications] = useState<Application[]>([]);
     const [page, setPage] = useState(1);
 
-    const ITEMS_PER_PAGE = 2;
+    const ITEMS_PER_PAGE = 3;
 
     useEffect(() => {
         const fetchJobsFromApplications = async () => {
@@ -67,7 +67,7 @@ export default function AppliedJobsList() {
                 List <span>{applications.length}</span> applied jobs.
             </h2>
 
-            <div className="saved_jobs_list_grid">
+            <div className="grid grid-col-2 gap-4">
                 {paginatedApplications.map((app) => {
                     const job = jobs.find(
                         (j) => j.id === app.jobId

@@ -9,6 +9,23 @@ export default function CompanyItem({ company }: { company: Company }) {
     const router = useRouter();
     const { isFollowing, loading, toggleFollow } = useFollowCompany(company?.companyId);
 
+    const formatFollowers = (count) => {
+        if (count >= 1000000) {
+            return `${(count / 1000000)
+                .toFixed(1)
+                .replace(".0", "")
+                .replace(".", ",")}M`;
+        }
+
+        if (count >= 1000) {
+            return `${(count / 1000)
+                .toFixed(1)
+                .replace(".0", "")
+                .replace(".", ",")}k`;
+        }
+
+        return count;
+    };
     return (
         <div className="list-company__item" >
             <div>
@@ -44,15 +61,17 @@ export default function CompanyItem({ company }: { company: Company }) {
 
             {/* Bottom */}
             <div className="list-company__item--info">
-                <div className="number-job">
+                {/* <div className="number-job">
                     <i className="fa-solid fa-briefcase"></i>
 
                     <span className="followers">{company.size} 0 jobs</span>
-                </div>
+                </div> */}
                 <div className="number-job">
-                    <i className="fa-solid fa-briefcase"></i>
+                    <i className="fa-solid fa-user"></i>
 
-                    <span className="followers">{company.followers} followers</span>
+                    <span className="followers">
+                        {formatFollowers(company.followers)} followers
+                    </span>                
                 </div>
                 <button
                     className={`btn btn-follow ${isFollowing ? "following" : ""}`}
